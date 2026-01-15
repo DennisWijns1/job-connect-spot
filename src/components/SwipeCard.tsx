@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { HandyCard } from './HandyCard';
 import { ProjectCard } from './ProjectCard';
-import { X, MessageCircle, Heart } from 'lucide-react';
+import { X, Hammer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SwipeCardProps {
@@ -53,21 +53,24 @@ export const SwipeCard = ({
       animate={{ x: exitX }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      {/* Like/Nope overlays */}
+      {/* Like overlay - Hammer */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center bg-success/20 rounded-3xl z-20 pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center bg-accent/20 rounded-3xl z-20 pointer-events-none"
         style={{ opacity: likeOpacity }}
       >
-        <div className="bg-success text-success-foreground px-6 py-3 rounded-2xl font-bold text-2xl rotate-[-15deg] border-4 border-success-foreground">
+        <div className="bg-accent text-accent-foreground px-6 py-3 rounded-2xl font-bold text-2xl rotate-[-15deg] border-4 border-accent-foreground flex items-center gap-2">
+          <Hammer className="w-8 h-8" />
           CHAT
         </div>
       </motion.div>
 
+      {/* Nope overlay - X */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center bg-destructive/20 rounded-3xl z-20 pointer-events-none"
         style={{ opacity: nopeOpacity }}
       >
-        <div className="bg-destructive text-destructive-foreground px-6 py-3 rounded-2xl font-bold text-2xl rotate-[15deg] border-4 border-destructive-foreground">
+        <div className="bg-destructive text-destructive-foreground px-6 py-3 rounded-2xl font-bold text-2xl rotate-[15deg] border-4 border-destructive-foreground flex items-center gap-2">
+          <X className="w-8 h-8" />
           NOPE
         </div>
       </motion.div>
@@ -88,26 +91,21 @@ interface SwipeButtonsProps {
 
 export const SwipeButtons = ({ onSwipeLeft, onSwipeRight }: SwipeButtonsProps) => {
   return (
-    <div className="flex items-center justify-center gap-6 py-6">
+    <div className="flex items-center justify-center gap-8 py-6">
+      {/* X Button - Reject */}
       <button
         onClick={onSwipeLeft}
-        className="w-16 h-16 rounded-full bg-card shadow-card flex items-center justify-center text-destructive hover:scale-110 hover:shadow-card-hover transition-all duration-200 active:scale-95"
+        className="w-16 h-16 rounded-full bg-card shadow-card flex items-center justify-center text-destructive hover:scale-110 hover:shadow-card-hover transition-all duration-200 active:scale-95 border-2 border-destructive/20"
       >
-        <X className="w-8 h-8" />
+        <X className="w-8 h-8" strokeWidth={3} />
       </button>
 
+      {/* Hammer Button - Accept/Chat */}
       <button
         onClick={onSwipeRight}
-        className="w-20 h-20 rounded-full btn-cta flex items-center justify-center hover:scale-110 transition-all duration-200 active:scale-95"
+        className="w-20 h-20 rounded-full btn-cta flex items-center justify-center hover:scale-110 transition-all duration-200 active:scale-95 shadow-lg"
       >
-        <MessageCircle className="w-9 h-9 text-accent-foreground" />
-      </button>
-
-      <button
-        onClick={onSwipeRight}
-        className="w-16 h-16 rounded-full bg-card shadow-card flex items-center justify-center text-success hover:scale-110 hover:shadow-card-hover transition-all duration-200 active:scale-95"
-      >
-        <Heart className="w-8 h-8" />
+        <Hammer className="w-10 h-10 text-accent-foreground" />
       </button>
     </div>
   );
