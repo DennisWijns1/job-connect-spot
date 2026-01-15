@@ -18,7 +18,7 @@ export const HandyCard = ({ handy, className }: HandyCardProps) => {
       )}
     >
       {/* Photo Section */}
-      <div className="relative h-72 overflow-hidden">
+      <div className="relative h-32 overflow-hidden">
         <img
           src={handy.avatar}
           alt={handy.name}
@@ -60,7 +60,7 @@ export const HandyCard = ({ handy, className }: HandyCardProps) => {
       </div>
 
       {/* Info Section */}
-      <div className="p-5">
+      <div className="p-3">
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="font-display font-bold text-xl text-foreground">
@@ -125,28 +125,6 @@ export const HandyCard = ({ handy, className }: HandyCardProps) => {
         </div>
       </div>
 
-      {/* Work Photos Preview */}
-      {handy.workPhotos.length > 0 && (
-        <div className="px-5 pb-5">
-          <p className="text-xs text-muted-foreground mb-2 font-medium">
-            Recente werken
-          </p>
-          <div className="flex gap-2">
-            {handy.workPhotos.slice(0, 2).map((photo, idx) => (
-              <div
-                key={idx}
-                className="flex-1 h-20 rounded-xl overflow-hidden"
-              >
-                <img
-                  src={photo}
-                  alt={`Werk ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { HandyCard } from './HandyCard';
 import { ProjectCard } from './ProjectCard';
-import { X, Hammer } from 'lucide-react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SwipeCardProps {
@@ -59,7 +59,7 @@ export const SwipeCard = ({
         style={{ opacity: likeOpacity }}
       >
         <div className="bg-accent text-accent-foreground px-6 py-3 rounded-2xl font-bold text-2xl rotate-[-15deg] border-4 border-accent-foreground flex items-center gap-2">
-          <Hammer className="w-8 h-8" />
+          <span className="text-3xl">🔨</span>
           CHAT
         </div>
       </motion.div>
@@ -91,11 +91,12 @@ interface SwipeButtonsProps {
 
 export const SwipeButtons = ({ onSwipeLeft, onSwipeRight }: SwipeButtonsProps) => {
   return (
-    <div className="flex items-center justify-center gap-8 py-6">
+    <div className="flex items-center justify-center gap-12 py-4">
       {/* X Button - Reject */}
       <button
         onClick={onSwipeLeft}
-        className="w-16 h-16 rounded-full bg-card shadow-card flex items-center justify-center text-destructive hover:scale-110 hover:shadow-card-hover transition-all duration-200 active:scale-95 border-2 border-destructive/20"
+        className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-destructive hover:scale-110 hover:bg-destructive hover:text-white transition-all duration-200 active:scale-95 border-2 border-destructive/30"
+        aria-label="Weigeren"
       >
         <X className="w-8 h-8" strokeWidth={3} />
       </button>
@@ -103,9 +104,10 @@ export const SwipeButtons = ({ onSwipeLeft, onSwipeRight }: SwipeButtonsProps) =
       {/* Hammer Button - Accept/Chat */}
       <button
         onClick={onSwipeRight}
-        className="w-20 h-20 rounded-full btn-cta flex items-center justify-center hover:scale-110 transition-all duration-200 active:scale-95 shadow-lg"
+        className="w-20 h-20 rounded-full bg-accent shadow-lg flex items-center justify-center hover:scale-110 transition-all duration-200 active:scale-95"
+        aria-label="Accepteren"
       >
-        <Hammer className="w-10 h-10 text-accent-foreground" />
+        <span className="text-4xl">🔨</span>
       </button>
     </div>
   );
