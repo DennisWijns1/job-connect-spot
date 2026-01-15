@@ -42,7 +42,7 @@ const SwipePage = () => {
   const visibleItems = items.slice(currentIndex, currentIndex + 2);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header
         title={isHandy ? 'Projecten' : 'Handy\'s'}
         showFilters
@@ -53,9 +53,9 @@ const SwipePage = () => {
         onOpenFilters={() => setIsFilterOpen(true)}
       />
 
-      <div className="px-4 pt-4">
+      <div className="flex-1 px-4 py-2 flex flex-col">
         {/* Card Stack */}
-        <div className="relative h-[520px]">
+        <div className="relative flex-1 min-h-[300px] max-h-[400px] w-full max-w-md mx-auto">
           <AnimatePresence>
             {visibleItems.map((item, index) => (
               <SwipeCard
@@ -90,12 +90,17 @@ const SwipePage = () => {
 
         {/* Swipe Buttons */}
         {visibleItems.length > 0 && (
-          <SwipeButtons
-            onSwipeLeft={handleSwipeLeft}
-            onSwipeRight={handleSwipeRight}
-          />
+          <div className="w-full max-w-md mx-auto">
+            <SwipeButtons
+              onSwipeLeft={handleSwipeLeft}
+              onSwipeRight={handleSwipeRight}
+            />
+          </div>
         )}
       </div>
+
+      {/* Spacer for bottom nav */}
+      <div className="h-20" />
 
       {!isHandy && <EmergencyButton />}
       <BottomNav />
