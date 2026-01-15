@@ -12,6 +12,7 @@ interface SwipeCardProps {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   isTop: boolean;
+  onCardClick?: () => void;
 }
 
 export const SwipeCard = ({
@@ -20,6 +21,7 @@ export const SwipeCard = ({
   onSwipeLeft,
   onSwipeRight,
   isTop,
+  onCardClick,
 }: SwipeCardProps) => {
   const [exitX, setExitX] = useState(0);
   const x = useMotionValue(0);
@@ -75,11 +77,19 @@ export const SwipeCard = ({
         </div>
       </motion.div>
 
-      {type === 'handy' ? (
-        <HandyCard handy={item as HandyProfile} />
-      ) : (
-        <ProjectCard project={item as Project} />
-      )}
+      <div onClick={(e) => {
+        // Only trigger click if not dragging
+        if (onCardClick && Math.abs(x.get()) < 10) {
+          e.stopPropagation();
+          onCardClick();
+        }
+      }}>
+        {type === 'handy' ? (
+          <HandyCard handy={item as HandyProfile} />
+        ) : (
+          <ProjectCard project={item as Project} />
+        )}
+      </div>
     </motion.div>
   );
 };
