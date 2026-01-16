@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -11,6 +11,7 @@ import { FilterModal } from '@/components/FilterModal';
 import { HandyProfile } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 
 const SwipePage = () => {
   const navigate = useNavigate();
@@ -188,6 +189,16 @@ const SwipePage = () => {
       <BottomNav />
       <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
       
+      {/* Floating Search Button - to reopen problem dialog */}
+      {!isHandy && !showProblemDialog && (
+        <button
+          onClick={() => setShowProblemDialog(true)}
+          className="fixed bottom-28 right-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
+        >
+          <Search className="w-6 h-6" />
+        </button>
+      )}
+
       {/* Problem Input Dialog - Only for seekers */}
       <ProblemInputDialog
         isOpen={showProblemDialog}
