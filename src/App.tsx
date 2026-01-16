@@ -12,6 +12,7 @@ import ChatsPage from "./pages/ChatsPage";
 import ChatDetailPage from "./pages/ChatDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import LearningPage from "./pages/LearningPage";
+import QuickCallPage from "./pages/QuickCallPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/chat/:id" element={<ChatDetailPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/learn" element={<LearningPage />} />
+          <Route path="/quick-call" element={<QuickCallPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

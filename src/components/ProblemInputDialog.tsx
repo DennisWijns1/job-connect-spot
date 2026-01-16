@@ -44,46 +44,43 @@ export const ProblemInputDialog = ({ isOpen, onClose, onSubmit }: ProblemInputDi
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50"
           />
 
-          {/* Dialog */}
+          {/* Dialog - Smaller and centered at bottom */}
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.95 }}
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.95 }}
+            exit={{ opacity: 0, y: 50, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl p-6 pb-8 shadow-2xl max-h-[80vh] overflow-y-auto"
+            className="fixed bottom-4 left-4 right-4 z-50 bg-card rounded-2xl p-5 shadow-card-hover max-w-md mx-auto border border-border"
           >
-            {/* Handle bar */}
-            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-4" />
-
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
             >
-              <X className="w-5 h-5 text-secondary" />
+              <X className="w-4 h-4 text-muted-foreground" />
             </button>
 
             {/* Title */}
-            <div className="mb-6">
-              <h2 className="font-display font-bold text-xl text-foreground mb-2">
+            <div className="mb-4 pr-8">
+              <h2 className="font-display font-bold text-lg text-foreground">
                 Wat is je probleem?
               </h2>
-              <p className="text-secondary text-sm">
-                Beschrijf kort wat je nodig hebt, we filteren direct op de juiste handy's
+              <p className="text-muted-foreground text-sm">
+                We filteren direct op de juiste handy's
               </p>
             </div>
 
             {/* Search input */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 value={problem}
                 onChange={(e) => setProblem(e.target.value)}
-                placeholder="Bijv. 'de kraan lekt' of 'lamp ophangen'"
-                className="pl-12 pr-4 h-14 text-base rounded-2xl border-2 border-border focus:border-primary bg-background"
+                placeholder="Bijv. 'de kraan lekt'"
+                className="pl-10 pr-4 h-12 text-sm rounded-xl border-border focus:border-primary bg-background text-foreground placeholder:text-muted-foreground"
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               />
             </div>
@@ -92,27 +89,27 @@ export const ProblemInputDialog = ({ isOpen, onClose, onSubmit }: ProblemInputDi
             <Button
               onClick={handleSubmit}
               disabled={!problem.trim()}
-              className="w-full h-14 rounded-2xl text-base font-semibold mb-6"
+              className="w-full h-11 rounded-xl text-sm font-semibold mb-4 bg-gradient-to-r from-primary to-primary/90 hover:brightness-110"
             >
-              <Search className="w-5 h-5 mr-2" />
+              <Search className="w-4 h-4 mr-2" />
               Zoek Handy's
             </Button>
 
             {/* Suggestions */}
-            <div className="mb-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium text-secondary">Populaire problemen</span>
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb className="w-3.5 h-3.5 text-accent" />
+                <span className="text-xs font-medium text-muted-foreground">Populaire problemen</span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {suggestionPrompts.map((suggestion, index) => (
+              <div className="flex flex-wrap gap-2">
+                {suggestionPrompts.slice(0, 4).map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion.text)}
-                    className="flex items-center gap-2 p-3 rounded-xl bg-muted hover:bg-muted/80 transition-colors text-left"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
                   >
-                    <span className="text-xl">{suggestion.icon}</span>
-                    <span className="text-sm text-foreground">{suggestion.text}</span>
+                    <span className="text-base">{suggestion.icon}</span>
+                    <span className="text-xs text-foreground group-hover:text-primary transition-colors">{suggestion.text}</span>
                   </button>
                 ))}
               </div>
@@ -121,7 +118,7 @@ export const ProblemInputDialog = ({ isOpen, onClose, onSubmit }: ProblemInputDi
             {/* Skip button */}
             <button
               onClick={onClose}
-              className="w-full py-3 text-secondary text-sm hover:text-foreground transition-colors"
+              className="w-full py-2 text-muted-foreground text-xs hover:text-foreground transition-colors"
             >
               Overslaan en direct beginnen swipen →
             </button>

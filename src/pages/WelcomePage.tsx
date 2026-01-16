@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Hammer, Wrench, Search, ArrowRight } from 'lucide-react';
+import { Hammer, Wrench, Search, ArrowRight, GraduationCap } from 'lucide-react';
 
 const WelcomePage = () => {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState<'handy' | 'seeker' | null>(null);
+  const [selectedType, setSelectedType] = useState<'handy' | 'seeker' | 'instructor' | null>(null);
 
   const handleContinue = () => {
     if (selectedType) {
@@ -14,7 +14,7 @@ const WelcomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
       {/* Header */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Logo */}
@@ -24,7 +24,7 @@ const WelcomePage = () => {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="w-24 h-24 rounded-3xl bg-primary flex items-center justify-center shadow-lg">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
             <Hammer className="w-12 h-12 text-primary-foreground" />
           </div>
         </motion.div>
@@ -34,12 +34,12 @@ const WelcomePage = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
           <h1 className="font-display font-extrabold text-4xl text-foreground mb-3">
-            Handy<span className="text-accent">Match</span>
+            Handy<span className="text-gradient">Match</span>
           </h1>
-          <p className="text-secondary text-lg max-w-xs mx-auto">
+          <p className="text-muted-foreground text-lg max-w-xs mx-auto">
             Vind de juiste hulp in je buurt, of bied je vaardigheden aan
           </p>
         </motion.div>
@@ -49,28 +49,30 @@ const WelcomePage = () => {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="w-full max-w-sm space-y-4"
+          className="w-full max-w-sm space-y-3"
         >
           {/* Handy Card */}
           <button
             onClick={() => setSelectedType('handy')}
-            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left ${
+            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
               selectedType === 'handy'
-                ? 'border-primary bg-primary/5 shadow-card'
-                : 'border-border bg-card hover:border-primary/50 hover:shadow-soft'
+                ? 'border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-card'
+                : 'border-border bg-card hover:border-primary/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-primary/5'
             }`}
           >
             <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${
-                selectedType === 'handy' ? 'bg-primary' : 'bg-primary/10'
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                selectedType === 'handy' 
+                  ? 'bg-gradient-to-br from-primary to-primary/80' 
+                  : 'bg-primary/10 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-primary/10'
               }`}>
-                <Wrench className={`w-7 h-7 ${selectedType === 'handy' ? 'text-primary-foreground' : 'text-primary'}`} />
+                <Wrench className={`w-7 h-7 transition-colors ${selectedType === 'handy' ? 'text-primary-foreground' : 'text-primary'}`} />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
                   Ik ben een Handy
                 </h3>
-                <p className="text-secondary text-sm">
+                <p className="text-muted-foreground text-sm">
                   Ik wil mijn vaardigheden aanbieden en klussen uitvoeren
                 </p>
               </div>
@@ -80,24 +82,54 @@ const WelcomePage = () => {
           {/* Seeker Card */}
           <button
             onClick={() => setSelectedType('seeker')}
-            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left ${
+            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
               selectedType === 'seeker'
-                ? 'border-primary bg-primary/5 shadow-card'
-                : 'border-border bg-card hover:border-primary/50 hover:shadow-soft'
+                ? 'border-accent bg-gradient-to-r from-accent/10 to-accent/5 shadow-card'
+                : 'border-border bg-card hover:border-accent/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-accent/5'
             }`}
           >
             <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${
-                selectedType === 'seeker' ? 'bg-accent' : 'bg-accent/10'
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                selectedType === 'seeker' 
+                  ? 'bg-gradient-to-br from-accent to-accent/80' 
+                  : 'bg-accent/10 group-hover:bg-gradient-to-br group-hover:from-accent/20 group-hover:to-accent/10'
               }`}>
-                <Search className={`w-7 h-7 ${selectedType === 'seeker' ? 'text-accent-foreground' : 'text-accent'}`} />
+                <Search className={`w-7 h-7 transition-colors ${selectedType === 'seeker' ? 'text-accent-foreground' : 'text-accent'}`} />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
                   Ik zoek een Handy
                 </h3>
-                <p className="text-secondary text-sm">
+                <p className="text-muted-foreground text-sm">
                   Ik heb hulp nodig bij een klus of project
+                </p>
+              </div>
+            </div>
+          </button>
+
+          {/* Instructor Card */}
+          <button
+            onClick={() => setSelectedType('instructor')}
+            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
+              selectedType === 'instructor'
+                ? 'border-success bg-gradient-to-r from-success/10 to-success/5 shadow-card'
+                : 'border-border bg-card hover:border-success/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-success/5'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                selectedType === 'instructor' 
+                  ? 'bg-gradient-to-br from-success to-success/80' 
+                  : 'bg-success/10 group-hover:bg-gradient-to-br group-hover:from-success/20 group-hover:to-success/10'
+              }`}>
+                <GraduationCap className={`w-7 h-7 transition-colors ${selectedType === 'instructor' ? 'text-success-foreground' : 'text-success'}`} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-display font-bold text-lg text-foreground mb-1">
+                  Ik ben een Lesgever
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Ik wil mijn kennis delen en anderen opleiden
                 </p>
               </div>
             </div>
