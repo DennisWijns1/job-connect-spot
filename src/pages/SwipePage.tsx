@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -6,9 +6,10 @@ import { EmergencyButton } from '@/components/EmergencyButton';
 import { SwipeCard, SwipeButtons } from '@/components/SwipeCard';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
+import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { FilterModal } from '@/components/FilterModal';
-import { HandyProfile } from '@/types/handymatch';
+import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -18,15 +19,30 @@ const SwipePage = () => {
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = userType === 'handy';
 
+  // Check if problem dialog was already shown (only show first time for seekers)
+  const [hasShownProblemDialog, setHasShownProblemDialog] = useState(() => {
+    return localStorage.getItem('handymatch_problemDialogShown') === 'true';
+  });
+
   const [allItems] = useState(isHandy ? mockProjects : mockHandyProfiles);
   const [filteredItems, setFilteredItems] = useState(allItems);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
-  const [showProblemDialog, setShowProblemDialog] = useState(!isHandy);
+  const [showProblemDialog, setShowProblemDialog] = useState(!isHandy && !hasShownProblemDialog);
   const [selectedHandy, setSelectedHandy] = useState<HandyProfile | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
   const [currentProblem, setCurrentProblem] = useState<string | null>(null);
+
+  // Mark problem dialog as shown when it's closed
+  useEffect(() => {
+    if (!showProblemDialog && !hasShownProblemDialog && !isHandy) {
+      localStorage.setItem('handymatch_problemDialogShown', 'true');
+      setHasShownProblemDialog(true);
+    }
+  }, [showProblemDialog, hasShownProblemDialog, isHandy]);
 
   const filterByProblem = useCallback((problem: string) => {
     const lowerProblem = problem.toLowerCase();
@@ -104,10 +120,13 @@ const SwipePage = () => {
     }
   }, [currentIndex, filteredItems]);
 
-  const handleCardClick = useCallback((item: HandyProfile) => {
+  const handleCardClick = useCallback((item: HandyProfile | Project) => {
     if (!isHandy) {
-      setSelectedHandy(item);
+      setSelectedHandy(item as HandyProfile);
       setShowDetailModal(true);
+    } else {
+      setSelectedProject(item as Project);
+      setShowProjectModal(true);
     }
   }, [isHandy]);
 
@@ -120,6 +139,13 @@ const SwipePage = () => {
       navigate('/chats');
     }
   }, [selectedHandy, navigate]);
+
+  const handleApplyForProject = useCallback(() => {
+    setShowProjectModal(false);
+    if (currentIndex < filteredItems.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    }
+  }, [currentIndex, filteredItems.length]);
 
   const visibleItems = filteredItems.slice(currentIndex, currentIndex + 2);
 
@@ -147,7 +173,7 @@ const SwipePage = () => {
                 onSwipeLeft={handleSwipeLeft}
                 onSwipeRight={handleSwipeRight}
                 isTop={index === 0}
-                onCardClick={!isHandy ? () => handleCardClick(item as HandyProfile) : undefined}
+                onCardClick={() => handleCardClick(item)}
               />
             ))}
           </AnimatePresence>
@@ -212,6 +238,14 @@ const SwipePage = () => {
         isOpen={showDetailModal}
         onClose={() => setShowDetailModal(false)}
         onContact={handleContactFromDetail}
+      />
+
+      {/* Project Detail Modal (for Handy users) */}
+      <ProjectDetailModal
+        project={selectedProject}
+        isOpen={showProjectModal}
+        onClose={() => setShowProjectModal(false)}
+        onApply={handleApplyForProject}
       />
     </div>
   );

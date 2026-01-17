@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Hammer, Wrench, Search, ArrowRight, GraduationCap } from 'lucide-react';
+import { Hammer, Wrench, Search, GraduationCap } from 'lucide-react';
 
 const WelcomePage = () => {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState<'handy' | 'seeker' | 'instructor' | null>(null);
 
-  const handleContinue = () => {
-    if (selectedType) {
-      navigate('/login', { state: { userType: selectedType } });
-    }
+  // Check if user is already logged in
+  const isLoggedIn = localStorage.getItem('handymatch_user');
+  if (isLoggedIn) {
+    // Redirect to swipe page immediately
+    navigate('/swipe', { replace: true });
+    return null;
+  }
+
+  const handleSelect = (type: 'handy' | 'seeker' | 'instructor') => {
+    // Navigate directly to login with the selected type
+    navigate('/login', { state: { userType: type } });
   };
 
   return (
@@ -53,20 +59,12 @@ const WelcomePage = () => {
         >
           {/* Seeker Card - FIRST */}
           <button
-            onClick={() => setSelectedType('seeker')}
-            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
-              selectedType === 'seeker'
-                ? 'border-accent bg-gradient-to-r from-accent/10 to-accent/5 shadow-card'
-                : 'border-border bg-card hover:border-accent/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-accent/5'
-            }`}
+            onClick={() => handleSelect('seeker')}
+            className="w-full p-5 rounded-2xl border-2 border-border bg-card hover:border-accent/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-accent/5 transition-all duration-300 text-left group"
           >
             <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                selectedType === 'seeker' 
-                  ? 'bg-gradient-to-br from-accent to-accent/80' 
-                  : 'bg-accent/10 group-hover:bg-gradient-to-br group-hover:from-accent/20 group-hover:to-accent/10'
-              }`}>
-                <Search className={`w-7 h-7 transition-colors ${selectedType === 'seeker' ? 'text-accent-foreground' : 'text-accent'}`} />
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-accent/10 group-hover:bg-gradient-to-br group-hover:from-accent/20 group-hover:to-accent/10">
+                <Search className="w-7 h-7 transition-colors text-accent" />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
@@ -81,20 +79,12 @@ const WelcomePage = () => {
 
           {/* Handy Card - SECOND */}
           <button
-            onClick={() => setSelectedType('handy')}
-            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
-              selectedType === 'handy'
-                ? 'border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-card'
-                : 'border-border bg-card hover:border-primary/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-primary/5'
-            }`}
+            onClick={() => handleSelect('handy')}
+            className="w-full p-5 rounded-2xl border-2 border-border bg-card hover:border-primary/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-primary/5 transition-all duration-300 text-left group"
           >
             <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                selectedType === 'handy' 
-                  ? 'bg-gradient-to-br from-primary to-primary/80' 
-                  : 'bg-primary/10 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-primary/10'
-              }`}>
-                <Wrench className={`w-7 h-7 transition-colors ${selectedType === 'handy' ? 'text-primary-foreground' : 'text-primary'}`} />
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-primary/10 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-primary/10">
+                <Wrench className="w-7 h-7 transition-colors text-primary" />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
@@ -109,20 +99,12 @@ const WelcomePage = () => {
 
           {/* Instructor Card - THIRD */}
           <button
-            onClick={() => setSelectedType('instructor')}
-            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
-              selectedType === 'instructor'
-                ? 'border-success bg-gradient-to-r from-success/10 to-success/5 shadow-card'
-                : 'border-border bg-card hover:border-success/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-success/5'
-            }`}
+            onClick={() => handleSelect('instructor')}
+            className="w-full p-5 rounded-2xl border-2 border-border bg-card hover:border-success/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-success/5 transition-all duration-300 text-left group"
           >
             <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                selectedType === 'instructor' 
-                  ? 'bg-gradient-to-br from-success to-success/80' 
-                  : 'bg-success/10 group-hover:bg-gradient-to-br group-hover:from-success/20 group-hover:to-success/10'
-              }`}>
-                <GraduationCap className={`w-7 h-7 transition-colors ${selectedType === 'instructor' ? 'text-success-foreground' : 'text-success'}`} />
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-success/10 group-hover:bg-gradient-to-br group-hover:from-success/20 group-hover:to-success/10">
+                <GraduationCap className="w-7 h-7 transition-colors text-success" />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
@@ -136,27 +118,6 @@ const WelcomePage = () => {
           </button>
         </motion.div>
       </div>
-
-      {/* Bottom CTA */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="p-6 safe-area-bottom"
-      >
-        <button
-          onClick={handleContinue}
-          disabled={!selectedType}
-          className={`w-full py-4 px-6 rounded-2xl font-semibold text-lg flex items-center justify-center gap-3 transition-all duration-300 ${
-            selectedType
-              ? 'btn-cta'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
-          }`}
-        >
-          Aan de slag
-          <ArrowRight className="w-5 h-5" />
-        </button>
-      </motion.div>
     </div>
   );
 };

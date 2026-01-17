@@ -63,7 +63,7 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 bg-black/50 z-50"
           />
 
           {/* Modal */}
@@ -72,37 +72,40 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 top-12 z-50 bg-card rounded-t-3xl overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 top-12 z-50 bg-background rounded-t-3xl overflow-hidden flex flex-col"
           >
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-foreground/20 backdrop-blur-sm flex items-center justify-center hover:bg-foreground/30 transition-colors"
             >
               <X className="w-5 h-5 text-white" />
             </button>
 
             {/* Photo gallery */}
-            <div className="relative h-64 bg-muted flex-shrink-0">
+            <div className="relative h-72 bg-muted flex-shrink-0">
               <img
                 src={photos[currentPhotoIndex]}
                 alt={`Werk foto ${currentPhotoIndex + 1}`}
                 className="w-full h-full object-cover"
               />
               
+              {/* Gradient overlay for better contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              
               {photos.length > 1 && (
                 <>
                   <button
                     onClick={prevPhoto}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-lg"
                   >
-                    <ChevronLeft className="w-6 h-6 text-white" />
+                    <ChevronLeft className="w-6 h-6 text-foreground" />
                   </button>
                   <button
                     onClick={nextPhoto}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-lg"
                   >
-                    <ChevronRight className="w-6 h-6 text-white" />
+                    <ChevronRight className="w-6 h-6 text-foreground" />
                   </button>
                   
                   {/* Photo indicators */}
@@ -111,7 +114,7 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
                       <button
                         key={index}
                         onClick={() => setCurrentPhotoIndex(index)}
-                        className={`w-2 h-2 rounded-full transition-colors ${
+                        className={`w-2.5 h-2.5 rounded-full transition-colors shadow-sm ${
                           index === currentPhotoIndex ? 'bg-white' : 'bg-white/50'
                         }`}
                       />
@@ -122,13 +125,13 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 bg-background">
               {/* Header */}
               <div className="flex items-start gap-4 mb-6">
                 <img
                   src={handy.avatar}
                   alt={handy.name}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-card shadow-lg"
+                  className="w-16 h-16 rounded-full object-cover border-3 border-primary/20 shadow-lg ring-2 ring-white"
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -139,7 +142,7 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
                       <Shield className="w-5 h-5 text-primary fill-primary/20" />
                     )}
                   </div>
-                  <p className="text-secondary text-sm mb-2">{handy.specialty}</p>
+                  <p className="text-primary font-medium text-sm mb-2">{handy.specialty}</p>
                   <HammerRating rating={handy.rating} size="sm" showCount reviewCount={handy.reviewCount} />
                 </div>
               </div>
@@ -147,47 +150,52 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
               {/* Badges */}
               <div className="flex flex-wrap gap-2 mb-6">
                 {handy.isProfessional && (
-                  <Badge className="bg-primary/10 text-primary border-primary/20">
+                  <Badge className="bg-primary/10 text-primary border-primary/20 border font-medium">
                     <Award className="w-3 h-3 mr-1" />
                     Professioneel
                   </Badge>
                 )}
                 {handy.isVerified && (
-                  <Badge className="bg-accent/10 text-accent border-accent/20">
+                  <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 border font-medium">
                     <Shield className="w-3 h-3 mr-1" />
                     Geverifieerd diploma
                   </Badge>
                 )}
-                <Badge variant="outline" className="text-secondary">
+                <Badge variant="outline" className="text-muted-foreground border-border">
                   <MapPin className="w-3 h-3 mr-1" />
                   {handy.distance} km
                 </Badge>
-                <Badge variant="outline" className="text-secondary">
+                <Badge variant="outline" className="text-muted-foreground border-border">
                   <Clock className="w-3 h-3 mr-1" />
                   {handy.experience}
                 </Badge>
               </div>
 
               {/* Price */}
-              <div className="bg-muted rounded-2xl p-4 mb-6">
-                <div className="text-sm text-secondary mb-1">Tarief</div>
+              <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl p-4 mb-6 border border-primary/10">
+                <div className="text-sm text-muted-foreground mb-1">Tarief</div>
                 <div className="font-display font-bold text-2xl text-foreground">
                   {handy.isQuoteBased ? (
-                    'Offerte op maat'
+                    <span className="text-primary">Offerte op maat</span>
                   ) : (
-                    <>€{handy.hourlyRate}<span className="text-base font-normal text-secondary">/uur</span></>
+                    <>
+                      <span className="text-primary">€{handy.hourlyRate}</span>
+                      <span className="text-base font-normal text-muted-foreground">/uur</span>
+                    </>
                   )}
                 </div>
               </div>
 
               {/* About */}
               <div className="mb-6">
-                <h3 className="font-display font-semibold text-lg text-foreground mb-2">
+                <h3 className="font-display font-semibold text-lg text-foreground mb-3">
                   Over {handy.name.split(' ')[0]}
                 </h3>
-                <p className="text-secondary leading-relaxed">
-                  {handy.description}
-                </p>
+                <div className="bg-card rounded-2xl p-4 border border-border">
+                  <p className="text-foreground leading-relaxed">
+                    {handy.description}
+                  </p>
+                </div>
               </div>
 
               {/* Specialties */}
@@ -197,7 +205,7 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {handy.specialties.map((specialty, index) => (
-                    <Badge key={index} variant="secondary" className="rounded-full">
+                    <Badge key={index} className="rounded-full bg-accent/10 text-accent border-accent/20 border font-medium">
                       {specialty}
                     </Badge>
                   ))}
@@ -209,21 +217,21 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
                 <h3 className="font-display font-semibold text-lg text-foreground mb-3">
                   Reviews ({handy.reviewCount})
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {mockReviews.map((review) => (
-                    <div key={review.id} className="bg-muted rounded-xl p-4">
+                    <div key={review.id} className="bg-card rounded-2xl p-4 border border-border">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-foreground">{review.author}</span>
-                        <span className="text-xs text-secondary">{review.date}</span>
+                        <span className="font-semibold text-foreground">{review.author}</span>
+                        <span className="text-xs text-muted-foreground">{review.date}</span>
                       </div>
                       <div className="flex items-center gap-1 mb-2">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={`text-sm ${i < review.rating ? '' : 'opacity-30'}`}>
+                          <span key={i} className={`text-sm ${i < review.rating ? 'text-accent' : 'opacity-30'}`}>
                             🔨
                           </span>
                         ))}
                       </div>
-                      <p className="text-secondary text-sm">{review.text}</p>
+                      <p className="text-muted-foreground text-sm">{review.text}</p>
                     </div>
                   ))}
                 </div>
@@ -251,7 +259,7 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
 
             {/* CTA Button */}
             <div className="p-4 border-t border-border bg-card flex-shrink-0">
-              <Button onClick={onContact} className="w-full h-14 rounded-2xl text-base font-semibold">
+              <Button onClick={onContact} className="w-full h-14 rounded-2xl text-base font-semibold bg-accent hover:bg-accent/90 text-accent-foreground">
                 <span className="mr-2">💬</span>
                 Start Gesprek
               </Button>

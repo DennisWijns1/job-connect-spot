@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Search as SearchIcon } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { categories } from '@/data/mockData';
 import { Badge } from '@/components/ui/badge';
 
@@ -17,6 +18,7 @@ export const FilterModal = ({ isOpen, onClose }: FilterModalProps) => {
   const [maxHourlyRate, setMaxHourlyRate] = useState([50]);
   const [professionalOnly, setProfessionalOnly] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -25,6 +27,11 @@ export const FilterModal = ({ isOpen, onClose }: FilterModalProps) => {
         : [...prev, category]
     );
   };
+
+  // Filter categories based on search query
+  const filteredCategories = categories.filter(cat =>
+    cat.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (!isOpen) return null;
 
@@ -58,11 +65,24 @@ export const FilterModal = ({ isOpen, onClose }: FilterModalProps) => {
         </div>
 
         <div className="p-6 space-y-8">
-          {/* Categories */}
+          {/* Categories with Search */}
           <div>
             <h3 className="font-semibold text-foreground mb-3">Categorie</h3>
+            
+            {/* Search input */}
+            <div className="relative mb-3">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Zoek specifiek..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-10 rounded-xl border-border bg-background text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+            
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
+              {filteredCategories.map((category) => (
                 <Badge
                   key={category}
                   variant={selectedCategories.includes(category) ? 'default' : 'outline'}
@@ -76,6 +96,9 @@ export const FilterModal = ({ isOpen, onClose }: FilterModalProps) => {
                   {category}
                 </Badge>
               ))}
+              {filteredCategories.length === 0 && searchQuery && (
+                <p className="text-muted-foreground text-sm">Geen categorieën gevonden voor "{searchQuery}"</p>
+              )}
             </div>
           </div>
 
