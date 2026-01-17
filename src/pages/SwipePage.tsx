@@ -135,9 +135,9 @@ const SwipePage = () => {
         onOpenFilters={() => setIsFilterOpen(true)}
       />
 
-      <div className="flex-1 px-4 py-2 flex flex-col">
+      <div className="flex-1 px-4 py-2 flex flex-col overflow-hidden">
         {/* Card Stack */}
-        <div className="relative flex-1 min-h-[300px] max-h-[400px] w-full max-w-md mx-auto">
+        <div className="relative flex-1 min-h-[280px] max-h-[320px] w-full max-w-md mx-auto">
           <AnimatePresence>
             {visibleItems.map((item, index) => (
               <SwipeCard
@@ -171,9 +171,9 @@ const SwipePage = () => {
           )}
         </div>
 
-        {/* Swipe Buttons */}
+        {/* Swipe Buttons - Fixed position above bottom nav */}
         {visibleItems.length > 0 && (
-          <div className="w-full max-w-md mx-auto">
+          <div className="w-full max-w-md mx-auto py-4 mt-auto">
             <SwipeButtons
               onSwipeLeft={handleSwipeLeft}
               onSwipeRight={handleSwipeRight}
@@ -183,7 +183,7 @@ const SwipePage = () => {
       </div>
 
       {/* Spacer for bottom nav */}
-      <div className="h-20" />
+      <div className="h-24" />
 
       {!isHandy && <EmergencyButton />}
       <BottomNav />
