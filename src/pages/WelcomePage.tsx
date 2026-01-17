@@ -51,35 +51,7 @@ const WelcomePage = () => {
           transition={{ delay: 0.4 }}
           className="w-full max-w-sm space-y-3"
         >
-          {/* Handy Card */}
-          <button
-            onClick={() => setSelectedType('handy')}
-            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
-              selectedType === 'handy'
-                ? 'border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-card'
-                : 'border-border bg-card hover:border-primary/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-primary/5'
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                selectedType === 'handy' 
-                  ? 'bg-gradient-to-br from-primary to-primary/80' 
-                  : 'bg-primary/10 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-primary/10'
-              }`}>
-                <Wrench className={`w-7 h-7 transition-colors ${selectedType === 'handy' ? 'text-primary-foreground' : 'text-primary'}`} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                  Ik ben een Handy
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  Ik wil mijn vaardigheden aanbieden en klussen uitvoeren
-                </p>
-              </div>
-            </div>
-          </button>
-
-          {/* Seeker Card */}
+          {/* Seeker Card - FIRST */}
           <button
             onClick={() => setSelectedType('seeker')}
             className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
@@ -107,7 +79,35 @@ const WelcomePage = () => {
             </div>
           </button>
 
-          {/* Instructor Card */}
+          {/* Handy Card - SECOND */}
+          <button
+            onClick={() => setSelectedType('handy')}
+            className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
+              selectedType === 'handy'
+                ? 'border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-card'
+                : 'border-border bg-card hover:border-primary/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-primary/5'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                selectedType === 'handy' 
+                  ? 'bg-gradient-to-br from-primary to-primary/80' 
+                  : 'bg-primary/10 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-primary/10'
+              }`}>
+                <Wrench className={`w-7 h-7 transition-colors ${selectedType === 'handy' ? 'text-primary-foreground' : 'text-primary'}`} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-display font-bold text-lg text-foreground mb-1">
+                  Ik ben een Handy
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Ik wil mijn vaardigheden aanbieden en klussen uitvoeren
+                </p>
+              </div>
+            </div>
+          </button>
+
+          {/* Instructor Card - THIRD */}
           <button
             onClick={() => setSelectedType('instructor')}
             className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
