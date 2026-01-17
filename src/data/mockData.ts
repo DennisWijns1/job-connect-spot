@@ -139,8 +139,11 @@ export const mockProjects: Project[] = [
   {
     id: '1',
     title: 'Stopcontact vervangen in keuken',
-    description: 'Oud stopcontact werkt niet meer goed, moet vervangen worden. Liefst deze week nog.',
-    photos: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop'],
+    description: 'Ons stopcontact in de keuken werkt niet meer goed. Soms valt de stroom weg als we er iets in pluggen. Het stopcontact ziet er ook wat vergeeld uit en ik denk dat het vervangen moet worden. Het zit naast het aanrecht, dus makkelijk bereikbaar. Liefst deze week nog opgelost want we kunnen onze koffiemachine niet gebruiken.',
+    photos: [
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=400&fit=crop',
+    ],
     location: 'Leuven Centrum',
     postedBy: 'Sophie',
     postedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
@@ -150,8 +153,12 @@ export const mockProjects: Project[] = [
   {
     id: '2',
     title: 'Tuin winterklaar maken',
-    description: 'Zoek iemand om mijn tuin winterklaar te maken. Hagen snoeien, bladeren ruimen, etc.',
-    photos: ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop'],
+    description: 'Onze tuin moet winterklaar gemaakt worden. De hagen zijn behoorlijk uitgegroeid (ongeveer 15 meter lang) en moeten gesnoeid worden. Er liggen ook veel bladeren die opgeruimd moeten worden. Daarnaast zouden enkele planten afgedekt moeten worden tegen de vorst. De tuin is ongeveer 200m². Materiaal is aanwezig, alleen hulp nodig.',
+    photos: [
+      'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1558904541-efa843a96f01?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&h=400&fit=crop',
+    ],
     location: 'Heverlee',
     postedBy: 'Marc',
     postedAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
@@ -161,13 +168,44 @@ export const mockProjects: Project[] = [
   {
     id: '3',
     title: 'DRINGEND: Waterlek onder spoelbak',
-    description: 'Water druppelt constant. Heb emmers gezet maar moet snel opgelost worden!',
-    photos: ['https://images.unsplash.com/photo-1585704032915-c3400305e979?w=600&h=400&fit=crop'],
+    description: 'Er is een waterlek onder onze spoelbak in de keuken! Het water druppelt constant uit de afvoerbuis. Ik heb emmers en handdoeken gelegd maar het moet echt snel opgelost worden. Ik vermoed dat er iets los zit bij de sifon of de aansluiting. Graag zo snel mogelijk iemand die dit kan repareren!',
+    photos: [
+      'https://images.unsplash.com/photo-1585704032915-c3400305e979?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&h=400&fit=crop',
+    ],
     location: 'Kessel-Lo',
     postedBy: 'Anna',
     postedAt: new Date(Date.now() - 30 * 60 * 1000),
     category: 'Loodgieter',
     urgency: 'high',
+  },
+  {
+    id: '4',
+    title: 'Badkamer tegels vervangen',
+    description: 'Een paar tegels in onze badkamer zijn gebarsten en moeten vervangen worden. Het gaat om 4 tegels (20x20cm) naast het bad. Ik heb dezelfde tegels nog op voorraad liggen, dus alleen arbeid nodig. De oude tegels moeten eerst verwijderd worden en daarna de nieuwe netjes geplaatst worden.',
+    photos: [
+      'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&h=400&fit=crop',
+    ],
+    location: 'Leuven',
+    postedBy: 'Koen',
+    postedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
+    category: 'Tegels',
+    urgency: 'low',
+  },
+  {
+    id: '5',
+    title: 'Muur schilderen in woonkamer',
+    description: 'De muren van onze woonkamer moeten geschilderd worden. Het gaat om 2 muren (totaal ongeveer 25m²). De muren zijn al geprepareerd en klaar om te schilderen. De verf (wit) is aanwezig. Zoek iemand met ervaring die een mooi strak resultaat kan leveren.',
+    photos: [
+      'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&h=400&fit=crop',
+    ],
+    location: 'Wijgmaal',
+    postedBy: 'Lisa',
+    postedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+    category: 'Schilderen',
+    urgency: 'medium',
   },
 ];
 
