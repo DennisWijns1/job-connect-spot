@@ -189,11 +189,11 @@ const SwipePage = () => {
       <BottomNav />
       <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
       
-      {/* Floating Search Button - to reopen problem dialog */}
+      {/* Floating Search Button - to reopen problem dialog (LEFT side) */}
       {!isHandy && !showProblemDialog && (
         <button
           onClick={() => setShowProblemDialog(true)}
-          className="fixed bottom-28 right-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
+          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
         >
           <Search className="w-6 h-6" />
         </button>
