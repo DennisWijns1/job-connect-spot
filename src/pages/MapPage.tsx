@@ -2,8 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { EmergencyButton } from '@/components/EmergencyButton';
-import { mockHandyProfiles } from '@/data/mockData';
-import { MessageCircle } from 'lucide-react';
+import { mockHandyProfiles, mockProjects } from '@/data/mockData';
+import { MessageCircle, MapPin, Euro, Briefcase } from 'lucide-react';
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 
 const onlineHandys = mockHandyProfiles.filter(h => h.isOnline);
 
@@ -22,7 +24,7 @@ const landmarks = [
   { name: 'Stadspark', x: 100, y: 280, emoji: '🌳' },
 ];
 
-// Mock coordinates around Leuven centrum
+// Mock coordinates for handys
 const handyLocations = [
   { ...onlineHandys[0], top: '28%', left: '48%' },
   { ...onlineHandys[1], top: '18%', left: '65%' },
@@ -31,22 +33,33 @@ const handyLocations = [
   { ...onlineHandys[4], top: '62%', left: '55%' },
 ].filter(h => h?.isOnline);
 
+// Mock coordinates for projects (for handy view)
+const projectLocations = mockProjects.slice(0, 5).map((project, index) => ({
+  ...project,
+  top: ['32%', '22%', '52%', '42%', '65%'][index],
+  left: ['45%', '62%', '32%', '75%', '50%'][index],
+}));
+
 const MapPage = () => {
   const navigate = useNavigate();
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isSeeker = userType === 'seeker';
+  const isHandy = userType === 'handy';
 
-  const handleStartChat = (handyId: string, handyName: string) => {
-    // Navigate to chat and start conversation
-    navigate('/chats', { state: { newChatWith: handyId, handyName } });
+  const handleStartChat = (id: string, name: string) => {
+    navigate('/chats', { state: { newChatWith: id, handyName: name } });
+  };
+
+  const handleApplyProject = (projectTitle: string) => {
+    navigate('/chats', { state: { newProjectChat: true, projectTitle } });
   };
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Kaart" showFilters />
+      <Header title={isHandy ? 'Projecten in de buurt' : 'Kaart'} showFilters />
 
       <div className="relative h-[calc(100vh-180px)] mx-4 mt-4 rounded-3xl overflow-hidden shadow-card">
-        {/* Map Background - Detailed Leuven Map */}
+        {/* Map Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5">
           {/* Grid pattern for streets */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
@@ -110,8 +123,8 @@ const MapPage = () => {
           </div>
         </div>
 
-        {/* Handy Markers */}
-        {handyLocations.map((handy) => handy && (
+        {/* Handy Markers (for seekers) */}
+        {isSeeker && handyLocations.map((handy) => handy && (
           <div
             key={handy.id}
             className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10"
@@ -165,6 +178,64 @@ const MapPage = () => {
           </div>
         ))}
 
+        {/* Project Markers (for handys) */}
+        {isHandy && projectLocations.map((project) => (
+          <div
+            key={project.id}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10"
+            style={{ top: project.top, left: project.left }}
+          >
+            {/* Pulse animation */}
+            <div className="absolute inset-0 w-14 h-14 -m-1 rounded-full bg-secondary/40 animate-ping" />
+            
+            {/* Project marker */}
+            <div className="relative transition-transform duration-200 group-hover:scale-110">
+              <div className="w-12 h-12 rounded-full border-4 border-card shadow-card-hover overflow-hidden bg-secondary flex items-center justify-center">
+                <Briefcase className="w-6 h-6 text-primary" />
+              </div>
+              {/* Urgency indicator */}
+              {project.urgency === 'high' && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full border-2 border-card animate-pulse" />
+              )}
+            </div>
+
+            {/* Popup on hover */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-20">
+              <div className="bg-card rounded-2xl shadow-card-hover p-4 min-w-[220px] border border-border">
+                <div className="text-center">
+                  <p className="font-bold text-sm text-foreground">{project.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{project.category}</p>
+                  
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <Badge variant="outline" className="text-xs">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      {project.location}
+                    </Badge>
+                    {project.urgency === 'high' && (
+                      <Badge className="bg-destructive text-destructive-foreground text-xs">
+                        Urgent
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleApplyProject(project.title);
+                    }}
+                    className="mt-3 w-full py-2.5 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground rounded-xl text-xs font-semibold hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Solliciteer
+                  </button>
+                </div>
+                {/* Arrow */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-card" />
+              </div>
+            </div>
+          </div>
+        ))}
+
         {/* Your location indicator */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <div className="w-6 h-6 rounded-full bg-primary border-4 border-card shadow-lg">
@@ -177,12 +248,25 @@ const MapPage = () => {
 
         {/* Legend */}
         <div className="absolute bottom-4 left-4 right-4 bg-card/95 backdrop-blur-sm rounded-2xl p-4 shadow-card border border-border">
-          <p className="text-sm font-semibold text-foreground mb-1">
-            🔨 {handyLocations.length} Handy's online in Leuven
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Hover over een marker om te chatten
-          </p>
+          {isSeeker ? (
+            <>
+              <p className="text-sm font-semibold text-foreground mb-1">
+                🔨 {handyLocations.length} Handy's online in Leuven
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Hover over een marker om te chatten
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-semibold text-foreground mb-1">
+                📋 {projectLocations.length} Projecten in de buurt
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Hover over een project om te solliciteren
+              </p>
+            </>
+          )}
         </div>
       </div>
 
