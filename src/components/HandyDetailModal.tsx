@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Clock, Shield, Award, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, MapPin, Clock, Shield, Award, Star, ChevronLeft, ChevronRight, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { HandyProfile } from '@/types/handymatch';
 import { HammerRating } from './HammerRating';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PaymentQRModal } from './PaymentQRModal';
 
 interface HandyDetailModalProps {
   handy: HandyProfile | null;
@@ -40,6 +41,7 @@ const mockReviews = [
 
 export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDetailModalProps) => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   if (!handy) return null;
 
@@ -257,14 +259,37 @@ export const HandyDetailModal = ({ handy, isOpen, onClose, onContact }: HandyDet
               )}
             </div>
 
-            {/* CTA Button */}
-            <div className="p-4 border-t border-border bg-card flex-shrink-0">
-              <Button onClick={onContact} className="w-full h-14 rounded-2xl text-base font-semibold bg-accent hover:bg-accent/90 text-accent-foreground">
+            {/* CTA Buttons */}
+            <div className="p-4 border-t border-border bg-card flex-shrink-0 space-y-3">
+              {/* Payment QR Button */}
+              <Button 
+                onClick={() => setShowPaymentModal(true)} 
+                variant="outline"
+                className="w-full h-12 rounded-[20px] text-base font-medium border-2 border-primary/20 text-primary hover:bg-primary/5"
+              >
+                <CreditCard className="w-5 h-5 mr-2" />
+                Betaal {handy.name.split(' ')[0]}
+              </Button>
+              
+              {/* Contact Button */}
+              <Button 
+                onClick={onContact} 
+                className="w-full h-14 rounded-[20px] text-base font-semibold btn-cta"
+              >
                 <span className="mr-2">💬</span>
                 Start Gesprek
               </Button>
             </div>
           </motion.div>
+          
+          {/* Payment Modal */}
+          <PaymentQRModal
+            isOpen={showPaymentModal}
+            onClose={() => setShowPaymentModal(false)}
+            recipientName={handy.name}
+            recipientIBAN="BE71 0961 2345 6769"
+            suggestedAmount={handy.hourlyRate}
+          />
         </>
       )}
     </AnimatePresence>
