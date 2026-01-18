@@ -1,26 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Hammer, Wrench, Search, GraduationCap } from 'lucide-react';
 
 const WelcomePage = () => {
   const navigate = useNavigate();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check if user is already logged in
-  const isLoggedIn = localStorage.getItem('handymatch_user');
-  if (isLoggedIn) {
-    // Redirect to swipe page immediately
-    navigate('/swipe', { replace: true });
-    return null;
-  }
+  // Check if user is already logged in - using useEffect to avoid navigation during render
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('handymatch_user');
+    if (isLoggedIn) {
+      navigate('/swipe', { replace: true });
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, [navigate]);
 
   const handleSelect = (type: 'handy' | 'seeker' | 'instructor') => {
-    // Navigate directly to login with the selected type
     navigate('/login', { state: { userType: type } });
   };
 
+  // Show nothing while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-16 h-16 rounded-[20px] gradient-primary flex items-center justify-center animate-pulse">
+          <Hammer className="w-8 h-8 text-white" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Logo */}
@@ -30,8 +43,8 @@ const WelcomePage = () => {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
-            <Hammer className="w-12 h-12 text-primary-foreground" />
+          <div className="w-24 h-24 rounded-[24px] gradient-primary flex items-center justify-center shadow-lg">
+            <Hammer className="w-12 h-12 text-white" />
           </div>
         </motion.div>
 
@@ -55,16 +68,16 @@ const WelcomePage = () => {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="w-full max-w-sm space-y-3"
+          className="w-full max-w-sm space-y-4"
         >
           {/* Seeker Card - FIRST */}
           <button
             onClick={() => handleSelect('seeker')}
-            className="w-full p-5 rounded-2xl border-2 border-border bg-card hover:border-accent/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-accent/5 transition-all duration-300 text-left group"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-accent/10 group-hover:bg-gradient-to-br group-hover:from-accent/20 group-hover:to-accent/10">
-                <Search className="w-7 h-7 transition-colors text-accent" />
+              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-accent/15 group-hover:gradient-accent">
+                <Search className="w-7 h-7 transition-colors text-accent group-hover:text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
@@ -80,11 +93,11 @@ const WelcomePage = () => {
           {/* Handy Card - SECOND */}
           <button
             onClick={() => handleSelect('handy')}
-            className="w-full p-5 rounded-2xl border-2 border-border bg-card hover:border-primary/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-primary/5 transition-all duration-300 text-left group"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-primary/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-primary/10 group-hover:bg-gradient-to-br group-hover:from-primary/20 group-hover:to-primary/10">
-                <Wrench className="w-7 h-7 transition-colors text-primary" />
+              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-primary/15 group-hover:gradient-primary">
+                <Wrench className="w-7 h-7 transition-colors text-primary group-hover:text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
@@ -100,11 +113,11 @@ const WelcomePage = () => {
           {/* Instructor Card - THIRD */}
           <button
             onClick={() => handleSelect('instructor')}
-            className="w-full p-5 rounded-2xl border-2 border-border bg-card hover:border-success/50 hover:shadow-soft hover:bg-gradient-to-r hover:from-card hover:to-success/5 transition-all duration-300 text-left group"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-success/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 bg-success/10 group-hover:bg-gradient-to-br group-hover:from-success/20 group-hover:to-success/10">
-                <GraduationCap className="w-7 h-7 transition-colors text-success" />
+              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-success/15 group-hover:bg-success">
+                <GraduationCap className="w-7 h-7 transition-colors text-success group-hover:text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">

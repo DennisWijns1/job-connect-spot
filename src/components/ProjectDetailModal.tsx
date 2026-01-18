@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Clock, AlertTriangle, ChevronLeft, ChevronRight, Hammer } from 'lucide-react';
+import { X, MapPin, Clock, AlertTriangle, ChevronLeft, ChevronRight, Hammer, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { Project } from '@/types/handymatch';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { PaymentQRModal } from './PaymentQRModal';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -17,6 +18,8 @@ interface ProjectDetailModalProps {
 
 export const ProjectDetailModal = ({ project, isOpen, onClose, onApply }: ProjectDetailModalProps) => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
 
   if (!project) return null;
 
@@ -31,8 +34,9 @@ export const ProjectDetailModal = ({ project, isOpen, onClose, onApply }: Projec
   };
 
   const handleApply = () => {
+    setHasApplied(true);
     toast.success(`Je hebt je aangeboden voor "${project.title}"!`, {
-      description: 'De klant ontvangt nu je aanvraag en kan je profiel bekijken.',
+      description: 'De klant ontvangt nu je aanvraag. Na afronding kun je een betaling ontvangen.',
     });
     onApply();
   };
@@ -170,14 +174,37 @@ export const ProjectDetailModal = ({ project, isOpen, onClose, onApply }: Projec
               </div>
             </div>
 
-            {/* CTA Button */}
-            <div className="p-4 border-t border-border bg-card flex-shrink-0">
-              <Button onClick={handleApply} className="w-full h-14 rounded-2xl text-base font-semibold bg-accent hover:bg-accent/90 text-accent-foreground">
+            {/* CTA Buttons */}
+            <div className="p-4 border-t border-border bg-card flex-shrink-0 space-y-3">
+              {hasApplied && (
+                <Button 
+                  onClick={() => setShowPaymentModal(true)} 
+                  variant="outline"
+                  className="w-full h-12 rounded-[20px] text-base font-medium border-2 border-success/30 text-success hover:bg-success/5"
+                >
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Bekijk Betaal QR-code (na afronding)
+                </Button>
+              )}
+              
+              <Button 
+                onClick={handleApply} 
+                disabled={hasApplied}
+                className={`w-full h-14 rounded-[20px] text-base font-semibold ${hasApplied ? 'bg-success text-success-foreground' : 'btn-cta'}`}
+              >
                 <Hammer className="w-5 h-5 mr-2" />
-                Ik bied mezelf aan voor deze klus
+                {hasApplied ? 'Aangeboden ✓' : 'Ik bied mezelf aan voor deze klus'}
               </Button>
             </div>
           </motion.div>
+          
+          {/* Payment Modal for after project completion */}
+          <PaymentQRModal
+            isOpen={showPaymentModal}
+            onClose={() => setShowPaymentModal(false)}
+            recipientName={project.postedBy}
+            projectTitle={project.title}
+          />
         </>
       )}
     </AnimatePresence>
