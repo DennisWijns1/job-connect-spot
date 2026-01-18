@@ -1,36 +1,20 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Hammer, Wrench, Search, GraduationCap } from 'lucide-react';
 
 const WelcomePage = () => {
   const navigate = useNavigate();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  // Check if user is already logged in - using useEffect to avoid navigation during render
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem('handymatch_user');
-    if (isLoggedIn) {
-      navigate('/swipe', { replace: true });
-    } else {
-      setIsCheckingAuth(false);
-    }
-  }, [navigate]);
 
   const handleSelect = (type: 'handy' | 'seeker' | 'instructor') => {
-    navigate('/login', { state: { userType: type } });
+    // Check if already logged in - if so, just update type and go to swipe
+    const isLoggedIn = localStorage.getItem('handymatch_user');
+    if (isLoggedIn) {
+      localStorage.setItem('handymatch_userType', type);
+      navigate('/swipe');
+    } else {
+      navigate('/login', { state: { userType: type } });
+    }
   };
-
-  // Show nothing while checking authentication
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-16 h-16 rounded-[20px] gradient-primary flex items-center justify-center animate-pulse">
-          <Hammer className="w-8 h-8 text-white" />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
