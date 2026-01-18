@@ -13,8 +13,8 @@
     /* Text - Antraciet #424242 */
     --foreground: 0 0% 26%;
 
-    /* Card - Pure white for clean cards */
-    --card: 0 0% 100%;
+    /* Card - Warm Sand #D2B48C with subtle warmth */
+    --card: 34 44% 88%;
     --card-foreground: 0 0% 26%;
 
     --popover: 0 0% 100%;
@@ -28,12 +28,12 @@
     --accent: 154 25% 64%;
     --accent-foreground: 0 0% 20%;
 
-    /* Secondary - Warm Sand #D2B48C (for subtle accents, badges, highlights) */
-    --secondary: 34 44% 69%;
-    --secondary-foreground: 0 0% 26%;
+    /* Secondary - Softer blue */
+    --secondary: 210 20% 35%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 34 20% 94%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 34 20% 80%;
+    --muted-foreground: 0 0% 40%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
@@ -42,17 +42,17 @@
     --success: 154 35% 50%;
     --success-foreground: 0 0% 100%;
 
-    --border: 34 15% 88%;
-    --input: 34 15% 88%;
+    --border: 34 20% 85%;
+    --input: 34 20% 85%;
     --ring: 154 25% 64%;
 
     --radius: 1.25rem;
 
-    /* Custom shadows - With warm undertone */
-    --shadow-card: 0 8px 32px -8px rgba(210, 180, 140, 0.15), 0 4px 16px -4px rgba(44, 62, 80, 0.08);
-    --shadow-card-hover: 0 16px 48px -8px rgba(210, 180, 140, 0.25), 0 8px 24px -4px rgba(44, 62, 80, 0.1);
+    /* Custom shadows - Soft and broad */
+    --shadow-card: 0 8px 32px -8px rgba(44, 62, 80, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 16px 48px -8px rgba(44, 62, 80, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
     --shadow-button: 0 6px 20px -4px rgba(143, 185, 168, 0.5);
-    --shadow-soft: 0 4px 20px -4px rgba(210, 180, 140, 0.12);
+    --shadow-soft: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
@@ -61,7 +61,7 @@
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 154 25% 64%;
     --sidebar-accent-foreground: 0 0% 20%;
-    --sidebar-border: 34 15% 88%;
+    --sidebar-border: 34 20% 85%;
     --sidebar-ring: 154 25% 64%;
   }
 

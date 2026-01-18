@@ -27,8 +27,8 @@ const WelcomePage = () => {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="w-24 h-24 rounded-[24px] bg-secondary flex items-center justify-center shadow-lg ring-4 ring-secondary/30">
-            <Hammer className="w-12 h-12 text-primary" />
+          <div className="w-24 h-24 rounded-[24px] gradient-primary flex items-center justify-center shadow-lg">
+            <Hammer className="w-12 h-12 text-white" />
           </div>
         </motion.div>
 
@@ -39,8 +39,8 @@ const WelcomePage = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-10"
         >
-          <h1 className="font-display font-extrabold text-4xl mb-3">
-            <span className="text-primary">Handy</span><span className="text-secondary">Match</span>
+          <h1 className="font-display font-extrabold text-4xl text-foreground mb-3">
+            Handy<span className="text-gradient">Match</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-xs mx-auto">
             Vind de juiste hulp in je buurt, of bied je vaardigheden aan
@@ -54,17 +54,17 @@ const WelcomePage = () => {
           transition={{ delay: 0.4 }}
           className="w-full max-w-sm space-y-4"
         >
-          {/* Seeker Card - Accent with sand highlight */}
+          {/* Seeker Card - FIRST */}
           <button
             onClick={() => handleSelect('seeker')}
-            className="w-full p-5 rounded-[20px] border-2 border-border bg-card hover:border-accent hover:shadow-card-hover transition-all duration-300 text-left group card-elevated"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-accent/15 group-hover:bg-accent">
+              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-accent/15 group-hover:gradient-accent">
                 <Search className="w-7 h-7 transition-colors text-accent group-hover:text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-display font-bold text-lg text-primary mb-1">
+                <h3 className="font-display font-bold text-lg text-foreground mb-1">
                   Ik zoek een Handy
                 </h3>
                 <p className="text-muted-foreground text-sm">
@@ -74,17 +74,17 @@ const WelcomePage = () => {
             </div>
           </button>
 
-          {/* Handy Card - Primary blue */}
+          {/* Handy Card - SECOND */}
           <button
             onClick={() => handleSelect('handy')}
-            className="w-full p-5 rounded-[20px] border-2 border-border bg-card hover:border-primary hover:shadow-card-hover transition-all duration-300 text-left group card-elevated"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-primary/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-primary/10 group-hover:bg-primary">
+              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-primary/15 group-hover:gradient-primary">
                 <Wrench className="w-7 h-7 transition-colors text-primary group-hover:text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-display font-bold text-lg text-primary mb-1">
+                <h3 className="font-display font-bold text-lg text-foreground mb-1">
                   Ik ben een Handy
                 </h3>
                 <p className="text-muted-foreground text-sm">
@@ -94,17 +94,17 @@ const WelcomePage = () => {
             </div>
           </button>
 
-          {/* Instructor Card - Secondary/sand accent */}
+          {/* Instructor Card - THIRD */}
           <button
             onClick={() => handleSelect('instructor')}
-            className="w-full p-5 rounded-[20px] border-2 border-border bg-card hover:border-secondary hover:shadow-card-hover transition-all duration-300 text-left group card-elevated"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-success/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-secondary/20 group-hover:bg-secondary">
-                <GraduationCap className="w-7 h-7 transition-colors text-primary group-hover:text-primary" />
+              <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-success/15 group-hover:bg-success">
+                <GraduationCap className="w-7 h-7 transition-colors text-success group-hover:text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-display font-bold text-lg text-primary mb-1">
+                <h3 className="font-display font-bold text-lg text-foreground mb-1">
                   Ik ben een Lesgever
                 </h3>
                 <p className="text-muted-foreground text-sm">
