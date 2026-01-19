@@ -57,7 +57,7 @@ const WelcomePage = () => {
           {/* Seeker Card - FIRST */}
           <button
             onClick={() => handleSelect('seeker')}
-            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-400 text-left group card-elevated"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:bg-secondary hover:shadow-card-hover hover:border-accent/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-accent/15 group-hover:gradient-accent">
@@ -77,7 +77,7 @@ const WelcomePage = () => {
           {/* Handy Card - SECOND */}
           <button
             onClick={() => handleSelect('handy')}
-            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-primary/40 transition-all duration-400 text-left group card-elevated"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:bg-secondary hover:shadow-card-hover hover:border-primary/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-primary/15 group-hover:gradient-primary">
@@ -97,7 +97,7 @@ const WelcomePage = () => {
           {/* Instructor Card - THIRD */}
           <button
             onClick={() => handleSelect('instructor')}
-            className="w-full p-5 rounded-[20px] border border-border bg-card hover:shadow-card-hover hover:border-success/40 transition-all duration-400 text-left group card-elevated"
+            className="w-full p-5 rounded-[20px] border border-border bg-card hover:bg-secondary hover:shadow-card-hover hover:border-success/40 transition-all duration-400 text-left group card-elevated"
           >
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-300 bg-success/15 group-hover:bg-success">
