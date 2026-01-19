@@ -12,6 +12,7 @@ import { FilterModal } from '@/components/FilterModal';
 import { HandyFilterModal } from '@/components/HandyFilterModal';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
 import { MyProjectsSheet } from '@/components/MyProjectsSheet';
+import { CalendarSheet } from '@/components/CalendarSheet';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -40,6 +41,7 @@ const SwipePage = () => {
   const [currentProblem, setCurrentProblem] = useState<string | null>(null);
   const [showProjectSearch, setShowProjectSearch] = useState(false);
   const [showMyProjects, setShowMyProjects] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   // Mark problem dialog as shown when it's closed
   useEffect(() => {
@@ -191,6 +193,8 @@ const SwipePage = () => {
         onOpenFilters={() => setIsFilterOpen(true)}
         showProjectsButton
         onOpenProjects={() => setShowMyProjects(true)}
+        showCalendar
+        onOpenCalendar={() => setShowCalendar(true)}
       />
 
       <div className="flex-1 px-4 py-2 flex flex-col overflow-hidden">
@@ -304,6 +308,12 @@ const SwipePage = () => {
         isOpen={showProjectModal}
         onClose={() => setShowProjectModal(false)}
         onApply={handleApplyForProject}
+      />
+
+      {/* Calendar Sheet */}
+      <CalendarSheet
+        isOpen={showCalendar}
+        onClose={() => setShowCalendar(false)}
       />
     </div>
   );
