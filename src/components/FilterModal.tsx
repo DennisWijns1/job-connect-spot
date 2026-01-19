@@ -154,7 +154,7 @@ export const FilterModal = ({ isOpen, onClose }: FilterModalProps) => {
           <div className="flex items-center justify-between p-4 bg-background rounded-2xl">
             <div>
               <h3 className="font-semibold text-foreground">Alleen professionals</h3>
-              <p className="text-secondary text-sm">Bedrijven met BTW-nummer</p>
+              <p className="text-muted-foreground text-sm">Bedrijven met BTW-nummer</p>
             </div>
             <Switch
               checked={professionalOnly}

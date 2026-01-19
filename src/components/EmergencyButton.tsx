@@ -47,7 +47,7 @@ export const EmergencyButton = () => {
               <h2 className="font-display font-bold text-xl text-foreground mb-2">
                 Noodhulp
               </h2>
-              <p className="text-secondary text-sm mb-6">
+              <p className="text-muted-foreground text-sm mb-6">
                 Voel je je onveilig? We staan klaar om te helpen. Klik om direct de hulpdiensten te contacteren.
               </p>
 

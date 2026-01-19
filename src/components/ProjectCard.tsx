@@ -65,7 +65,7 @@ export const ProjectCard = ({ project, className }: ProjectCardProps) => {
           {project.title}
         </h3>
 
-        <p className="text-secondary text-sm mb-4 line-clamp-3">
+        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
           {project.description}
         </p>
 

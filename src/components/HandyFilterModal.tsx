@@ -50,12 +50,12 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
       >
         {/* Header */}
         <div className="sticky top-0 bg-secondary px-6 py-4 border-b border-secondary/20 flex items-center justify-between">
-          <h2 className="font-display font-bold text-xl text-secondary-foreground">
+          <h2 className="font-display font-bold text-xl text-foreground">
             Filter Projecten
           </h2>
           <button
             onClick={onClose}
-            className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-secondary-foreground hover:bg-primary/20 transition-colors"
+            className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-foreground hover:bg-primary/20 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
