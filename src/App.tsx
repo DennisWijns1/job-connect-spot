@@ -13,6 +13,10 @@ import ChatDetailPage from "./pages/ChatDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import LearningPage from "./pages/LearningPage";
 import QuickCallPage from "./pages/QuickCallPage";
+import InstructorHomePage from "./pages/InstructorHomePage";
+import InstructorRegisterPage from "./pages/InstructorRegisterPage";
+import InstructorDashboardPage from "./pages/InstructorDashboardPage";
+import CreateLessonPage from "./pages/CreateLessonPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +38,10 @@ const App = () => (
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/learning" element={<LearningPage />} />
           <Route path="/quick-call" element={<QuickCallPage />} />
+          <Route path="/instructor" element={<InstructorHomePage />} />
+          <Route path="/instructor/register" element={<InstructorRegisterPage />} />
+          <Route path="/instructor/dashboard" element={<InstructorDashboardPage />} />
+          <Route path="/instructor/lesson/new" element={<CreateLessonPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

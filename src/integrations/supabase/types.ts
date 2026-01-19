@@ -64,6 +64,281 @@ export type Database = {
           },
         ]
       }
+      instructor_diplomas: {
+        Row: {
+          ai_verification_result: Json | null
+          ai_verification_score: number | null
+          ai_verification_status: string | null
+          created_at: string
+          diploma_image_url: string
+          diploma_number: string | null
+          has_signature: boolean | null
+          has_stamp: boolean | null
+          id: string
+          institution: string | null
+          instructor_id: string
+          issue_date: string | null
+          issue_place: string | null
+          training_title: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          ai_verification_result?: Json | null
+          ai_verification_score?: number | null
+          ai_verification_status?: string | null
+          created_at?: string
+          diploma_image_url: string
+          diploma_number?: string | null
+          has_signature?: boolean | null
+          has_stamp?: boolean | null
+          id?: string
+          institution?: string | null
+          instructor_id: string
+          issue_date?: string | null
+          issue_place?: string | null
+          training_title?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          ai_verification_result?: Json | null
+          ai_verification_score?: number | null
+          ai_verification_status?: string | null
+          created_at?: string
+          diploma_image_url?: string
+          diploma_number?: string | null
+          has_signature?: boolean | null
+          has_stamp?: boolean | null
+          id?: string
+          institution?: string | null
+          instructor_id?: string
+          issue_date?: string | null
+          issue_place?: string | null
+          training_title?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_diplomas_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instructors: {
+        Row: {
+          avatar_url: string | null
+          average_rating: number | null
+          bio: string | null
+          created_at: string
+          diploma_verified: boolean | null
+          email: string
+          experience_verified: boolean | null
+          expertise: string[] | null
+          full_name: string
+          id: string
+          identity_verified: boolean | null
+          is_online: boolean | null
+          phone: string | null
+          total_revenue: number | null
+          total_students: number | null
+          updated_at: string
+          user_id: string
+          vat_number: string | null
+          verification_status: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          average_rating?: number | null
+          bio?: string | null
+          created_at?: string
+          diploma_verified?: boolean | null
+          email: string
+          experience_verified?: boolean | null
+          expertise?: string[] | null
+          full_name: string
+          id?: string
+          identity_verified?: boolean | null
+          is_online?: boolean | null
+          phone?: string | null
+          total_revenue?: number | null
+          total_students?: number | null
+          updated_at?: string
+          user_id: string
+          vat_number?: string | null
+          verification_status?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          average_rating?: number | null
+          bio?: string | null
+          created_at?: string
+          diploma_verified?: boolean | null
+          email?: string
+          experience_verified?: boolean | null
+          expertise?: string[] | null
+          full_name?: string
+          id?: string
+          identity_verified?: boolean | null
+          is_online?: boolean | null
+          phone?: string | null
+          total_revenue?: number | null
+          total_students?: number | null
+          updated_at?: string
+          user_id?: string
+          vat_number?: string | null
+          verification_status?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
+      lesson_enrollments: {
+        Row: {
+          completed_at: string | null
+          enrolled_at: string
+          id: string
+          lesson_id: string
+          progress_percentage: number | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          enrolled_at?: string
+          id?: string
+          lesson_id: string
+          progress_percentage?: number | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          enrolled_at?: string
+          id?: string
+          lesson_id?: string
+          progress_percentage?: number | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_enrollments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          lesson_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_reviews_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          average_rating: number | null
+          category: string
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          extras: string | null
+          id: string
+          image_url: string | null
+          instructor_id: string
+          lesson_type: string | null
+          level: string | null
+          modules: Json | null
+          price: number
+          status: string | null
+          target_audience: string | null
+          title: string
+          total_enrollments: number | null
+          updated_at: string
+        }
+        Insert: {
+          average_rating?: number | null
+          category: string
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          extras?: string | null
+          id?: string
+          image_url?: string | null
+          instructor_id: string
+          lesson_type?: string | null
+          level?: string | null
+          modules?: Json | null
+          price: number
+          status?: string | null
+          target_audience?: string | null
+          title: string
+          total_enrollments?: number | null
+          updated_at?: string
+        }
+        Update: {
+          average_rating?: number | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          extras?: string | null
+          id?: string
+          image_url?: string | null
+          instructor_id?: string
+          lesson_type?: string | null
+          level?: string | null
+          modules?: Json | null
+          price?: number
+          status?: string | null
+          target_audience?: string | null
+          title?: string
+          total_enrollments?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
