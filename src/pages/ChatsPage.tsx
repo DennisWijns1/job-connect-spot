@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
@@ -10,12 +9,22 @@ import { MessageCircle } from 'lucide-react';
 
 const ChatsPage = () => {
   const navigate = useNavigate();
+  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
+  const isHandy = userType === 'handy';
+
+  const emptyStateText = isHandy
+    ? 'Begin met swipen op projecten om contact te leggen met klanten'
+    : 'Begin met swipen om contact te leggen met Handy\'s';
+
+  const headerSubtitle = isHandy ? 'Gesprekken met klanten' : 'Gesprekken met Handy\'s';
 
   return (
     <div className="min-h-screen bg-background pb-24">
       <Header title="Chats" showNotifications />
 
       <div className="px-4 py-4">
+        <p className="text-sm text-muted-foreground mb-4">{headerSubtitle}</p>
+        
         {mockChats.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -28,8 +37,8 @@ const ChatsPage = () => {
             <h3 className="font-display font-bold text-xl text-foreground mb-2">
               Nog geen gesprekken
             </h3>
-            <p className="text-secondary text-sm max-w-xs mx-auto">
-              Begin met swipen om contact te leggen met Handy's of klanten
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+              {emptyStateText}
             </p>
           </motion.div>
         ) : (
@@ -41,7 +50,7 @@ const ChatsPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 onClick={() => navigate(`/chat/${chat.id}`)}
-                className="w-full bg-card rounded-2xl p-4 shadow-soft hover:shadow-card transition-all text-left"
+                className="w-full bg-card rounded-2xl p-4 shadow-soft hover:shadow-card transition-all text-left border border-border"
               >
                 <div className="flex items-center gap-4">
                   {/* Avatar */}
@@ -52,7 +61,7 @@ const ChatsPage = () => {
                       className="w-14 h-14 rounded-xl object-cover"
                     />
                     {chat.participant.isOnline && (
-                      <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-success border-2 border-card" />
+                      <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-card" />
                     )}
                   </div>
 
@@ -66,7 +75,7 @@ const ChatsPage = () => {
                         {formatDistanceToNow(chat.lastMessageTime, { addSuffix: false, locale: nl })}
                       </span>
                     </div>
-                    <p className="text-sm text-secondary truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       {chat.lastMessage}
                     </p>
                   </div>
