@@ -6,10 +6,17 @@ const WelcomePage = () => {
   const navigate = useNavigate();
 
   const handleSelect = (type: 'handy' | 'seeker' | 'instructor') => {
-    // Check if already logged in - if so, just update type and go to swipe
+    localStorage.setItem('handymatch_userType', type);
+    
+    // Instructors have a separate portal
+    if (type === 'instructor') {
+      navigate('/instructor');
+      return;
+    }
+    
+    // Check if already logged in - if so, go to swipe
     const isLoggedIn = localStorage.getItem('handymatch_user');
     if (isLoggedIn) {
-      localStorage.setItem('handymatch_userType', type);
       navigate('/swipe');
     } else {
       navigate('/login', { state: { userType: type } });
