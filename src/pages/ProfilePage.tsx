@@ -85,7 +85,7 @@ const ProfilePage = () => {
 
           {/* User Type Badge */}
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl ${
-            isHandy ? 'bg-secondary text-secondary-foreground' : 'bg-accent/10 text-accent'
+            isHandy ? 'bg-secondary text-foreground' : 'bg-accent/10 text-accent'
           }`}>
             {isHandy ? <Briefcase className="w-4 h-4" /> : <User className="w-4 h-4" />}
             <span className="font-medium text-sm">

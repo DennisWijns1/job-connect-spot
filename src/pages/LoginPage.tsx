@@ -66,7 +66,7 @@ const LoginPage = () => {
           <h1 className="font-display font-bold text-3xl text-foreground mb-2">
             {isLogin ? 'Welkom terug' : 'Account aanmaken'}
           </h1>
-          <p className="text-secondary">
+          <p className="text-muted-foreground">
             {isLogin 
               ? 'Log in om verder te gaan' 
               : 'Maak een account om te starten'}
@@ -146,7 +146,7 @@ const LoginPage = () => {
           <ArrowRight className="w-5 h-5" />
         </button>
 
-        <p className="text-center text-secondary">
+        <p className="text-center text-muted-foreground">
           {isLogin ? 'Nog geen account? ' : 'Al een account? '}
           <button
             onClick={() => setIsLogin(!isLogin)}

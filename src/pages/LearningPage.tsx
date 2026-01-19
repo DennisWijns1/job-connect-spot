@@ -320,8 +320,8 @@ const LearningPage = () => {
               <Play className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-bold text-secondary-foreground">Online Lessenportaal</h3>
-              <p className="text-sm text-secondary-foreground/70">Bekijk je gekochte lessen en volg live sessies</p>
+              <h3 className="font-bold text-foreground">Online Lessenportaal</h3>
+              <p className="text-sm text-muted-foreground">Bekijk je gekochte lessen en volg live sessies</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -367,12 +367,12 @@ const LearningPage = () => {
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex gap-2">
                   {series.hasDiploma && (
-                    <div className="bg-secondary text-secondary-foreground text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                    <div className="bg-secondary text-foreground text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1">
                       <Award className="w-3 h-3" />
                       Diploma
                     </div>
                   )}
-                  <Badge className="bg-secondary text-secondary-foreground text-xs">
+                  <Badge className="bg-secondary text-foreground text-xs">
                     {series.level}
                   </Badge>
                 </div>

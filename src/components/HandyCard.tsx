@@ -80,9 +80,9 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
         {/* Price */}
         <div className="font-display font-bold text-lg text-foreground">
           {handy.isQuoteBased ? (
-            <span className="text-sm text-secondary">Offerte op maat</span>
+            <span className="text-sm text-muted-foreground">Offerte op maat</span>
           ) : (
-            <span>€{handy.hourlyRate}<span className="text-sm font-normal text-secondary">/uur</span></span>
+            <span>€{handy.hourlyRate}<span className="text-sm font-normal text-muted-foreground">/uur</span></span>
           )}
         </div>
       </div>

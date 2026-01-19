@@ -191,7 +191,7 @@ const SwipePage = () => {
               <h3 className="font-display font-bold text-xl text-foreground mb-2">
                 Niemand meer in de buurt
               </h3>
-              <p className="text-secondary text-sm max-w-xs">
+              <p className="text-muted-foreground text-sm max-w-xs">
                 Probeer je filters aan te passen of kom later terug
               </p>
             </motion.div>
