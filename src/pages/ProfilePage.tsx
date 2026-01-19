@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { HammerRating } from '@/components/HammerRating';
+import { CalendarSection } from '@/components/CalendarSection';
 import {
   User,
   Camera,
@@ -134,7 +135,15 @@ const ProfilePage = () => {
           ))}
         </motion.div>
 
-        {/* Settings & Logout */}
+        {/* Calendar/Agenda Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          <CalendarSection />
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

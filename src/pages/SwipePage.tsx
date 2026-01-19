@@ -10,10 +10,12 @@ import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { FilterModal } from '@/components/FilterModal';
 import { HandyFilterModal } from '@/components/HandyFilterModal';
+import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
+import { MyProjectsSheet } from '@/components/MyProjectsSheet';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Key } from 'lucide-react';
 
 const SwipePage = () => {
   const navigate = useNavigate();
@@ -36,6 +38,8 @@ const SwipePage = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [currentProblem, setCurrentProblem] = useState<string | null>(null);
+  const [showProjectSearch, setShowProjectSearch] = useState(false);
+  const [showMyProjects, setShowMyProjects] = useState(false);
 
   // Mark problem dialog as shown when it's closed
   useEffect(() => {
@@ -99,6 +103,31 @@ const SwipePage = () => {
     });
   }, [allItems]);
 
+  const handleProjectSearch = useCallback((filters: ProjectFilters) => {
+    // Filter projects based on search criteria
+    let filtered = mockProjects;
+    
+    if (filters.specialty) {
+      filtered = filtered.filter(project => 
+        project.category?.toLowerCase().includes(filters.specialty.toLowerCase())
+      );
+    }
+    
+    if (filters.location) {
+      filtered = filtered.filter(project =>
+        project.location?.toLowerCase().includes(filters.location.toLowerCase())
+      );
+    }
+    
+    // Note: Budget filtering would be applied here once budget fields are added to projects
+    
+    setFilteredItems(filtered.length > 0 ? filtered : mockProjects);
+    setCurrentIndex(0);
+    toast.success('Projecten gefilterd', {
+      description: `${filtered.length} projecten gevonden`,
+    });
+  }, []);
+
   const handleSwipeLeft = useCallback(() => {
     if (currentIndex < filteredItems.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -154,12 +183,14 @@ const SwipePage = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
-        showFilters
-        showNotifications
+        showFilters={!isHandy}
+        showNotifications={false}
         showOnlineToggle={isHandy}
         isOnline={isOnline}
         onToggleOnline={() => setIsOnline(!isOnline)}
         onOpenFilters={() => setIsFilterOpen(true)}
+        showProjectsButton
+        onOpenProjects={() => setShowMyProjects(true)}
       />
 
       <div className="flex-1 px-4 py-2 flex flex-col overflow-hidden">
@@ -214,13 +245,21 @@ const SwipePage = () => {
 
       {!isHandy && <EmergencyButton />}
       <BottomNav />
-      {isHandy ? (
-        <HandyFilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
-      ) : (
+      {!isHandy && (
         <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
       )}
       
-      {/* Floating Search Button - to reopen problem dialog (LEFT side) */}
+      {/* Floating Search Button for Handy's - to search projects (LEFT side) */}
+      {isHandy && (
+        <button
+          onClick={() => setShowProjectSearch(true)}
+          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
+        >
+          <Search className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Floating Search Button for Seekers - to reopen problem dialog (LEFT side) */}
       {!isHandy && !showProblemDialog && (
         <button
           onClick={() => setShowProblemDialog(true)}
@@ -229,6 +268,20 @@ const SwipePage = () => {
           <Search className="w-6 h-6" />
         </button>
       )}
+
+      {/* Project Search Modal - for Handy's */}
+      <ProjectSearchModal
+        isOpen={showProjectSearch}
+        onClose={() => setShowProjectSearch(false)}
+        onSearch={handleProjectSearch}
+      />
+
+      {/* My Projects Sheet */}
+      <MyProjectsSheet
+        isOpen={showMyProjects}
+        onClose={() => setShowMyProjects(false)}
+        userType={isHandy ? 'handy' : 'seeker'}
+      />
 
       {/* Problem Input Dialog - Only for seekers */}
       <ProblemInputDialog

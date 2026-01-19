@@ -14,7 +14,143 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          handy_id: string
+          id: string
+          project_id: string | null
+          scheduled_at: string
+          seeker_id: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          handy_id: string
+          id?: string
+          project_id?: string | null
+          scheduled_at: string
+          seeker_id: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          handy_id?: string
+          id?: string
+          project_id?: string | null
+          scheduled_at?: string
+          seeker_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          full_name: string | null
+          hourly_rate: number | null
+          id: string
+          is_online: boolean | null
+          location: string | null
+          specialty: string | null
+          updated_at: string
+          user_id: string
+          user_type: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string | null
+          hourly_rate?: number | null
+          id?: string
+          is_online?: boolean | null
+          location?: string | null
+          specialty?: string | null
+          updated_at?: string
+          user_id: string
+          user_type?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string | null
+          hourly_rate?: number | null
+          id?: string
+          is_online?: boolean | null
+          location?: string | null
+          specialty?: string | null
+          updated_at?: string
+          user_id?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
