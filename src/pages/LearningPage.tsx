@@ -309,6 +309,43 @@ const LearningPage = () => {
         </div>
 
         {/* Lesson Series */}
+        {/* Online Lesson Portal */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-secondary rounded-2xl p-5 mb-6"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Play className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-bold text-secondary-foreground">Online Lessenportaal</h3>
+              <p className="text-sm text-secondary-foreground/70">Bekijk je gekochte lessen en volg live sessies</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <button 
+              onClick={() => toast.info('Mijn lessen portaal komt binnenkort!')}
+              className="bg-primary/10 hover:bg-primary/20 text-primary rounded-xl p-4 text-left transition-all"
+            >
+              <BookOpen className="w-5 h-5 mb-2" />
+              <span className="font-medium text-sm">Mijn Lessen</span>
+              <p className="text-xs text-primary/70 mt-1">0 actieve cursussen</p>
+            </button>
+            <button 
+              onClick={() => toast.info('Live sessies portaal komt binnenkort!')}
+              className="bg-accent/20 hover:bg-accent/30 text-accent-foreground rounded-xl p-4 text-left transition-all"
+            >
+              <Play className="w-5 h-5 mb-2 text-accent" />
+              <span className="font-medium text-sm">Live Sessies</span>
+              <p className="text-xs text-muted-foreground mt-1">Geen geplande sessies</p>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Lesson Series */}
+        <h3 className="font-bold text-foreground mb-4">Beschikbare Lessenreeksen</h3>
         <div className="space-y-4">
           {filteredSeries.map((series, index) => (
             <motion.div
@@ -330,12 +367,12 @@ const LearningPage = () => {
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex gap-2">
                   {series.hasDiploma && (
-                    <div className="bg-accent text-accent-foreground text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                    <div className="bg-secondary text-secondary-foreground text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1">
                       <Award className="w-3 h-3" />
                       Diploma
                     </div>
                   )}
-                  <Badge className="bg-white/90 text-foreground text-xs">
+                  <Badge className="bg-secondary text-secondary-foreground text-xs">
                     {series.level}
                   </Badge>
                 </div>
