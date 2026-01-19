@@ -143,7 +143,7 @@ const CreateLessonPage = () => {
         target_audience: targetAudience || null,
         level,
         lesson_type: lessonType,
-        modules: modules.filter(m => m.title),
+        modules: JSON.parse(JSON.stringify(modules.filter(m => m.title))),
         duration_hours: durationHours ? parseInt(durationHours) : null,
         extras: extras || null,
         price: parseFloat(price) || 0,
