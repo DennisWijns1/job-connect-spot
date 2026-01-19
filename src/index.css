@@ -28,9 +28,9 @@
     --accent: 154 25% 64%;
     --accent-foreground: 0 0% 20%;
 
-    /* Secondary - Warm Sand #D2B48C lighter version */
-    --secondary: 33 45% 80%;
-    --secondary-foreground: 33 30% 25%;
+    /* Secondary - Warm Sand - very light, almost off-white */
+    --secondary: 33 35% 92%;
+    --secondary-foreground: 33 40% 25%;
 
     --muted: 210 10% 92%;
     --muted-foreground: 0 0% 40%;
