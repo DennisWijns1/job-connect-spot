@@ -1,4 +1,4 @@
-import { ArrowLeft, SlidersHorizontal, Wrench, Power } from 'lucide-react';
+import { ArrowLeft, SlidersHorizontal, Wrench, Power, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +13,8 @@ interface HeaderProps {
   onOpenFilters?: () => void;
   showProjectsButton?: boolean;
   onOpenProjects?: () => void;
+  showCalendar?: boolean;
+  onOpenCalendar?: () => void;
 }
 
 export const Header = ({
@@ -25,6 +27,8 @@ export const Header = ({
   onOpenFilters,
   showProjectsButton = false,
   onOpenProjects,
+  showCalendar = false,
+  onOpenCalendar,
 }: HeaderProps) => {
   const navigate = useNavigate();
 
@@ -40,6 +44,17 @@ export const Header = ({
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
+          
+          {showCalendar && (
+            <button
+              onClick={onOpenCalendar}
+              className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-foreground hover:bg-muted transition-colors relative"
+            >
+              <Calendar className="w-5 h-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary" />
+            </button>
+          )}
+          
           <h1 className="font-display font-bold text-xl text-foreground">
             {title}
           </h1>
