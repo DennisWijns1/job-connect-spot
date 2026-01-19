@@ -1,9 +1,8 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Clock, Users, MessageCircle, CheckCircle, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Wrench, Clock, Users, MessageCircle, CheckCircle, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 
 interface MyProjectsSheetProps {
   isOpen: boolean;
@@ -96,7 +95,7 @@ export const MyProjectsSheet = ({ isOpen, onClose, userType }: MyProjectsSheetPr
       <SheetContent side="right" className="w-[340px] sm:w-[400px]">
         <SheetHeader>
           <SheetTitle className="font-display text-lg flex items-center gap-2">
-            <Key className="w-5 h-5 text-primary" />
+            <Wrench className="w-5 h-5 text-primary" />
             {isHandy ? 'Mijn Opdrachten' : 'Mijn Projecten'}
           </SheetTitle>
         </SheetHeader>
