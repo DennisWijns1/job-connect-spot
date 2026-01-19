@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { EmergencyButton } from '@/components/EmergencyButton';
-import { mockHandyProfiles } from '@/data/mockData';
-import { MessageCircle } from 'lucide-react';
+import { mockHandyProfiles, mockProjects } from '@/data/mockData';
+import { MessageCircle, Hammer, MapPin } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 const onlineHandys = mockHandyProfiles.filter(h => h.isOnline);
 
@@ -22,7 +25,7 @@ const landmarks = [
   { name: 'Stadspark', x: 100, y: 280, emoji: '🌳' },
 ];
 
-// Mock coordinates around Leuven centrum
+// Mock coordinates for handys (for seekers)
 const handyLocations = [
   { ...onlineHandys[0], top: '28%', left: '48%' },
   { ...onlineHandys[1], top: '18%', left: '65%' },
@@ -31,14 +34,33 @@ const handyLocations = [
   { ...onlineHandys[4], top: '62%', left: '55%' },
 ].filter(h => h?.isOnline);
 
+// Mock coordinates for projects (for handymen)
+const projectLocations = mockProjects.map((project, index) => ({
+  ...project,
+  top: `${20 + (index * 15) % 50}%`,
+  left: `${25 + (index * 18) % 55}%`,
+}));
+
+const urgencyColors = {
+  low: 'bg-muted text-muted-foreground',
+  medium: 'bg-accent text-accent-foreground',
+  high: 'bg-destructive text-destructive-foreground',
+};
+
 const MapPage = () => {
   const navigate = useNavigate();
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isSeeker = userType === 'seeker';
+  const isHandy = userType === 'handy';
 
-  const handleStartChat = (handyId: string, handyName: string) => {
-    // Navigate to chat and start conversation
-    navigate('/chats', { state: { newChatWith: handyId, handyName } });
+  const handleStartChat = (id: string, name: string) => {
+    navigate('/chats', { state: { newChatWith: id, handyName: name } });
+  };
+
+  const handleApplyForProject = (projectTitle: string) => {
+    toast.success(`Je hebt je aangeboden voor "${projectTitle}"!`, {
+      description: 'De klant ontvangt je aanvraag',
+    });
   };
 
   return (
@@ -46,7 +68,7 @@ const MapPage = () => {
       <Header title="Kaart" showFilters />
 
       <div className="relative h-[calc(100vh-180px)] mx-4 mt-4 rounded-3xl overflow-hidden shadow-card">
-        {/* Map Background - Detailed Leuven Map */}
+        {/* Map Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5">
           {/* Grid pattern for streets */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
@@ -106,12 +128,14 @@ const MapPage = () => {
           {/* City label */}
           <div className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-card border border-border">
             <p className="font-display font-bold text-primary text-lg">Leuven</p>
-            <p className="text-xs text-muted-foreground">Centrum • Live</p>
+            <p className="text-xs text-muted-foreground">
+              {isHandy ? 'Projecten in de buurt' : 'Centrum • Live'}
+            </p>
           </div>
         </div>
 
-        {/* Handy Markers */}
-        {handyLocations.map((handy) => handy && (
+        {/* Handy Markers (for seekers) */}
+        {isSeeker && handyLocations.map((handy) => handy && (
           <div
             key={handy.id}
             className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10"
@@ -130,7 +154,7 @@ const MapPage = () => {
                 />
               </div>
               {/* Online indicator */}
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-card" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
             </div>
 
             {/* Popup on hover */}
@@ -165,6 +189,58 @@ const MapPage = () => {
           </div>
         ))}
 
+        {/* Project Markers (for handymen) */}
+        {isHandy && projectLocations.map((project) => (
+          <div
+            key={project.id}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10"
+            style={{ top: project.top, left: project.left }}
+          >
+            {/* Pulse animation for urgent */}
+            {project.urgency === 'high' && (
+              <div className="absolute inset-0 w-14 h-14 -m-1 rounded-full bg-destructive/30 animate-ping" />
+            )}
+            
+            {/* Project marker */}
+            <div className="relative transition-transform duration-200 group-hover:scale-110">
+              <div className={`w-12 h-12 rounded-full border-4 border-card shadow-card-hover flex items-center justify-center ${
+                project.urgency === 'high' ? 'bg-destructive' : 'bg-primary'
+              }`}>
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+            </div>
+
+            {/* Popup on hover */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-20">
+              <div className="bg-card rounded-2xl shadow-card-hover p-4 min-w-[220px] border border-border">
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <p className="font-bold text-sm text-foreground line-clamp-2">{project.title}</p>
+                    <Badge className={`text-[10px] ${urgencyColors[project.urgency]} shrink-0`}>
+                      {project.urgency === 'high' ? 'Dringend' : project.urgency === 'medium' ? 'Normaal' : 'Rustig'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">{project.location}</p>
+                  <Badge variant="outline" className="text-xs mb-3">{project.category}</Badge>
+                  
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleApplyForProject(project.title);
+                    }}
+                    className="w-full py-2.5 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground rounded-xl text-xs font-semibold hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Hammer className="w-4 h-4" />
+                    Bied aan
+                  </button>
+                </div>
+                {/* Arrow */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-card" />
+              </div>
+            </div>
+          </div>
+        ))}
+
         {/* Your location indicator */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <div className="w-6 h-6 rounded-full bg-primary border-4 border-card shadow-lg">
@@ -177,12 +253,25 @@ const MapPage = () => {
 
         {/* Legend */}
         <div className="absolute bottom-4 left-4 right-4 bg-card/95 backdrop-blur-sm rounded-2xl p-4 shadow-card border border-border">
-          <p className="text-sm font-semibold text-foreground mb-1">
-            🔨 {handyLocations.length} Handy's online in Leuven
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Hover over een marker om te chatten
-          </p>
+          {isSeeker ? (
+            <>
+              <p className="text-sm font-semibold text-foreground mb-1">
+                🔨 {handyLocations.length} Handy's online in Leuven
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Hover over een marker om te chatten
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-semibold text-foreground mb-1">
+                📍 {projectLocations.length} Projecten in de buurt
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Hover over een marker om je aan te bieden
+              </p>
+            </>
+          )}
         </div>
       </div>
 

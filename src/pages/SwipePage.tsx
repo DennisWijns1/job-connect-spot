@@ -9,6 +9,7 @@ import { HandyDetailModal } from '@/components/HandyDetailModal';
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { FilterModal } from '@/components/FilterModal';
+import { HandyFilterModal } from '@/components/HandyFilterModal';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -213,7 +214,11 @@ const SwipePage = () => {
 
       {!isHandy && <EmergencyButton />}
       <BottomNav />
-      <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      {isHandy ? (
+        <HandyFilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      ) : (
+        <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      )}
       
       {/* Floating Search Button - to reopen problem dialog (LEFT side) */}
       {!isHandy && !showProblemDialog && (
