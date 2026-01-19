@@ -73,7 +73,7 @@ const ProfilePage = () => {
               <h2 className="font-display font-bold text-xl text-foreground">
                 {user.username || 'Gebruiker'}
               </h2>
-              <p className="text-secondary text-sm">{user.email}</p>
+              <p className="text-muted-foreground text-sm">{user.email}</p>
               {isHandy && (
                 <div className="flex items-center gap-2 mt-2">
                   <HammerRating rating={4.5} size="sm" />
@@ -85,7 +85,7 @@ const ProfilePage = () => {
 
           {/* User Type Badge */}
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl ${
-            isHandy ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+            isHandy ? 'bg-secondary text-secondary-foreground' : 'bg-accent/10 text-accent'
           }`}>
             {isHandy ? <Briefcase className="w-4 h-4" /> : <User className="w-4 h-4" />}
             <span className="font-medium text-sm">
