@@ -1,4 +1,4 @@
-import { ArrowLeft, SlidersHorizontal, Key, Power } from 'lucide-react';
+import { ArrowLeft, SlidersHorizontal, Wrench, Power } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -78,7 +78,7 @@ export const Header = ({
               onClick={onOpenProjects}
               className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-foreground hover:bg-muted transition-colors relative"
             >
-              <Key className="w-5 h-5" />
+              <Wrench className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
             </button>
           )}
