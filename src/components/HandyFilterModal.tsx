@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Search as SearchIcon, MapPin } from 'lucide-react';
+import { X, Search as SearchIcon, MapPin, Euro } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 import { categories } from '@/data/mockData';
 
 interface HandyFilterModalProps {
@@ -10,11 +11,12 @@ interface HandyFilterModalProps {
   onClose: () => void;
 }
 
-const hourlyRateOptions = [20, 30, 40, 50];
+const locations = ['Leuven', 'Heverlee', 'Kessel-Lo', 'Wijgmaal', 'Brussel', 'Antwerpen', 'Gent'];
 
 export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => {
   const [locationSearch, setLocationSearch] = useState('');
-  const [minHourlyRate, setMinHourlyRate] = useState<number | null>(null);
+  const [distanceKm, setDistanceKm] = useState([15]);
+  const [hourlyRate, setHourlyRate] = useState([20, 60]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,6 +30,10 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
 
   const filteredCategories = categories.filter(cat =>
     cat.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredLocations = locations.filter(loc =>
+    loc.toLowerCase().includes(locationSearch.toLowerCase())
   );
 
   if (!isOpen) return null;
@@ -62,13 +68,13 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
         </div>
 
         <div className="p-6 space-y-8">
-          {/* Location Search */}
+          {/* Location Search with Distance Slider */}
           <div>
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary" />
               Locatie
             </h3>
-            <div className="relative">
+            <div className="relative mb-4">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
@@ -78,43 +84,72 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
                 className="pl-10 h-12 rounded-xl border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
-            {/* Quick location suggestions */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {['Leuven', 'Heverlee', 'Kessel-Lo', 'Wijgmaal'].map((loc) => (
-                <Badge
-                  key={loc}
-                  variant={locationSearch === loc ? 'default' : 'outline'}
-                  className="cursor-pointer py-2 px-3"
-                  onClick={() => setLocationSearch(loc)}
-                >
-                  {loc}
-                </Badge>
-              ))}
+            
+            {/* Location suggestions */}
+            {locationSearch && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {filteredLocations.map((loc) => (
+                  <Badge
+                    key={loc}
+                    variant="outline"
+                    className="cursor-pointer py-2 px-3 hover:bg-primary/10"
+                    onClick={() => setLocationSearch(loc)}
+                  >
+                    {loc}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Distance Slider */}
+            <div className="bg-background rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-muted-foreground">Afstand</span>
+                <span className="text-sm font-semibold text-primary">{distanceKm[0]} km</span>
+              </div>
+              <Slider
+                value={distanceKm}
+                onValueChange={setDistanceKm}
+                max={50}
+                min={1}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                <span>1 km</span>
+                <span>50 km</span>
+              </div>
             </div>
           </div>
 
-          {/* Minimum Hourly Rate */}
+          {/* Hourly Rate Slider */}
           <div>
-            <h3 className="font-semibold text-foreground mb-3">
-              Minimum uurtarief
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Euro className="w-4 h-4 text-primary" />
+              Uurtarief
             </h3>
-            <div className="flex gap-2">
-              {hourlyRateOptions.map((rate) => (
-                <button
-                  key={rate}
-                  onClick={() => setMinHourlyRate(minHourlyRate === rate ? null : rate)}
-                  className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
-                    minHourlyRate === rate
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-background text-foreground hover:bg-primary/10'
-                  }`}
-                >
-                  €{rate}/u
-                </button>
-              ))}
+            <div className="bg-background rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-muted-foreground">Bereik</span>
+                <span className="text-sm font-semibold text-primary">
+                  €{hourlyRate[0]} - €{hourlyRate[1]}/uur
+                </span>
+              </div>
+              <Slider
+                value={hourlyRate}
+                onValueChange={setHourlyRate}
+                max={100}
+                min={10}
+                step={5}
+                className="w-full"
+              />
+              <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                <span>€10/uur</span>
+                <span>€100/uur</span>
+              </div>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Kies je gewenste minimum tarief als handy
+              Stel je gewenste uurtarief bereik in
             </p>
           </div>
 
