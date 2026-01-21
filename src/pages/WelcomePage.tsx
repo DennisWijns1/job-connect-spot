@@ -18,6 +18,8 @@ const WelcomePage = () => {
     const isLoggedIn = localStorage.getItem('handymatch_user');
     if (isLoggedIn) {
       navigate('/swipe');
+    } else if (type === 'handy') {
+      navigate('/handy/register');
     } else {
       navigate('/login', { state: { userType: type } });
     }

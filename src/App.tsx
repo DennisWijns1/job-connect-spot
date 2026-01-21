@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import WelcomePage from "./pages/WelcomePage";
 import LoginPage from "./pages/LoginPage";
+import HandyRegisterPage from "./pages/HandyRegisterPage";
 import SwipePage from "./pages/SwipePage";
 import MapPage from "./pages/MapPage";
 import AIHelpPage from "./pages/AIHelpPage";
@@ -12,7 +13,7 @@ import ChatsPage from "./pages/ChatsPage";
 import ChatDetailPage from "./pages/ChatDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import LearningPage from "./pages/LearningPage";
-import QuickCallPage from "./pages/QuickCallPage";
+import QuickChatPage from "./pages/QuickChatPage";
 import InstructorHomePage from "./pages/InstructorHomePage";
 import InstructorRegisterPage from "./pages/InstructorRegisterPage";
 import InstructorDashboardPage from "./pages/InstructorDashboardPage";
@@ -30,6 +31,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/handy/register" element={<HandyRegisterPage />} />
           <Route path="/swipe" element={<SwipePage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/ai" element={<AIHelpPage />} />
@@ -37,7 +39,7 @@ const App = () => (
           <Route path="/chat/:id" element={<ChatDetailPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/learning" element={<LearningPage />} />
-          <Route path="/quick-call" element={<QuickCallPage />} />
+          <Route path="/quick-chat" element={<QuickChatPage />} />
           <Route path="/instructor" element={<InstructorHomePage />} />
           <Route path="/instructor/register" element={<InstructorRegisterPage />} />
           <Route path="/instructor/dashboard" element={<InstructorDashboardPage />} />

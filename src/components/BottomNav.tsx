@@ -1,4 +1,4 @@
-import { Home, Map, MessageCircle, Bot, User, Video, GraduationCap } from 'lucide-react';
+import { Home, Map, MessageCircle, Bot, User, MessagesSquare, GraduationCap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -11,7 +11,7 @@ export const BottomNav = () => {
   const navItems = isSeeker ? [
     { icon: Home, label: 'Swipe', path: '/swipe' },
     { icon: Map, label: 'Kaart', path: '/map' },
-    { icon: Video, label: 'Quick Call', path: '/quick-call', highlight: true },
+    { icon: MessagesSquare, label: 'Quick Chat', path: '/quick-chat', highlight: true },
     { icon: Bot, label: 'AI Hulp', path: '/ai' },
     { icon: MessageCircle, label: 'Chats', path: '/chats' },
     { icon: User, label: 'Profiel', path: '/profile' },

@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { Video, Phone, Clock, User, X, Mic, MicOff, VideoOff } from 'lucide-react';
+import { Send, MessageCircle, Video, Clock, User, Phone, Mic, MicOff, VideoOff, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { mockHandyProfiles } from '@/data/mockData';
 import { toast } from 'sonner';
 
@@ -11,13 +12,24 @@ const MAX_CALL_DURATION = 300; // 5 minutes in seconds
 
 const availableHandys = mockHandyProfiles.filter(h => h.isOnline).slice(0, 4);
 
-const QuickCallPage = () => {
+interface ChatMessage {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: Date;
+  isUser: boolean;
+}
+
+const QuickChatPage = () => {
+  const [selectedHandy, setSelectedHandy] = useState<typeof availableHandys[0] | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [messageInput, setMessageInput] = useState('');
   const [isInCall, setIsInCall] = useState(false);
-  const [callPartner, setCallPartner] = useState<typeof availableHandys[0] | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(MAX_CALL_DURATION);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -25,31 +37,15 @@ const QuickCallPage = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const startCall = useCallback((handy: typeof availableHandys[0]) => {
-    setIsConnecting(true);
-    setCallPartner(handy);
-    
-    // Simulate connection delay
-    setTimeout(() => {
-      setIsConnecting(false);
-      setIsInCall(true);
-      setTimeRemaining(MAX_CALL_DURATION);
-      toast.success(`Verbonden met ${handy.name}!`, {
-        description: 'Je hebt 5 minuten voor deze Quick Call',
-      });
-    }, 2000);
-  }, []);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  const endCall = useCallback(() => {
-    setIsInCall(false);
-    setCallPartner(null);
-    setTimeRemaining(MAX_CALL_DURATION);
-    setIsMuted(false);
-    setIsVideoOff(false);
-    toast.info('Gesprek beëindigd');
-  }, []);
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
 
-  // Countdown timer
+  // Countdown timer for video call
   useEffect(() => {
     if (!isInCall) return;
     
@@ -57,8 +53,8 @@ const QuickCallPage = () => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           endCall();
-          toast.warning('Quick Call tijd verstreken', {
-            description: 'Start een nieuwe call als je meer hulp nodig hebt',
+          toast.warning('Quick Chat videogesprek beëindigd', {
+            description: 'Je kunt verder chatten of een nieuw videogesprek starten',
           });
           return MAX_CALL_DURATION;
         }
@@ -67,15 +63,91 @@ const QuickCallPage = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isInCall, endCall]);
+  }, [isInCall]);
+
+  const startChat = (handy: typeof availableHandys[0]) => {
+    setSelectedHandy(handy);
+    setChatMessages([
+      {
+        id: '1',
+        senderId: handy.id,
+        content: `Hallo! Ik ben ${handy.name}, ${handy.specialty.toLowerCase()}. Hoe kan ik je helpen?`,
+        timestamp: new Date(),
+        isUser: false,
+      },
+    ]);
+  };
+
+  const sendMessage = () => {
+    if (!messageInput.trim() || !selectedHandy) return;
+
+    const newMessage: ChatMessage = {
+      id: Date.now().toString(),
+      senderId: 'user',
+      content: messageInput,
+      timestamp: new Date(),
+      isUser: true,
+    };
+
+    setChatMessages(prev => [...prev, newMessage]);
+    setMessageInput('');
+
+    // Simulate handy response
+    setTimeout(() => {
+      const responses = [
+        'Ik snap het probleem! Dat kan ik zeker helpen oplossen.',
+        'Kun je misschien een foto sturen van het probleem?',
+        'Dat klinkt als iets wat we snel kunnen oplossen. Wil je een videogesprek starten zodat ik het kan zien?',
+        'Ik heb dit vaker gezien. Laat me je wat tips geven.',
+      ];
+      
+      const response: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        senderId: selectedHandy.id,
+        content: responses[Math.floor(Math.random() * responses.length)],
+        timestamp: new Date(),
+        isUser: false,
+      };
+      
+      setChatMessages(prev => [...prev, response]);
+    }, 1500);
+  };
+
+  const startVideoCall = () => {
+    if (!selectedHandy) return;
+    
+    setIsConnecting(true);
+    
+    setTimeout(() => {
+      setIsConnecting(false);
+      setIsInCall(true);
+      setTimeRemaining(MAX_CALL_DURATION);
+      toast.success(`Videogesprek gestart met ${selectedHandy.name}!`, {
+        description: 'Je hebt 5 minuten voor dit gesprek',
+      });
+    }, 2000);
+  };
+
+  const endCall = () => {
+    setIsInCall(false);
+    setTimeRemaining(MAX_CALL_DURATION);
+    setIsMuted(false);
+    setIsVideoOff(false);
+    toast.info('Videogesprek beëindigd');
+  };
+
+  const closeChat = () => {
+    setSelectedHandy(null);
+    setChatMessages([]);
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Quick Call" showBack />
+      <Header title="Quick Chat" showBack />
 
       <div className="px-4 py-6">
         <AnimatePresence mode="wait">
-          {!isInCall && !isConnecting ? (
+          {!selectedHandy && !isInCall && !isConnecting ? (
             <motion.div
               key="lobby"
               initial={{ opacity: 0, y: 20 }}
@@ -86,33 +158,37 @@ const QuickCallPage = () => {
               <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-background rounded-2xl p-6 mb-6 border border-accent/20">
                 <div className="flex items-start gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center">
-                    <Video className="w-7 h-7 text-accent-foreground" />
+                    <MessageCircle className="w-7 h-7 text-accent-foreground" />
                   </div>
                   <div className="flex-1">
                     <h2 className="font-display font-bold text-xl text-foreground mb-1">
-                      Snelle Video Hulp
+                      Snelle Chat & Video
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                      Start een 5-minuten videogesprek met een handyman in de buurt. Perfect voor snelle vragen of live begeleiding bij een klus.
+                      Start een chat met een beschikbare Handy. Als het probleem complexer is, kun je vanuit de chat een videogesprek starten voor live begeleiding.
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-4 mt-4 pt-4 border-t border-accent/10">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4 text-accent" />
-                    <span>Max 5 minuten</span>
+                    <MessageCircle className="w-4 h-4 text-accent" />
+                    <span>Chat eerst</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Video className="w-4 h-4 text-accent" />
-                    <span>FaceTime stijl</span>
+                    <span>Video indien nodig</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4 text-accent" />
+                    <span>Max 5 min video</span>
                   </div>
                 </div>
               </div>
 
               {/* Available Handys */}
               <h3 className="font-semibold text-foreground mb-4">
-                Beschikbare Handy's voor Quick Call
+                Beschikbare Handy's
               </h3>
 
               <div className="space-y-3">
@@ -144,11 +220,11 @@ const QuickCallPage = () => {
                       </div>
 
                       <Button
-                        onClick={() => startCall(handy)}
+                        onClick={() => startChat(handy)}
                         className="bg-gradient-to-r from-accent to-accent/80 hover:brightness-110 text-accent-foreground rounded-xl px-4"
                       >
-                        <Video className="w-4 h-4 mr-2" />
-                        Bel
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Chat
                       </Button>
                     </div>
                   </motion.div>
@@ -165,18 +241,18 @@ const QuickCallPage = () => {
             >
               <div className="relative mb-6">
                 <img
-                  src={callPartner?.avatar}
-                  alt={callPartner?.name}
+                  src={selectedHandy?.avatar}
+                  alt={selectedHandy?.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-accent"
                 />
                 <div className="absolute inset-0 rounded-full border-4 border-accent/30 animate-ping" />
               </div>
               <h3 className="font-display font-bold text-xl text-foreground mb-2">
-                Verbinden met {callPartner?.name}...
+                Verbinden met {selectedHandy?.name}...
               </h3>
               <p className="text-muted-foreground">Even geduld</p>
             </motion.div>
-          ) : (
+          ) : isInCall ? (
             <motion.div
               key="in-call"
               initial={{ opacity: 0 }}
@@ -187,8 +263,8 @@ const QuickCallPage = () => {
               {/* Video feed placeholder */}
               <div className="absolute inset-0 bg-gradient-to-br from-muted to-foreground">
                 <img
-                  src={callPartner?.avatar}
-                  alt={callPartner?.name}
+                  src={selectedHandy?.avatar}
+                  alt={selectedHandy?.name}
                   className="w-full h-full object-cover opacity-30"
                 />
               </div>
@@ -214,8 +290,8 @@ const QuickCallPage = () => {
 
               {/* Partner info */}
               <div className="absolute top-1/3 left-1/2 -translate-x-1/2 text-center">
-                <h3 className="text-2xl font-bold text-primary-foreground mb-1">{callPartner?.name}</h3>
-                <p className="text-primary-foreground/70">{callPartner?.specialty}</p>
+                <h3 className="text-2xl font-bold text-primary-foreground mb-1">{selectedHandy?.name}</h3>
+                <p className="text-primary-foreground/70">{selectedHandy?.specialty}</p>
               </div>
 
               {/* Call controls */}
@@ -254,7 +330,83 @@ const QuickCallPage = () => {
                 </button>
               </div>
             </motion.div>
-          )}
+          ) : selectedHandy ? (
+            <motion.div
+              key="chat"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="flex flex-col h-[calc(100vh-200px)]"
+            >
+              {/* Chat Header */}
+              <div className="flex items-center gap-3 pb-4 border-b border-border mb-4">
+                <button onClick={closeChat} className="p-2 hover:bg-muted rounded-xl transition-colors">
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+                <div className="relative">
+                  <img
+                    src={selectedHandy.avatar}
+                    alt={selectedHandy.name}
+                    className="w-12 h-12 rounded-xl object-cover"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-card" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-foreground">{selectedHandy.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedHandy.specialty}</p>
+                </div>
+                <Button
+                  onClick={startVideoCall}
+                  size="sm"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl"
+                >
+                  <Video className="w-4 h-4 mr-1" />
+                  Video
+                </Button>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                {chatMessages.map((msg) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] p-3 rounded-2xl ${
+                        msg.isUser
+                          ? 'bg-primary text-primary-foreground rounded-br-sm'
+                          : 'bg-card border border-border rounded-bl-sm'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.content}</p>
+                    </div>
+                  </motion.div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="flex items-center gap-3">
+                <Input
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Typ je bericht..."
+                  className="flex-1 h-12 rounded-xl bg-card border-border"
+                />
+                <Button
+                  onClick={sendMessage}
+                  disabled={!messageInput.trim()}
+                  className="h-12 w-12 rounded-xl bg-primary hover:bg-primary/90"
+                >
+                  <Send className="w-5 h-5" />
+                </Button>
+              </div>
+            </motion.div>
+          ) : null}
         </AnimatePresence>
       </div>
 
@@ -263,4 +415,4 @@ const QuickCallPage = () => {
   );
 };
 
-export default QuickCallPage;
+export default QuickChatPage;
