@@ -23,69 +23,66 @@ const urgencyLabels = {
 };
 
 export const ProjectCard = ({ project, className }: ProjectCardProps) => {
+  // Use first project photo as main image
+  const mainPhoto = project.photos.length > 0 ? project.photos[0] : 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&h=400&fit=crop';
+
   return (
-    <div
+    <div 
       className={cn(
-        'card-elevated overflow-hidden w-full max-w-sm mx-auto',
+        'bg-card rounded-3xl shadow-card overflow-hidden border border-border cursor-pointer h-full flex flex-col',
         className
       )}
     >
-      {/* Photo Section - Same aspect ratio as HandyCard */}
-      {project.photos.length > 0 && (
-        <div className="relative aspect-[3/4] overflow-hidden">
-          <img
-            src={project.photos[0]}
-            alt={project.title}
-            className="w-full h-full object-cover"
-          />
+      {/* Photo Section - Fills available space (same as HandyCard) */}
+      <div className="relative flex-1 min-h-0">
+        <img
+          src={mainPhoto}
+          alt={project.title}
+          className="w-full h-full object-cover"
+        />
+        
+        {/* Urgency Badge - Top left */}
+        <div className="absolute top-4 left-4">
+          <Badge className={cn('font-medium', urgencyStyles[project.urgency])}>
+            <AlertCircle className="w-3.5 h-3.5 mr-1" />
+            {urgencyLabels[project.urgency]}
+          </Badge>
+        </div>
 
-          {/* Urgency Badge */}
-          <div className="absolute top-4 left-4">
-            <Badge className={cn('font-medium', urgencyStyles[project.urgency])}>
-              <AlertCircle className="w-3.5 h-3.5 mr-1" />
-              {urgencyLabels[project.urgency]}
-            </Badge>
-          </div>
+        {/* Category Badge - Top right */}
+        <div className="absolute top-4 right-4">
+          <Badge className="bg-primary text-primary-foreground">
+            {project.category}
+          </Badge>
+        </div>
 
-          {/* Category */}
-          <div className="absolute top-4 right-4">
-            <Badge className="bg-primary text-primary-foreground">
-              {project.category}
-            </Badge>
-          </div>
+        {/* Gradient overlay at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-          {/* Gradient overlay */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          
-          {/* Title overlay at bottom */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="font-display font-bold text-xl text-white mb-1">
-              {project.title}
-            </h3>
-            <div className="flex items-center gap-2 text-white/90 text-sm">
-              <MapPin className="w-4 h-4" />
-              {project.location}
-            </div>
+        {/* Title and location overlay at bottom of image */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <h3 className="font-display font-bold text-xl text-white mb-1 line-clamp-2">
+            {project.title}
+          </h3>
+          <div className="flex items-center gap-2 text-white/90 text-sm">
+            <MapPin className="w-4 h-4" />
+            {project.location}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Info Section - Simplified since title moved to overlay */}
-      <div className="p-4">
-        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-          {project.description}
-        </p>
-
-        {/* Meta info */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4" />
-            {formatDistanceToNow(project.postedAt, { addSuffix: true, locale: nl })}
-          </div>
-          <span className="font-medium text-foreground">
-            {project.postedBy}
-          </span>
+      {/* Minimal Content - Only essential info (same as HandyCard) */}
+      <div className="p-4 flex items-center justify-between">
+        {/* Time posted */}
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Clock className="w-4 h-4" />
+          {formatDistanceToNow(project.postedAt, { addSuffix: true, locale: nl })}
         </div>
+
+        {/* Posted by */}
+        <span className="font-medium text-foreground text-sm">
+          {project.postedBy}
+        </span>
       </div>
     </div>
   );

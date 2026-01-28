@@ -172,15 +172,15 @@ const SwipePage = () => {
   const visibleItems = filteredItems.slice(currentIndex, currentIndex + 2);
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-hidden pb-[72px]">
       {/* Zone 1: Header - Fixed 64px */}
       <SwipeHeader
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
         onOpenSearch={() => isHandy ? setShowProjectSearch(true) : setShowHandyFilter(true)}
       />
 
-      {/* Zone 2: Swipe Area - Flexible, min 55% of screen */}
-      <div className="flex-1 min-h-0 flex items-center justify-center p-4" style={{ minHeight: '55vh' }}>
+      {/* Zone 2: Swipe Area - Flexible */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
         <div className="relative w-full max-w-[420px] h-full max-h-[520px]">
           <AnimatePresence>
             {visibleItems.map((item, index) => (
@@ -216,7 +216,7 @@ const SwipePage = () => {
         </div>
       </div>
 
-      {/* Zone 3: Action Bar - Fixed 96px */}
+      {/* Zone 3: Action Bar - Fixed 96px - ALWAYS visible for both roles */}
       <SwipeActionBar
         onReject={handleSwipeLeft}
         onAccept={handleSwipeRight}
@@ -225,7 +225,7 @@ const SwipePage = () => {
         disabled={visibleItems.length === 0}
       />
 
-      {/* Bottom Navigation - Separate from swipe layout */}
+      {/* Bottom Navigation - Fixed at bottom */}
       <BottomNav />
 
       {/* Modals - Outside main layout flow */}
