@@ -10,7 +10,7 @@ export const EmergencyButton = () => {
       {/* Floating Emergency Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-destructive shadow-lg flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
+        className="fixed bottom-28 right-4 w-14 h-14 rounded-full bg-destructive shadow-lg flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
       >
         <AlertTriangle className="w-7 h-7 text-destructive-foreground" />
       </button>

@@ -44,7 +44,7 @@ export const SwipeCard = ({
   return (
     <motion.div
       className={cn(
-        'absolute w-full touch-none',
+        'absolute w-full h-full touch-none',
         isTop ? 'z-10' : 'z-0'
       )}
       style={{ x, rotate, opacity }}
