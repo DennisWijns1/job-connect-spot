@@ -31,27 +31,33 @@ export const InstructorHeader = ({ title, showBack }: InstructorHeaderProps) => 
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-primary text-primary-foreground safe-area-top">
+      <header className="sticky top-0 z-40 bg-gradient-to-r from-primary via-primary to-accent/90 text-primary-foreground safe-area-top">
         <div className="flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
             {showBack && (
               <button 
                 onClick={() => navigate(-1)}
-                className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            <h1 className="font-display font-bold text-lg">{title}</h1>
+            {/* Logo met oranje accent */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                <span className="text-accent-foreground font-bold text-sm">HM</span>
+              </div>
+              <h1 className="font-display font-bold text-lg">{title}</h1>
+            </div>
           </div>
 
           <button 
             onClick={() => setShowFavorites(!showFavorites)}
-            className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors relative"
+            className="w-10 h-10 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center hover:bg-accent/30 transition-colors relative"
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-5 h-5 text-accent-foreground" />
             {mockFollowed.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                 {mockFollowed.length}
               </span>
             )}
