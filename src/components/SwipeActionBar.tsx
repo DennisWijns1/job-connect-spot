@@ -4,16 +4,16 @@ import { cn } from '@/lib/utils';
 interface SwipeActionBarProps {
   onReject: () => void;
   onAccept: () => void;
-  onCreateProject?: () => void;
-  showCreateProject?: boolean;
+  onThirdAction?: () => void;
+  thirdActionLabel?: string;
   disabled?: boolean;
 }
 
 export const SwipeActionBar = ({
   onReject,
   onAccept,
-  onCreateProject,
-  showCreateProject = false,
+  onThirdAction,
+  thirdActionLabel = "Actie",
   disabled = false,
 }: SwipeActionBarProps) => {
   return (
@@ -51,25 +51,20 @@ export const SwipeActionBar = ({
           <span className="text-4xl">🔨</span>
         </button>
 
-        {/* Right: Create project button (+) */}
-        {showCreateProject ? (
-          <button
-            onClick={onCreateProject}
-            disabled={disabled}
-            className={cn(
-              "w-14 h-14 rounded-full bg-card shadow-card flex items-center justify-center transition-all duration-200 border-2 border-accent/30",
-              disabled 
-                ? "opacity-50 cursor-not-allowed" 
-                : "text-accent hover:scale-110 hover:bg-accent hover:text-white active:scale-95"
-            )}
-            aria-label="Nieuw project"
-          >
-            <Plus className="w-7 h-7" strokeWidth={2.5} />
-          </button>
-        ) : (
-          // Placeholder to maintain 3-button layout symmetry
-          <div className="w-14 h-14" />
-        )}
+        {/* Right: Third action button (+) - Always visible */}
+        <button
+          onClick={onThirdAction}
+          disabled={disabled || !onThirdAction}
+          className={cn(
+            "w-14 h-14 rounded-full bg-card shadow-card flex items-center justify-center transition-all duration-200 border-2 border-accent/30",
+            disabled || !onThirdAction
+              ? "opacity-50 cursor-not-allowed" 
+              : "text-accent hover:scale-110 hover:bg-accent hover:text-white active:scale-95"
+          )}
+          aria-label={thirdActionLabel}
+        >
+          <Plus className="w-7 h-7" strokeWidth={2.5} />
+        </button>
       </div>
     </div>
   );

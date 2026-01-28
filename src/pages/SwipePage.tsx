@@ -176,8 +176,6 @@ const SwipePage = () => {
       {/* Zone 1: Header - Fixed 64px */}
       <SwipeHeader
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
-        showSearch
-        showFavorites={!isHandy}
         onOpenSearch={() => isHandy ? setShowProjectSearch(true) : setShowHandyFilter(true)}
       />
 
@@ -222,8 +220,8 @@ const SwipePage = () => {
       <SwipeActionBar
         onReject={handleSwipeLeft}
         onAccept={handleSwipeRight}
-        onCreateProject={() => setShowCreateProject(true)}
-        showCreateProject={!isHandy}
+        onThirdAction={() => setShowCreateProject(true)}
+        thirdActionLabel={isHandy ? "Nieuw aanbod" : "Nieuw project"}
         disabled={visibleItems.length === 0}
       />
 
