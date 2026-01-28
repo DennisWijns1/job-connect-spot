@@ -14,15 +14,8 @@ const WelcomePage = () => {
       return;
     }
     
-    // Check if already logged in - if so, go to swipe
-    const isLoggedIn = localStorage.getItem('handymatch_user');
-    if (isLoggedIn) {
-      navigate('/swipe');
-    } else if (type === 'handy') {
-      navigate('/handy/register');
-    } else {
-      navigate('/login', { state: { userType: type } });
-    }
+    // Always go to swipe for testing purposes
+    navigate('/swipe');
   };
 
   return (
