@@ -6,85 +6,87 @@
 
 @layer base {
   :root {
-    /* HandyMatch Design System - Premium, Calm & Trustworthy */
+    /* HandyMatch Design System - Trust, Warmth & Clarity */
     
-    /* Background - Soft Cream #F7F4EF */
-    --background: 40 30% 95%;
-    /* Text - Deep Charcoal #242424 */
-    --foreground: 0 0% 14%;
+    /* Background - Soft Cream #FDFBF7 */
+    --background: 40 60% 98%;
+    /* Text - Soft Anthracite #4F5B66 */
+    --foreground: 210 14% 35%;
 
-    /* Card - Clean white with warm tint */
-    --card: 40 20% 99%;
-    --card-foreground: 0 0% 14%;
+    /* Card - Clean warm white */
+    --card: 40 50% 99%;
+    --card-foreground: 210 14% 35%;
 
-    --popover: 40 20% 99%;
-    --popover-foreground: 0 0% 14%;
+    --popover: 40 50% 99%;
+    --popover-foreground: 210 14% 35%;
 
-    /* Primary - Deep Indigo #2E344E */
-    --primary: 228 26% 24%;
-    --primary-foreground: 40 30% 95%;
+    /* Primary - Deep Marine Blue #283E51 */
+    --primary: 208 33% 24%;
+    --primary-foreground: 40 60% 98%;
 
-    /* Accent - Warm Copper #B8734A */
-    --accent: 24 44% 50%;
-    --accent-foreground: 40 30% 95%;
+    /* Accent - Warm Terracotta #E67E22 */
+    --accent: 28 80% 52%;
+    --accent-foreground: 40 60% 98%;
 
     /* Secondary - Light cream for highlights */
-    --secondary: 40 25% 90%;
-    --secondary-foreground: 228 26% 24%;
+    --secondary: 40 40% 94%;
+    --secondary-foreground: 208 33% 24%;
 
-    --muted: 40 15% 88%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 40 25% 90%;
+    --muted-foreground: 210 14% 45%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Subtle green for verifications */
-    --success: 142 40% 45%;
+    /* Success - Sage Green #82A67D */
+    --success: 115 18% 57%;
     --success-foreground: 0 0% 100%;
 
-    --border: 40 15% 85%;
-    --input: 40 15% 85%;
-    --ring: 24 44% 50%;
+    --border: 40 20% 88%;
+    --input: 40 20% 88%;
+    --ring: 28 80% 52%;
 
     --radius: 1.25rem;
 
-    /* Custom shadows - Soft and elegant */
-    --shadow-card: 0 8px 32px -8px rgba(46, 52, 78, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
-    --shadow-card-hover: 0 16px 48px -8px rgba(46, 52, 78, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
-    --shadow-button: 0 6px 20px -4px rgba(184, 115, 74, 0.4);
+    /* Custom shadows - Soft and inviting */
+    --shadow-card: 0 8px 32px -8px rgba(40, 62, 81, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 16px 48px -8px rgba(40, 62, 81, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+    --shadow-button: 0 6px 20px -4px rgba(230, 126, 34, 0.35);
     --shadow-soft: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
 
     /* Sidebar */
-    --sidebar-background: 40 30% 95%;
-    --sidebar-foreground: 0 0% 14%;
-    --sidebar-primary: 228 26% 24%;
-    --sidebar-primary-foreground: 40 30% 95%;
-    --sidebar-accent: 24 44% 50%;
-    --sidebar-accent-foreground: 40 30% 95%;
-    --sidebar-border: 40 15% 85%;
-    --sidebar-ring: 24 44% 50%;
+    --sidebar-background: 40 60% 98%;
+    --sidebar-foreground: 210 14% 35%;
+    --sidebar-primary: 208 33% 24%;
+    --sidebar-primary-foreground: 40 60% 98%;
+    --sidebar-accent: 28 80% 52%;
+    --sidebar-accent-foreground: 40 60% 98%;
+    --sidebar-border: 40 20% 88%;
+    --sidebar-ring: 28 80% 52%;
   }
 
   .dark {
-    --background: 228 25% 10%;
-    --foreground: 40 20% 95%;
-    --card: 228 25% 15%;
-    --card-foreground: 40 20% 95%;
-    --popover: 228 25% 15%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 24 44% 55%;
-    --primary-foreground: 228 25% 10%;
-    --accent: 24 44% 50%;
-    --accent-foreground: 228 25% 10%;
-    --secondary: 228 20% 20%;
-    --secondary-foreground: 40 20% 95%;
-    --muted: 228 20% 18%;
-    --muted-foreground: 40 15% 60%;
+    --background: 208 30% 8%;
+    --foreground: 40 30% 95%;
+    --card: 208 28% 12%;
+    --card-foreground: 40 30% 95%;
+    --popover: 208 28% 12%;
+    --popover-foreground: 40 30% 95%;
+    --primary: 28 80% 55%;
+    --primary-foreground: 208 30% 8%;
+    --accent: 28 80% 52%;
+    --accent-foreground: 208 30% 8%;
+    --secondary: 208 25% 18%;
+    --secondary-foreground: 40 30% 95%;
+    --muted: 208 22% 16%;
+    --muted-foreground: 40 20% 60%;
     --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 228 20% 20%;
-    --input: 228 20% 20%;
-    --ring: 24 44% 50%;
+    --success: 115 18% 50%;
+    --success-foreground: 0 0% 100%;
+    --border: 208 22% 18%;
+    --input: 208 22% 18%;
+    --ring: 28 80% 52%;
   }
 }
 
@@ -127,7 +129,7 @@
     transform: translateY(-4px);
   }
 
-  /* CTA Button with copper glow */
+  /* CTA Button with terracotta glow */
   .btn-cta {
     @apply bg-accent text-accent-foreground font-semibold rounded-[20px];
     box-shadow: var(--shadow-button);
@@ -136,12 +138,27 @@
 
   .btn-cta:hover {
     @apply brightness-110;
-    box-shadow: 0 8px 28px -4px rgba(184, 115, 74, 0.5);
+    box-shadow: 0 8px 28px -4px rgba(230, 126, 34, 0.45);
     transform: translateY(-2px);
   }
 
   .btn-cta:active {
     transform: translateY(0);
+  }
+
+  /* Success button with sage green */
+  .btn-success {
+    @apply font-semibold rounded-[20px];
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+    box-shadow: 0 6px 20px -4px rgba(130, 166, 125, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    @apply brightness-110;
+    box-shadow: 0 8px 28px -4px rgba(130, 166, 125, 0.5);
+    transform: translateY(-2px);
   }
 
   /* Trust badge */
@@ -165,11 +182,19 @@
   
   /* Gradient backgrounds */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(228 26% 24%) 0%, hsl(24 44% 50%) 100%);
+    background: linear-gradient(135deg, hsl(208 33% 24%) 0%, hsl(208 33% 32%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(24 44% 50%) 0%, hsl(24 44% 40%) 100%);
+    background: linear-gradient(135deg, hsl(28 80% 52%) 0%, hsl(28 80% 45%) 100%);
+  }
+
+  .gradient-warm {
+    background: linear-gradient(135deg, hsl(28 80% 52%) 0%, hsl(28 70% 58%) 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, hsl(115 18% 57%) 0%, hsl(115 18% 50%) 100%);
   }
 
   /* Swipe card animations */
