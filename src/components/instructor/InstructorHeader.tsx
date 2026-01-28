@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Heart, X, Star, MapPin } from 'lucide-react';
+import { ArrowLeft, Star, X, MapPin } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FollowedPerson {
@@ -31,7 +31,7 @@ export const InstructorHeader = ({ title, showBack }: InstructorHeaderProps) => 
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-gradient-to-r from-primary via-primary to-accent/90 text-primary-foreground safe-area-top">
+      <header className="sticky top-0 z-40 bg-gradient-to-r from-primary via-primary/90 to-accent text-primary-foreground safe-area-top">
         <div className="flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
             {showBack && (
@@ -44,8 +44,8 @@ export const InstructorHeader = ({ title, showBack }: InstructorHeaderProps) => 
             )}
             {/* Logo met oranje accent */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-sm">HM</span>
+              <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-sm">HM</span>
               </div>
               <h1 className="font-display font-bold text-lg">{title}</h1>
             </div>
@@ -53,11 +53,11 @@ export const InstructorHeader = ({ title, showBack }: InstructorHeaderProps) => 
 
           <button 
             onClick={() => setShowFavorites(!showFavorites)}
-            className="w-10 h-10 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center hover:bg-accent/30 transition-colors relative"
+            className="w-10 h-10 rounded-xl bg-accent/30 border border-accent/40 flex items-center justify-center hover:bg-accent/40 transition-colors relative"
           >
-            <Heart className="w-5 h-5 text-accent-foreground" />
+            <Star className="w-5 h-5 text-white fill-accent" />
             {mockFollowed.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                 {mockFollowed.length}
               </span>
             )}
@@ -83,7 +83,10 @@ export const InstructorHeader = ({ title, showBack }: InstructorHeaderProps) => 
               className="fixed top-16 right-4 w-80 bg-card rounded-2xl shadow-card border border-border z-50 overflow-hidden"
             >
               <div className="flex items-center justify-between p-4 border-b border-border">
-                <h3 className="font-semibold text-foreground">Mijn favorieten</h3>
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Star className="w-4 h-4 text-accent fill-accent" />
+                  Mijn favorieten
+                </h3>
                 <button 
                   onClick={() => setShowFavorites(false)}
                   className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
@@ -95,7 +98,7 @@ export const InstructorHeader = ({ title, showBack }: InstructorHeaderProps) => 
               <ScrollArea className="max-h-80">
                 {mockFollowed.length === 0 ? (
                   <div className="p-6 text-center">
-                    <Heart className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                    <Star className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Je volgt nog niemand</p>
                   </div>
                 ) : (

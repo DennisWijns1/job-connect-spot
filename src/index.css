@@ -20,9 +20,9 @@
     --popover: 40 50% 99%;
     --popover-foreground: 210 14% 35%;
 
-    /* Primary - Lighter Marine Blue #3A5570 (lichter dan voorheen) */
-    --primary: 210 30% 33%;
-    --primary-foreground: 40 60% 98%;
+    /* Primary - Softer Marine Blue #5A7A94 (even lighter for better balance) */
+    --primary: 210 25% 47%;
+    --primary-foreground: 0 0% 100%;
 
     /* Accent - Warm Terracotta #E67E22 */
     --accent: 28 80% 52%;

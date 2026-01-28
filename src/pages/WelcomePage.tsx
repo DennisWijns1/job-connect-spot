@@ -36,7 +36,7 @@ const WelcomePage = () => {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="w-24 h-24 rounded-[24px] gradient-primary flex items-center justify-center shadow-lg">
+          <div className="w-24 h-24 rounded-[24px] bg-gradient-to-br from-primary via-primary/80 to-accent flex items-center justify-center shadow-lg">
             <Hammer className="w-12 h-12 text-white" />
           </div>
         </motion.div>

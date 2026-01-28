@@ -65,7 +65,7 @@ const MapPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Kaart" showFilters />
+      <Header title="Kaart" showFavorites />
 
       <div className="relative h-[calc(100vh-180px)] mx-4 mt-4 rounded-3xl overflow-hidden shadow-card">
         {/* Map Background */}
