@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { HammerRating } from './HammerRating';
 
 interface FavoriteHandy {
   id: string;
@@ -11,13 +12,48 @@ interface FavoriteHandy {
   avatar: string;
   specialty: string;
   rating: number;
+  reviewCount: number;
+  location: string;
 }
 
 // Mock data - zou uit database komen
 const mockFavoriteHandies: FavoriteHandy[] = [
-  { id: '1', name: 'Jan Peeters', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', specialty: 'Loodgieter', rating: 4.8 },
-  { id: '2', name: 'Mieke Janssen', avatar: 'https://randomuser.me/api/portraits/women/44.jpg', specialty: 'Elektricien', rating: 4.9 },
-  { id: '3', name: 'Peter Van den Berg', avatar: 'https://randomuser.me/api/portraits/men/55.jpg', specialty: 'Dakdekker', rating: 4.7 },
+  { 
+    id: '1', 
+    name: 'Jan Peeters', 
+    avatar: 'https://randomuser.me/api/portraits/men/32.jpg', 
+    specialty: 'Loodgieter', 
+    rating: 4.8,
+    reviewCount: 127,
+    location: 'Leuven'
+  },
+  { 
+    id: '2', 
+    name: 'Mieke Janssen', 
+    avatar: 'https://randomuser.me/api/portraits/women/44.jpg', 
+    specialty: 'Elektricien', 
+    rating: 4.9,
+    reviewCount: 89,
+    location: 'Brussel'
+  },
+  { 
+    id: '3', 
+    name: 'Peter Van den Berg', 
+    avatar: 'https://randomuser.me/api/portraits/men/55.jpg', 
+    specialty: 'Dakdekker', 
+    rating: 4.7,
+    reviewCount: 56,
+    location: 'Antwerpen'
+  },
+  { 
+    id: '4', 
+    name: 'Lisa De Smet', 
+    avatar: 'https://randomuser.me/api/portraits/women/68.jpg', 
+    specialty: 'Schilder', 
+    rating: 4.6,
+    reviewCount: 34,
+    location: 'Gent'
+  },
 ];
 
 interface HeaderProps {
@@ -160,12 +196,12 @@ export const Header = ({
               initial={{ opacity: 0, y: -10, x: 10 }}
               animate={{ opacity: 1, y: 0, x: 0 }}
               exit={{ opacity: 0, y: -10, x: 10 }}
-              className="fixed top-16 right-4 w-80 bg-card rounded-2xl shadow-card border border-border z-50 overflow-hidden"
+              className="fixed top-16 right-4 left-4 sm:left-auto sm:w-96 bg-card rounded-2xl shadow-card border border-border z-50 overflow-hidden"
             >
-              <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/5 to-accent/5">
                 <h3 className="font-semibold text-foreground flex items-center gap-2">
-                  <Star className="w-4 h-4 text-accent fill-accent" />
-                  Mijn favoriete handy's
+                  <Star className="w-5 h-5 text-accent fill-accent" />
+                  Opgeslagen handy's
                 </h3>
                 <button 
                   onClick={() => setShowFavoritesMenu(false)}
@@ -175,14 +211,17 @@ export const Header = ({
                 </button>
               </div>
 
-              <ScrollArea className="max-h-80">
+              <ScrollArea className="max-h-[60vh]">
                 {mockFavoriteHandies.length === 0 ? (
-                  <div className="p-6 text-center">
-                    <Star className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Je hebt nog geen favorieten</p>
+                  <div className="p-8 text-center">
+                    <Star className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground">Je hebt nog geen favorieten</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Swipe naar rechts om een handy op te slaan
+                    </p>
                   </div>
                 ) : (
-                  <div className="p-2">
+                  <div className="p-3 space-y-2">
                     {mockFavoriteHandies.map((handy) => (
                       <button
                         key={handy.id}
@@ -190,22 +229,26 @@ export const Header = ({
                           setShowFavoritesMenu(false);
                           navigate(`/profile/${handy.id}`);
                         }}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-colors"
+                        className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-muted transition-colors group"
                       >
                         <img 
                           src={handy.avatar} 
                           alt={handy.name}
-                          className="w-12 h-12 rounded-xl object-cover"
+                          className="w-14 h-14 rounded-xl object-cover ring-2 ring-border group-hover:ring-accent transition-all"
                         />
                         <div className="flex-1 text-left">
-                          <p className="font-medium text-foreground">{handy.name}</p>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{handy.specialty}</span>
-                            <span className="flex items-center gap-0.5">
-                              <Star className="w-3 h-3 text-accent fill-accent" />
-                              {handy.rating}
-                            </span>
+                          <p className="font-semibold text-foreground group-hover:text-accent transition-colors">
+                            {handy.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {handy.specialty} • {handy.location}
+                          </p>
+                          <div className="mt-1">
+                            <HammerRating rating={handy.rating} size="xs" showCount reviewCount={handy.reviewCount} />
                           </div>
+                        </div>
+                        <div className="text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                          →
                         </div>
                       </button>
                     ))}

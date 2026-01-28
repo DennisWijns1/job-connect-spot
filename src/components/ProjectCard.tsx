@@ -30,9 +30,9 @@ export const ProjectCard = ({ project, className }: ProjectCardProps) => {
         className
       )}
     >
-      {/* Photo Section */}
+      {/* Photo Section - Same aspect ratio as HandyCard */}
       {project.photos.length > 0 && (
-        <div className="relative h-56 overflow-hidden">
+        <div className="relative aspect-[3/4] overflow-hidden">
           <img
             src={project.photos[0]}
             alt={project.title}
@@ -55,37 +55,36 @@ export const ProjectCard = ({ project, className }: ProjectCardProps) => {
           </div>
 
           {/* Gradient overlay */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          
+          {/* Title overlay at bottom */}
+          <div className="absolute bottom-4 left-4 right-4">
+            <h3 className="font-display font-bold text-xl text-white mb-1">
+              {project.title}
+            </h3>
+            <div className="flex items-center gap-2 text-white/90 text-sm">
+              <MapPin className="w-4 h-4" />
+              {project.location}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Info Section */}
-      <div className="p-5">
-        <h3 className="font-display font-bold text-xl text-foreground mb-2">
-          {project.title}
-        </h3>
-
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+      {/* Info Section - Simplified since title moved to overlay */}
+      <div className="p-4">
+        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
           {project.description}
         </p>
 
         {/* Meta info */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4" />
-            {project.location}
-          </div>
-          <div className="flex items-center gap-1.5">
             <Clock className="w-4 h-4" />
             {formatDistanceToNow(project.postedAt, { addSuffix: true, locale: nl })}
           </div>
-        </div>
-
-        {/* Posted by */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            Geplaatst door <span className="font-medium text-foreground">{project.postedBy}</span>
-          </p>
+          <span className="font-medium text-foreground">
+            {project.postedBy}
+          </span>
         </div>
       </div>
     </div>

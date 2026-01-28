@@ -22,8 +22,8 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
       )}
       onClick={onClick}
     >
-      {/* Work Photo - Larger display */}
-      <div className="relative h-64">
+      {/* Work Photo - Much larger display for better proportions */}
+      <div className="relative aspect-[3/4]">
         <img
           src={mainPhoto}
           alt={`Werk van ${handy.name}`}
@@ -49,25 +49,25 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
         )}
 
         {/* Gradient overlay at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
         {/* Name and avatar overlay at bottom of image */}
         <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
           <img
             src={handy.avatar}
             alt={handy.name}
-            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
+            className="w-14 h-14 rounded-full object-cover border-3 border-white shadow-lg"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-display font-bold text-lg text-white truncate">
+              <h3 className="font-display font-bold text-xl text-white truncate">
                 {handy.name}
               </h3>
               {handy.isVerified && (
-                <Shield className="w-4 h-4 text-white fill-white/30 flex-shrink-0" />
+                <Shield className="w-5 h-5 text-white fill-white/30 flex-shrink-0" />
               )}
             </div>
-            <p className="text-white/80 text-sm">{handy.specialty}</p>
+            <p className="text-white/90 text-sm font-medium">{handy.specialty}</p>
           </div>
         </div>
       </div>

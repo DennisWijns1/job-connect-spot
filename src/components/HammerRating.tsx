@@ -1,7 +1,7 @@
 interface HammerRatingProps {
   rating: number;
   maxRating?: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   showCount?: boolean;
   reviewCount?: number;
 }
@@ -16,6 +16,7 @@ export const HammerRating = ({
   const fullHammers = Math.floor(rating);
 
   const sizeClasses = {
+    xs: 'text-[8px]',
     sm: 'text-[10px]',
     md: 'text-sm',
     lg: 'text-lg',

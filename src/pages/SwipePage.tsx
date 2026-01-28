@@ -8,14 +8,14 @@ import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
-import { HandyFilterModal } from '@/components/HandyFilterModal';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
 import { MyProjectsSheet } from '@/components/MyProjectsSheet';
 import { CalendarSheet } from '@/components/CalendarSheet';
+import { CreateProjectSheet } from '@/components/CreateProjectSheet';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 
 const SwipePage = () => {
   const navigate = useNavigate();
@@ -40,6 +40,7 @@ const SwipePage = () => {
   const [showProjectSearch, setShowProjectSearch] = useState(false);
   const [showMyProjects, setShowMyProjects] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showCreateProject, setShowCreateProject] = useState(false);
 
   // Mark problem dialog as shown when it's closed
   useEffect(() => {
@@ -197,7 +198,7 @@ const SwipePage = () => {
 
       <div className="flex-1 px-4 py-2 flex flex-col overflow-hidden">
         {/* Card Stack */}
-        <div className="relative flex-1 min-h-[280px] max-h-[320px] w-full max-w-md mx-auto">
+        <div className="relative flex-1 min-h-[400px] max-h-[480px] w-full max-w-sm mx-auto">
           <AnimatePresence>
             {visibleItems.map((item, index) => (
               <SwipeCard
@@ -258,6 +259,16 @@ const SwipePage = () => {
         </button>
       )}
 
+      {/* Floating Plus Button for Seekers - Quick project creation (LEFT side) */}
+      {!isHandy && (
+        <button
+          onClick={() => setShowCreateProject(true)}
+          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-accent to-accent/80 text-white shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
+        >
+          <Plus className="w-7 h-7" strokeWidth={2.5} />
+        </button>
+      )}
+
       {/* Project Search Modal - for Handy's */}
       <ProjectSearchModal
         isOpen={showProjectSearch}
@@ -270,6 +281,16 @@ const SwipePage = () => {
         isOpen={showMyProjects}
         onClose={() => setShowMyProjects(false)}
         userType={isHandy ? 'handy' : 'seeker'}
+        onCreateProject={() => {
+          setShowMyProjects(false);
+          setShowCreateProject(true);
+        }}
+      />
+
+      {/* Create Project Sheet - for Seekers */}
+      <CreateProjectSheet
+        isOpen={showCreateProject}
+        onClose={() => setShowCreateProject(false)}
       />
 
       {/* Problem Input Dialog - Only for seekers */}

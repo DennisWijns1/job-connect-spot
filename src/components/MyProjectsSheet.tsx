@@ -1,13 +1,14 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Wrench, Clock, Users, MessageCircle, CheckCircle, Calendar } from 'lucide-react';
+import { Wrench, Clock, Users, MessageCircle, CheckCircle, Calendar, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface MyProjectsSheetProps {
   isOpen: boolean;
   onClose: () => void;
   userType: 'handy' | 'seeker';
+  onCreateProject?: () => void;
 }
 
 // Mock data for handy user's projects (projects they applied for / are working on)
@@ -58,7 +59,7 @@ const seekerProjects = [
   },
 ];
 
-export const MyProjectsSheet = ({ isOpen, onClose, userType }: MyProjectsSheetProps) => {
+export const MyProjectsSheet = ({ isOpen, onClose, userType, onCreateProject }: MyProjectsSheetProps) => {
   const navigate = useNavigate();
   const isHandy = userType === 'handy';
   const projects = isHandy ? handyProjects : seekerProjects;
@@ -101,6 +102,17 @@ export const MyProjectsSheet = ({ isOpen, onClose, userType }: MyProjectsSheetPr
         </SheetHeader>
 
         <div className="mt-6 space-y-4">
+          {/* Create Project Button - Only for seekers */}
+          {!isHandy && onCreateProject && (
+            <Button 
+              onClick={onCreateProject}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-accent to-accent/80 text-white font-semibold"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Nieuw project plaatsen
+            </Button>
+          )}
+
           {/* Filters */}
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="rounded-full text-xs">
