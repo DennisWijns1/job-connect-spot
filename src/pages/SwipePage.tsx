@@ -6,6 +6,7 @@ import { EmergencyButton } from '@/components/EmergencyButton';
 import { SwipeCard, SwipeButtons } from '@/components/SwipeCard';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
+import { HandyFilterModal } from '@/components/HandyFilterModal';
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
@@ -38,6 +39,7 @@ const SwipePage = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [currentProblem, setCurrentProblem] = useState<string | null>(null);
   const [showProjectSearch, setShowProjectSearch] = useState(false);
+  const [showHandyFilter, setShowHandyFilter] = useState(false);
   const [showMyProjects, setShowMyProjects] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -185,7 +187,7 @@ const SwipePage = () => {
       <Header
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
         showSearch={!isHandy}
-        onOpenSearch={() => setShowProblemDialog(true)}
+        onOpenSearch={() => setShowHandyFilter(true)}
         showOnlineToggle={isHandy}
         isOnline={isOnline}
         onToggleOnline={() => setIsOnline(!isOnline)}
@@ -320,6 +322,12 @@ const SwipePage = () => {
       <CalendarSheet
         isOpen={showCalendar}
         onClose={() => setShowCalendar(false)}
+      />
+
+      {/* Handy Filter Modal - for seekers */}
+      <HandyFilterModal
+        isOpen={showHandyFilter}
+        onClose={() => setShowHandyFilter(false)}
       />
     </div>
   );

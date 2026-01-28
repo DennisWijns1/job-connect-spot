@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Search as SearchIcon, MapPin, Euro } from 'lucide-react';
+import { X, Search as SearchIcon, MapPin, Euro, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
@@ -17,6 +17,7 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
   const [locationSearch, setLocationSearch] = useState('');
   const [distanceKm, setDistanceKm] = useState([15]);
   const [hourlyRate, setHourlyRate] = useState([20, 60]);
+  const [minRating, setMinRating] = useState([3]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -55,9 +56,9 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
         className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl max-h-[85vh] overflow-y-auto safe-area-bottom"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-secondary px-6 py-4 border-b border-secondary/20 flex items-center justify-between">
+        <div className="sticky top-0 bg-secondary px-6 py-4 border-b border-secondary/20 flex items-center justify-between z-10">
           <h2 className="font-display font-bold text-xl text-foreground">
-            Filter Projecten
+            Filter Handy's
           </h2>
           <button
             onClick={onClose}
@@ -120,6 +121,37 @@ export const HandyFilterModal = ({ isOpen, onClose }: HandyFilterModalProps) => 
                 <span>50 km</span>
               </div>
             </div>
+          </div>
+
+          {/* Minimum Rating Slider */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Star className="w-4 h-4 text-accent fill-accent" />
+              Minimum beoordeling
+            </h3>
+            <div className="bg-background rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-muted-foreground">Minimaal</span>
+                <span className="text-sm font-semibold text-accent flex items-center gap-1">
+                  {minRating[0]} <span className="text-lg">🔨</span>
+                </span>
+              </div>
+              <Slider
+                value={minRating}
+                onValueChange={setMinRating}
+                max={5}
+                min={1}
+                step={0.5}
+                className="w-full"
+              />
+              <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                <span>1 🔨</span>
+                <span>5 🔨</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Toon alleen handy's met minimaal deze beoordeling
+            </p>
           </div>
 
           {/* Hourly Rate Slider */}
