@@ -57,19 +57,27 @@ const mockFavoriteHandies: FavoriteHandy[] = [
 
 interface SwipeHeaderProps {
   title: string;
-  showSearch?: boolean;
-  showFavorites?: boolean;
   onOpenSearch?: () => void;
+  onOpenFavorites?: () => void;
+  favoriteCount?: number;
 }
 
 export const SwipeHeader = ({
   title,
-  showSearch = false,
-  showFavorites = false,
   onOpenSearch,
+  onOpenFavorites,
+  favoriteCount = 0,
 }: SwipeHeaderProps) => {
   const navigate = useNavigate();
   const [showFavoritesMenu, setShowFavoritesMenu] = useState(false);
+
+  const handleFavoritesClick = () => {
+    if (onOpenFavorites) {
+      onOpenFavorites();
+    } else {
+      setShowFavoritesMenu(!showFavoritesMenu);
+    }
+  };
 
   return (
     <>
@@ -86,32 +94,28 @@ export const SwipeHeader = ({
             </h1>
           </div>
 
-          {/* Right: Max 2 action icons (search + favorites) */}
+          {/* Right: Always show 2 action icons (search + favorites) */}
           <div className="flex items-center gap-2">
-            {showSearch && (
-              <button
-                onClick={onOpenSearch}
-                className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
-                aria-label="Zoeken en filteren"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            )}
+            <button
+              onClick={onOpenSearch}
+              className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
+              aria-label="Zoeken en filteren"
+            >
+              <Search className="w-5 h-5" />
+            </button>
 
-            {showFavorites && (
-              <button
-                onClick={() => setShowFavoritesMenu(!showFavoritesMenu)}
-                className="w-10 h-10 rounded-xl bg-accent/30 border border-accent/40 flex items-center justify-center hover:bg-accent/40 transition-colors relative"
-                aria-label="Favorieten"
-              >
-                <Star className="w-5 h-5 text-white fill-accent" />
-                {mockFavoriteHandies.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
-                    {mockFavoriteHandies.length}
-                  </span>
-                )}
-              </button>
-            )}
+            <button
+              onClick={handleFavoritesClick}
+              className="w-10 h-10 rounded-xl bg-accent/30 border border-accent/40 flex items-center justify-center hover:bg-accent/40 transition-colors relative"
+              aria-label="Favorieten"
+            >
+              <Star className="w-5 h-5 text-white fill-accent" />
+              {(favoriteCount > 0 || mockFavoriteHandies.length > 0) && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                  {favoriteCount || mockFavoriteHandies.length}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </header>
