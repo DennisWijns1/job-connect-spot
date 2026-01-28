@@ -196,9 +196,9 @@ const SwipePage = () => {
         showFavorites={!isHandy}
       />
 
-      <div className="flex-1 px-4 py-2 flex flex-col overflow-hidden">
+      <div className="flex-1 px-4 py-2 flex flex-col">
         {/* Card Stack */}
-        <div className="relative flex-1 min-h-[400px] max-h-[480px] w-full max-w-sm mx-auto">
+        <div className="relative flex-1 w-full max-w-sm mx-auto" style={{ minHeight: '60vh', maxHeight: '65vh' }}>
           <AnimatePresence>
             {visibleItems.map((item, index) => (
               <SwipeCard

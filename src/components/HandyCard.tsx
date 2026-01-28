@@ -17,13 +17,13 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
   return (
     <div 
       className={cn(
-        'bg-card rounded-3xl shadow-card overflow-hidden border border-border cursor-pointer',
+        'bg-card rounded-3xl shadow-card overflow-hidden border border-border cursor-pointer h-full flex flex-col',
         className
       )}
       onClick={onClick}
     >
-      {/* Work Photo - Much larger display for better proportions */}
-      <div className="relative aspect-[3/4]">
+      {/* Work Photo - Fills available space */}
+      <div className="relative flex-1 min-h-0">
         <img
           src={mainPhoto}
           alt={`Werk van ${handy.name}`}
