@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { EmergencyButton } from '@/components/EmergencyButton';
-import { SwipeCard, SwipeButtons } from '@/components/SwipeCard';
+import { SwipeCard } from '@/components/SwipeCard';
+import { SwipeHeader } from '@/components/SwipeHeader';
+import { SwipeActionBar } from '@/components/SwipeActionBar';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
 import { HandyFilterModal } from '@/components/HandyFilterModal';
@@ -11,12 +11,10 @@ import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
 import { MyProjectsSheet } from '@/components/MyProjectsSheet';
-import { CalendarSheet } from '@/components/CalendarSheet';
 import { CreateProjectSheet } from '@/components/CreateProjectSheet';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus } from 'lucide-react';
 
 const SwipePage = () => {
   const navigate = useNavigate();
@@ -31,7 +29,6 @@ const SwipePage = () => {
   const [allItems] = useState(isHandy ? mockProjects : mockHandyProfiles);
   const [filteredItems, setFilteredItems] = useState(allItems);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isOnline, setIsOnline] = useState(true);
   const [showProblemDialog, setShowProblemDialog] = useState(!isHandy && !hasShownProblemDialog);
   const [selectedHandy, setSelectedHandy] = useState<HandyProfile | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -41,7 +38,6 @@ const SwipePage = () => {
   const [showProjectSearch, setShowProjectSearch] = useState(false);
   const [showHandyFilter, setShowHandyFilter] = useState(false);
   const [showMyProjects, setShowMyProjects] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
 
   // Mark problem dialog as shown when it's closed
@@ -55,7 +51,6 @@ const SwipePage = () => {
   const filterByProblem = useCallback((problem: string) => {
     const lowerProblem = problem.toLowerCase();
     
-    // Map common problem keywords to specialties/categories
     const keywordMap: Record<string, string[]> = {
       'kraan': ['loodgieter', 'sanitair', 'lekken'],
       'lekt': ['loodgieter', 'sanitair', 'lekken'],
@@ -72,7 +67,6 @@ const SwipePage = () => {
       'muur': ['schilder', 'schilderen', 'behangen'],
     };
 
-    // Find matching keywords
     const matchingCategories: string[] = [];
     Object.entries(keywordMap).forEach(([keyword, categories]) => {
       if (lowerProblem.includes(keyword)) {
@@ -81,10 +75,8 @@ const SwipePage = () => {
     });
 
     if (matchingCategories.length === 0) {
-      // No specific match, show all
       setFilteredItems(allItems);
     } else {
-      // Filter profiles that match any of the categories
       const filtered = (allItems as HandyProfile[]).filter(profile => {
         const specialtyMatch = matchingCategories.some(cat => 
           profile.specialty.toLowerCase().includes(cat)
@@ -107,7 +99,6 @@ const SwipePage = () => {
   }, [allItems]);
 
   const handleProjectSearch = useCallback((filters: ProjectFilters) => {
-    // Filter projects based on search criteria
     let filtered = mockProjects;
     
     if (filters.specialty) {
@@ -121,8 +112,6 @@ const SwipePage = () => {
         project.location?.toLowerCase().includes(filters.location.toLowerCase())
       );
     }
-    
-    // Note: Budget filtering would be applied here once budget fields are added to projects
     
     setFilteredItems(filtered.length > 0 ? filtered : mockProjects);
     setCurrentIndex(0);
@@ -183,24 +172,18 @@ const SwipePage = () => {
   const visibleItems = filteredItems.slice(currentIndex, currentIndex + 2);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      {/* Zone 1: Header - Fixed 64px */}
+      <SwipeHeader
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
-        showSearch={!isHandy}
-        onOpenSearch={() => setShowHandyFilter(true)}
-        showOnlineToggle={isHandy}
-        isOnline={isOnline}
-        onToggleOnline={() => setIsOnline(!isOnline)}
-        showProjectsButton
-        onOpenProjects={() => setShowMyProjects(true)}
-        showCalendar
-        onOpenCalendar={() => setShowCalendar(true)}
+        showSearch
         showFavorites={!isHandy}
+        onOpenSearch={() => isHandy ? setShowProjectSearch(true) : setShowHandyFilter(true)}
       />
 
-      <div className="flex-1 px-4 py-2 flex flex-col">
-        {/* Card Stack */}
-        <div className="relative flex-1 w-full max-w-sm mx-auto" style={{ minHeight: '60vh', maxHeight: '65vh' }}>
+      {/* Zone 2: Swipe Area - Flexible, min 55% of screen */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4" style={{ minHeight: '55vh' }}>
+        <div className="relative w-full max-w-[420px] h-full max-h-[520px]">
           <AnimatePresence>
             {visibleItems.map((item, index) => (
               <SwipeCard
@@ -233,52 +216,27 @@ const SwipePage = () => {
             </motion.div>
           )}
         </div>
-
-        {/* Swipe Buttons - Fixed position above bottom nav */}
-        {visibleItems.length > 0 && (
-          <div className="w-full max-w-md mx-auto py-4 mt-auto">
-            <SwipeButtons
-              onSwipeLeft={handleSwipeLeft}
-              onSwipeRight={handleSwipeRight}
-            />
-          </div>
-        )}
       </div>
 
-      {/* Spacer for bottom nav */}
-      <div className="h-24" />
+      {/* Zone 3: Action Bar - Fixed 96px */}
+      <SwipeActionBar
+        onReject={handleSwipeLeft}
+        onAccept={handleSwipeRight}
+        onCreateProject={() => setShowCreateProject(true)}
+        showCreateProject={!isHandy}
+        disabled={visibleItems.length === 0}
+      />
 
-      {!isHandy && <EmergencyButton />}
+      {/* Bottom Navigation - Separate from swipe layout */}
       <BottomNav />
-      
-      {/* Floating Search Button for Handy's - to search projects (LEFT side) */}
-      {isHandy && (
-        <button
-          onClick={() => setShowProjectSearch(true)}
-          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent text-white shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
-        >
-          <Search className="w-6 h-6" />
-        </button>
-      )}
 
-      {/* Floating Plus Button for Seekers - Quick project creation (LEFT side) */}
-      {!isHandy && (
-        <button
-          onClick={() => setShowCreateProject(true)}
-          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-accent to-accent/80 text-white shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
-        >
-          <Plus className="w-7 h-7" strokeWidth={2.5} />
-        </button>
-      )}
-
-      {/* Project Search Modal - for Handy's */}
+      {/* Modals - Outside main layout flow */}
       <ProjectSearchModal
         isOpen={showProjectSearch}
         onClose={() => setShowProjectSearch(false)}
         onSearch={handleProjectSearch}
       />
 
-      {/* My Projects Sheet */}
       <MyProjectsSheet
         isOpen={showMyProjects}
         onClose={() => setShowMyProjects(false)}
@@ -289,20 +247,17 @@ const SwipePage = () => {
         }}
       />
 
-      {/* Create Project Sheet - for Seekers */}
       <CreateProjectSheet
         isOpen={showCreateProject}
         onClose={() => setShowCreateProject(false)}
       />
 
-      {/* Problem Input Dialog - Only for seekers */}
       <ProblemInputDialog
         isOpen={showProblemDialog}
         onClose={() => setShowProblemDialog(false)}
         onSubmit={filterByProblem}
       />
 
-      {/* Handy Detail Modal */}
       <HandyDetailModal
         handy={selectedHandy}
         isOpen={showDetailModal}
@@ -310,7 +265,6 @@ const SwipePage = () => {
         onContact={handleContactFromDetail}
       />
 
-      {/* Project Detail Modal (for Handy users) */}
       <ProjectDetailModal
         project={selectedProject}
         isOpen={showProjectModal}
@@ -318,13 +272,6 @@ const SwipePage = () => {
         onApply={handleApplyForProject}
       />
 
-      {/* Calendar Sheet */}
-      <CalendarSheet
-        isOpen={showCalendar}
-        onClose={() => setShowCalendar(false)}
-      />
-
-      {/* Handy Filter Modal - for seekers */}
       <HandyFilterModal
         isOpen={showHandyFilter}
         onClose={() => setShowHandyFilter(false)}
