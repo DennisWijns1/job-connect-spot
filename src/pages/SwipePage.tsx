@@ -6,7 +6,7 @@ import { SwipeHeader } from '@/components/SwipeHeader';
 import { SwipeActionBar } from '@/components/SwipeActionBar';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
-import { HandyFilterModal } from '@/components/HandyFilterModal';
+
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
@@ -29,6 +29,7 @@ const SwipePage = () => {
   const [allItems] = useState(isHandy ? mockProjects : mockHandyProfiles);
   const [filteredItems, setFilteredItems] = useState(allItems);
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Show problem dialog on first visit for seekers
   const [showProblemDialog, setShowProblemDialog] = useState(!isHandy && !hasShownProblemDialog);
   const [selectedHandy, setSelectedHandy] = useState<HandyProfile | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -36,7 +37,6 @@ const SwipePage = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [currentProblem, setCurrentProblem] = useState<string | null>(null);
   const [showProjectSearch, setShowProjectSearch] = useState(false);
-  const [showHandyFilter, setShowHandyFilter] = useState(false);
   const [showMyProjects, setShowMyProjects] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
 
@@ -176,7 +176,7 @@ const SwipePage = () => {
       {/* Zone 1: Header - Fixed 64px */}
       <SwipeHeader
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
-        onOpenSearch={() => isHandy ? setShowProjectSearch(true) : setShowHandyFilter(true)}
+        onOpenSearch={() => isHandy ? setShowProjectSearch(true) : setShowProblemDialog(true)}
       />
 
       {/* Zone 2: Swipe Area - Flexible */}
@@ -270,10 +270,6 @@ const SwipePage = () => {
         onApply={handleApplyForProject}
       />
 
-      <HandyFilterModal
-        isOpen={showHandyFilter}
-        onClose={() => setShowHandyFilter(false)}
-      />
     </div>
   );
 };
