@@ -178,128 +178,238 @@ const InstructorHomePage = () => {
     );
   }
 
-  // Not registered - show onboarding
+  // Not registered - show onboarding with working tabs
   if (!isRegistered) {
+    const renderOnboardingTab = () => {
+      switch (activeTab) {
+        case 'overview':
+          return (
+            <motion.div
+              key="onboarding-overview"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Hero Banner */}
+              <div className="bg-gradient-to-br from-primary via-primary/90 to-accent/80 rounded-3xl p-6 text-primary-foreground mb-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+                
+                <div className="flex items-start gap-4 relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
+                    <GraduationCap className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h2 className="font-display font-bold text-xl mb-1">Word Lesgever</h2>
+                    <p className="text-sm opacity-90">Deel je expertise en verdien geld met je kennis</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA: Zet je les online */}
+              <div className="bg-card rounded-2xl p-6 border border-border mb-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-success/10 flex items-center justify-center">
+                    <Upload className="w-7 h-7 text-success" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-foreground text-lg">Zet je les online</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Maak een account aan en begin met lesgeven
+                    </p>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => navigate('/instructor/register')}
+                  className="w-full h-12 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground shadow-button"
+                >
+                  Start nu
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+
+              {/* Benefits */}
+              <div className="space-y-3 mb-6">
+                <h3 className="font-bold text-foreground">Waarom lesgeven op HandyMatch?</h3>
+                
+                <div className="bg-card rounded-xl p-4 border border-border flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Euro className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">Verdien geld</h4>
+                    <p className="text-sm text-muted-foreground">Bepaal zelf je prijzen en verdien passief inkomen</p>
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-xl p-4 border border-border flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-accent" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">Bereik duizenden</h4>
+                    <p className="text-sm text-muted-foreground">Onze community groeit elke dag met nieuwe leerlingen</p>
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-xl p-4 border border-border flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                    <Award className="w-5 h-5 text-success" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">Bouw je reputatie</h4>
+                    <p className="text-sm text-muted-foreground">Word een erkende expert in jouw vakgebied</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* How it works */}
+              <div className="bg-secondary rounded-2xl p-5">
+                <h3 className="font-bold text-foreground mb-4">Hoe werkt het?</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</div>
+                    <span className="text-sm text-foreground">Registreer en upload je diploma</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
+                    <span className="text-sm text-foreground">AI verifieert je diploma automatisch</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</div>
+                    <span className="text-sm text-foreground">Maak en publiceer je lessen</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">4</div>
+                    <span className="text-sm text-foreground">Begin met verdienen!</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        case 'lessons':
+          return (
+            <motion.div
+              key="onboarding-lessons"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
+              <div className="bg-card rounded-2xl p-6 border border-border text-center">
+                <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-8 h-8 text-accent" />
+                </div>
+                <h3 className="font-bold text-foreground text-lg mb-2">Nog geen lessen</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Registreer je eerst als lesgever om lessen te kunnen aanmaken en beheren.
+                </p>
+                <Button 
+                  onClick={() => navigate('/instructor/register')}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  Word lesgever
+                </Button>
+              </div>
+            </motion.div>
+          );
+        case 'enrollments':
+          return (
+            <motion.div
+              key="onboarding-enrollments"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
+              <div className="bg-card rounded-2xl p-6 border border-border text-center">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="font-bold text-foreground text-lg mb-2">Nog geen deelnemers</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Zodra je lessen aanbiedt, zie je hier je deelnemers en hun voortgang.
+                </p>
+                <Button 
+                  onClick={() => navigate('/instructor/register')}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  Begin met lesgeven
+                </Button>
+              </div>
+            </motion.div>
+          );
+        case 'reviews':
+          return (
+            <motion.div
+              key="onboarding-reviews"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
+              <div className="bg-card rounded-2xl p-6 border border-border text-center">
+                <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-8 h-8 text-success" />
+                </div>
+                <h3 className="font-bold text-foreground text-lg mb-2">Nog geen reviews</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Na je eerste lessen ontvang je hier feedback van je deelnemers.
+                </p>
+                <Button 
+                  onClick={() => navigate('/instructor/register')}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  Start als lesgever
+                </Button>
+              </div>
+            </motion.div>
+          );
+        case 'profile':
+          return (
+            <motion.div
+              key="onboarding-profile"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
+              <div className="bg-card rounded-2xl p-6 border border-border text-center">
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                  <GraduationCap className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <h3 className="font-bold text-foreground text-lg mb-2">Maak je profiel aan</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Registreer je om je expertise te tonen, diploma's te uploaden en je verificatie te starten.
+                </p>
+                <Button 
+                  onClick={() => navigate('/instructor/register')}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  Registreer nu
+                </Button>
+              </div>
+            </motion.div>
+          );
+        default:
+          return null;
+      }
+    };
+
     return (
       <div className="min-h-screen bg-background pb-24">
         <InstructorHeader title="Lesgever Portaal" />
 
         <div className="px-4 py-6">
-          {/* Hero Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-primary via-primary/90 to-accent/80 rounded-3xl p-6 text-primary-foreground mb-6 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-            
-            <div className="flex items-start gap-4 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
-                <GraduationCap className="w-7 h-7" />
-              </div>
-              <div>
-                <h2 className="font-display font-bold text-xl mb-1">Word Lesgever</h2>
-                <p className="text-sm opacity-90">Deel je expertise en verdien geld met je kennis</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* CTA: Zet je les online */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-card rounded-2xl p-6 border border-border mb-6"
-          >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-success/10 flex items-center justify-center">
-                <Upload className="w-7 h-7 text-success" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-foreground text-lg">Zet je les online</h3>
-                <p className="text-sm text-muted-foreground">
-                  Maak een account aan en begin met lesgeven
-                </p>
-              </div>
-            </div>
-
-            <Button 
-              onClick={() => navigate('/instructor/register')}
-              className="w-full h-12 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground shadow-button"
-            >
-              Start nu
-              <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
-          </motion.div>
-
-          {/* Benefits */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-3 mb-6"
-          >
-            <h3 className="font-bold text-foreground">Waarom lesgeven op HandyMatch?</h3>
-            
-            <div className="bg-card rounded-xl p-4 border border-border flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Euro className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h4 className="font-medium text-foreground">Verdien geld</h4>
-                <p className="text-sm text-muted-foreground">Bepaal zelf je prijzen en verdien passief inkomen</p>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-xl p-4 border border-border flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 text-accent" />
-              </div>
-              <div>
-                <h4 className="font-medium text-foreground">Bereik duizenden</h4>
-                <p className="text-sm text-muted-foreground">Onze community groeit elke dag met nieuwe leerlingen</p>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-xl p-4 border border-border flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-                <Award className="w-5 h-5 text-success" />
-              </div>
-              <div>
-                <h4 className="font-medium text-foreground">Bouw je reputatie</h4>
-                <p className="text-sm text-muted-foreground">Word een erkende expert in jouw vakgebied</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* How it works */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-secondary rounded-2xl p-5"
-          >
-            <h3 className="font-bold text-foreground mb-4">Hoe werkt het?</h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</div>
-                <span className="text-sm text-foreground">Registreer en upload je diploma</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
-                <span className="text-sm text-foreground">AI verifieert je diploma automatisch</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</div>
-                <span className="text-sm text-foreground">Maak en publiceer je lessen</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">4</div>
-                <span className="text-sm text-foreground">Begin met verdienen!</span>
-              </div>
-            </div>
-          </motion.div>
+          <AnimatePresence mode="wait">
+            {renderOnboardingTab()}
+          </AnimatePresence>
         </div>
 
         <InstructorBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
