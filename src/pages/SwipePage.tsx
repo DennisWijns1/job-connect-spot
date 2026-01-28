@@ -8,7 +8,6 @@ import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
-import { FilterModal } from '@/components/FilterModal';
 import { HandyFilterModal } from '@/components/HandyFilterModal';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
 import { MyProjectsSheet } from '@/components/MyProjectsSheet';
@@ -16,7 +15,7 @@ import { CalendarSheet } from '@/components/CalendarSheet';
 import { HandyProfile, Project } from '@/types/handymatch';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { Search, Key } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 const SwipePage = () => {
   const navigate = useNavigate();
@@ -31,7 +30,6 @@ const SwipePage = () => {
   const [allItems] = useState(isHandy ? mockProjects : mockHandyProfiles);
   const [filteredItems, setFilteredItems] = useState(allItems);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [showProblemDialog, setShowProblemDialog] = useState(!isHandy && !hasShownProblemDialog);
   const [selectedHandy, setSelectedHandy] = useState<HandyProfile | null>(null);
@@ -185,16 +183,16 @@ const SwipePage = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
-        showFilters={!isHandy}
-        showNotifications={false}
+        showSearch={!isHandy}
+        onOpenSearch={() => setShowProblemDialog(true)}
         showOnlineToggle={isHandy}
         isOnline={isOnline}
         onToggleOnline={() => setIsOnline(!isOnline)}
-        onOpenFilters={() => setIsFilterOpen(true)}
         showProjectsButton
         onOpenProjects={() => setShowMyProjects(true)}
         showCalendar
         onOpenCalendar={() => setShowCalendar(true)}
+        showFavorites={!isHandy}
       />
 
       <div className="flex-1 px-4 py-2 flex flex-col overflow-hidden">
@@ -249,25 +247,12 @@ const SwipePage = () => {
 
       {!isHandy && <EmergencyButton />}
       <BottomNav />
-      {!isHandy && (
-        <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
-      )}
       
       {/* Floating Search Button for Handy's - to search projects (LEFT side) */}
       {isHandy && (
         <button
           onClick={() => setShowProjectSearch(true)}
-          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
-        >
-          <Search className="w-6 h-6" />
-        </button>
-      )}
-
-      {/* Floating Search Button for Seekers - to reopen problem dialog (LEFT side) */}
-      {!isHandy && !showProblemDialog && (
-        <button
-          onClick={() => setShowProblemDialog(true)}
-          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
+          className="fixed bottom-28 left-4 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent text-white shadow-card-hover flex items-center justify-center hover:scale-105 transition-transform z-40"
         >
           <Search className="w-6 h-6" />
         </button>
