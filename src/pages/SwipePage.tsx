@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { SwipeCard } from '@/components/SwipeCard';
 import { SwipeHeader } from '@/components/SwipeHeader';
 import { SwipeActionBar } from '@/components/SwipeActionBar';
+import { AddButton } from '@/components/AddButton';
 import { EmergencyButton } from '@/components/EmergencyButton';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
@@ -181,10 +182,10 @@ const SwipePage = () => {
         projectCount={3}
       />
 
-      {/* Zone 2: Swipe Area - Card area */}
-      <div className="flex-1 flex items-start justify-center px-4 pt-2 min-h-0">
+      {/* Zone 2: Swipe Area - Card area with more top padding */}
+      <div className="flex-1 flex items-start justify-center px-4 pt-6 min-h-0">
         {/* Card container */}
-        <div className="relative w-full max-w-[450px] h-[48vh] aspect-[3/4]">
+        <div className="relative w-full max-w-[450px] h-[45vh] aspect-[3/4]">
           {/* Stack indicator - shows edge of next card */}
           {visibleItems.length > 1 && (
             <div className="absolute inset-0 rounded-3xl bg-card/50 border border-border/30 transform translate-y-2 scale-[0.96] -z-10" />
@@ -228,18 +229,20 @@ const SwipePage = () => {
         </div>
       </div>
 
-      {/* Zone 3: Swipe Action Zone - Fixed above bottom nav */}
-      <div className="flex-shrink-0 pb-2">
+      {/* Zone 3: Swipe Action Zone - X and Hammer centered below card */}
+      <div className="flex-shrink-0 pb-4">
         <SwipeActionBar
           onReject={handleSwipeLeft}
           onAccept={handleSwipeRight}
-          onThirdAction={() => setShowCreateProject(true)}
-          thirdActionLabel={isHandy ? "Nieuw aanbod" : "Nieuw project"}
           disabled={visibleItems.length === 0}
         />
       </div>
 
-      {/* Zone 4: Emergency button - positioned above bottom nav */}
+      {/* Zone 4: Floating buttons - Add button left, Emergency button right */}
+      <AddButton 
+        onClick={() => setShowCreateProject(true)}
+        label={isHandy ? "Nieuw aanbod" : "Nieuw project"}
+      />
       <EmergencyButton />
 
       {/* Bottom Navigation - Fixed */}
