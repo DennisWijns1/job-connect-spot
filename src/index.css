@@ -6,104 +6,104 @@
 
 @layer base {
   :root {
-    /* HandyMatch Design System - Light, Warm & Joyful */
+    /* HandyMatch Design System - Soft, Warm & Professional */
     
-    /* Background - Gebroken wit / warm beige #F7F4EF */
-    --background: 38 33% 95%;
+    /* Background - Zacht zandbeige #F4F1EC */
+    --background: 38 27% 94%;
     
-    /* Primary Text - Donkergrijs #2F2F2F */
-    --foreground: 0 0% 18%;
+    /* Primary Text - Warm donkergrijs #3F3F3F */
+    --foreground: 0 0% 25%;
 
-    /* Card - Warm white, slightly lighter than background */
-    --card: 38 40% 98%;
-    --card-foreground: 0 0% 18%;
+    /* Card - Warm crème #FBF9F6 */
+    --card: 36 39% 97%;
+    --card-foreground: 0 0% 25%;
 
-    --popover: 38 40% 98%;
-    --popover-foreground: 0 0% 18%;
+    --popover: 36 39% 97%;
+    --popover-foreground: 0 0% 25%;
 
-    /* Primary - Zacht professioneel groen #3F8F6B (headers, navigation, structure) */
-    --primary: 153 39% 40%;
+    /* Primary - Saliegroen #8FB7A1 (headers, navigation, structure) */
+    --primary: 147 22% 64%;
     --primary-foreground: 0 0% 100%;
 
-    /* Accent - Warm zongeel #F4C430 (CTAs, swipe actions, highlights) */
-    --accent: 45 90% 57%;
-    --accent-foreground: 0 0% 18%;
+    /* Accent - Zacht koraalroze #EFA8A1 (CTAs, primary actions) */
+    --accent: 5 71% 78%;
+    --accent-foreground: 0 0% 25%;
 
-    /* Secondary - Zacht koraal #FF7A5C (badges, notifications, secondary actions) */
-    --secondary: 11 100% 68%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Lighter sage for subtle highlights */
+    --secondary: 147 18% 85%;
+    --secondary-foreground: 0 0% 25%;
 
     /* Muted - Soft warm beige for subtle elements */
-    --muted: 38 25% 90%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 38 20% 90%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Destructive - Coral family */
-    --destructive: 11 85% 58%;
+    /* Destructive - Soft coral family */
+    --destructive: 5 60% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Same as primary green */
-    --success: 153 39% 40%;
+    /* Success - Sage green */
+    --success: 147 22% 64%;
     --success-foreground: 0 0% 100%;
 
-    /* Coral accent for badges, notifications */
-    --coral: 11 100% 68%;
-    --coral-foreground: 0 0% 100%;
+    /* Coral accent for highlights */
+    --coral: 5 71% 78%;
+    --coral-foreground: 0 0% 25%;
 
-    /* Mint - Licht blauwgroen #8FC6B0 for AI, tips, new labels */
-    --mint: 156 33% 67%;
-    --mint-foreground: 0 0% 18%;
+    /* Mint - Lighter sage for tips, AI help */
+    --mint: 147 25% 75%;
+    --mint-foreground: 0 0% 30%;
 
-    --border: 38 20% 88%;
-    --input: 38 20% 88%;
-    --ring: 45 90% 57%;
+    --border: 38 18% 88%;
+    --input: 38 18% 88%;
+    --ring: 5 71% 78%;
 
     --radius: 1.25rem;
 
-    /* Custom shadows - Warm and soft */
-    --shadow-card: 0 8px 32px -8px rgba(63, 143, 107, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
-    --shadow-card-hover: 0 16px 48px -8px rgba(63, 143, 107, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
-    --shadow-button: 0 6px 24px -4px rgba(244, 196, 48, 0.45);
-    --shadow-button-coral: 0 6px 24px -4px rgba(255, 122, 92, 0.45);
-    --shadow-soft: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
+    /* Custom shadows - Soft and subtle */
+    --shadow-card: 0 4px 20px -6px rgba(143, 183, 161, 0.12), 0 2px 10px -4px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 8px 30px -6px rgba(143, 183, 161, 0.18), 0 4px 16px -4px rgba(0, 0, 0, 0.06);
+    --shadow-button: 0 4px 16px -4px rgba(239, 168, 161, 0.40);
+    --shadow-button-sage: 0 4px 16px -4px rgba(143, 183, 161, 0.35);
+    --shadow-soft: 0 2px 12px -4px rgba(0, 0, 0, 0.05);
 
     /* Sidebar */
-    --sidebar-background: 38 33% 95%;
-    --sidebar-foreground: 153 39% 40%;
-    --sidebar-primary: 153 39% 40%;
+    --sidebar-background: 38 27% 94%;
+    --sidebar-foreground: 147 22% 50%;
+    --sidebar-primary: 147 22% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 90% 57%;
-    --sidebar-accent-foreground: 0 0% 18%;
-    --sidebar-border: 38 20% 88%;
-    --sidebar-ring: 45 90% 57%;
+    --sidebar-accent: 5 71% 78%;
+    --sidebar-accent-foreground: 0 0% 25%;
+    --sidebar-border: 38 18% 88%;
+    --sidebar-ring: 5 71% 78%;
   }
 
   .dark {
-    /* Dark mode - Soft green tinted dark */
-    --background: 153 20% 12%;
-    --foreground: 38 30% 95%;
-    --card: 153 18% 16%;
-    --card-foreground: 38 30% 95%;
-    --popover: 153 18% 16%;
-    --popover-foreground: 38 30% 95%;
-    --primary: 45 90% 57%;
-    --primary-foreground: 0 0% 18%;
-    --accent: 45 90% 57%;
-    --accent-foreground: 0 0% 18%;
-    --secondary: 11 100% 68%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 153 15% 20%;
-    --muted-foreground: 38 20% 65%;
-    --destructive: 11 75% 55%;
+    /* Dark mode - Warm sage tinted dark */
+    --background: 147 15% 14%;
+    --foreground: 38 25% 92%;
+    --card: 147 12% 18%;
+    --card-foreground: 38 25% 92%;
+    --popover: 147 12% 18%;
+    --popover-foreground: 38 25% 92%;
+    --primary: 5 71% 78%;
+    --primary-foreground: 0 0% 20%;
+    --accent: 5 71% 78%;
+    --accent-foreground: 0 0% 20%;
+    --secondary: 147 15% 25%;
+    --secondary-foreground: 38 25% 92%;
+    --muted: 147 12% 22%;
+    --muted-foreground: 38 18% 60%;
+    --destructive: 5 55% 55%;
     --destructive-foreground: 0 0% 100%;
-    --success: 153 39% 45%;
+    --success: 147 22% 55%;
     --success-foreground: 0 0% 100%;
-    --coral: 11 100% 68%;
-    --coral-foreground: 0 0% 100%;
-    --mint: 156 33% 60%;
-    --mint-foreground: 0 0% 18%;
-    --border: 153 20% 22%;
-    --input: 153 20% 22%;
-    --ring: 45 90% 57%;
+    --coral: 5 71% 75%;
+    --coral-foreground: 0 0% 20%;
+    --mint: 147 22% 60%;
+    --mint-foreground: 0 0% 20%;
+    --border: 147 12% 25%;
+    --input: 147 12% 25%;
+    --ring: 5 71% 78%;
   }
 }
 
@@ -123,18 +123,18 @@
 }
 
 @layer utilities {
-  /* Glassmorphism */
+  /* Glassmorphism - softer */
   .glass {
-    @apply bg-white/70 backdrop-blur-xl;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    @apply bg-white/60 backdrop-blur-xl;
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .glass-dark {
-    @apply bg-black/20 backdrop-blur-xl;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply bg-black/15 backdrop-blur-xl;
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  /* Card styles - Warm and elevated */
+  /* Card styles - Soft and elevated */
   .card-elevated {
     @apply bg-card rounded-[20px];
     box-shadow: var(--shadow-card);
@@ -143,19 +143,19 @@
 
   .card-elevated:hover {
     box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
+    transform: translateY(-3px);
   }
 
-  /* CTA Button with sunny yellow glow */
+  /* CTA Button with soft coral glow */
   .btn-cta {
-    @apply bg-accent text-accent-foreground font-bold rounded-[20px];
+    @apply bg-accent text-accent-foreground font-semibold rounded-[20px];
     box-shadow: var(--shadow-button);
     transition: all 0.3s ease;
   }
 
   .btn-cta:hover {
     @apply brightness-105;
-    box-shadow: 0 8px 32px -4px rgba(244, 196, 48, 0.55);
+    box-shadow: 0 6px 24px -4px rgba(239, 168, 161, 0.50);
     transform: translateY(-2px);
   }
 
@@ -163,61 +163,61 @@
     transform: translateY(0);
   }
 
-  /* Secondary button with coral */
-  .btn-coral {
+  /* Secondary button with sage */
+  .btn-sage {
     @apply font-semibold rounded-[20px];
-    background-color: hsl(var(--coral));
-    color: hsl(var(--coral-foreground));
-    box-shadow: var(--shadow-button-coral);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--shadow-button-sage);
     transition: all 0.3s ease;
   }
 
-  .btn-coral:hover {
+  .btn-sage:hover {
     @apply brightness-105;
-    box-shadow: 0 8px 28px -4px rgba(255, 122, 92, 0.55);
+    box-shadow: 0 6px 24px -4px rgba(143, 183, 161, 0.45);
     transform: translateY(-2px);
   }
 
-  /* Success/Primary button with green */
+  /* Success button */
   .btn-success {
     @apply font-semibold rounded-[20px];
     background-color: hsl(var(--success));
     color: hsl(var(--success-foreground));
-    box-shadow: 0 6px 20px -4px rgba(63, 143, 107, 0.4);
+    box-shadow: var(--shadow-button-sage);
     transition: all 0.3s ease;
   }
 
   .btn-success:hover {
     @apply brightness-105;
-    box-shadow: 0 8px 28px -4px rgba(63, 143, 107, 0.5);
+    box-shadow: 0 6px 24px -4px rgba(143, 183, 161, 0.45);
     transform: translateY(-2px);
   }
 
-  /* Coral badge for notifications, badges */
+  /* Coral badge */
   .badge-coral {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--coral) / 0.15);
-    color: hsl(var(--coral));
+    background-color: hsl(var(--coral) / 0.20);
+    color: hsl(5 50% 45%);
   }
 
-  /* Mint badge for AI, tips, new labels */
+  /* Mint/Sage badge for AI, tips, new labels */
   .badge-mint {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--mint) / 0.25);
-    color: hsl(153 39% 35%);
+    background-color: hsl(var(--mint) / 0.30);
+    color: hsl(147 25% 40%);
   }
 
   /* Accent badge for highlights */
   .badge-accent {
-    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold;
-    background-color: hsl(var(--accent) / 0.20);
-    color: hsl(0 0% 18%);
+    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
+    background-color: hsl(var(--accent) / 0.25);
+    color: hsl(5 50% 40%);
   }
 
   /* Trust badge */
   .trust-badge {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    @apply bg-primary/15 text-primary;
+    @apply bg-primary/20 text-primary;
   }
 
   /* Hammer rating */
@@ -230,32 +230,32 @@
   }
 
   .hammer-empty {
-    @apply text-muted-foreground/30;
+    @apply text-muted-foreground/25;
   }
   
-  /* Gradient backgrounds */
+  /* Gradient backgrounds - Soft gradients */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(153 39% 40%) 0%, hsl(153 39% 48%) 100%);
+    background: linear-gradient(135deg, hsl(147 22% 64%) 0%, hsl(147 25% 70%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(45 90% 57%) 0%, hsl(40 88% 55%) 100%);
+    background: linear-gradient(135deg, hsl(5 71% 78%) 0%, hsl(8 65% 80%) 100%);
   }
 
   .gradient-coral {
-    background: linear-gradient(135deg, hsl(11 100% 68%) 0%, hsl(16 95% 65%) 100%);
+    background: linear-gradient(135deg, hsl(5 71% 78%) 0%, hsl(10 60% 80%) 100%);
   }
 
   .gradient-warm {
-    background: linear-gradient(135deg, hsl(45 90% 57%) 0%, hsl(11 100% 68%) 100%);
+    background: linear-gradient(135deg, hsl(147 22% 68%) 0%, hsl(5 71% 80%) 100%);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, hsl(153 39% 40%) 0%, hsl(153 35% 45%) 100%);
+    background: linear-gradient(135deg, hsl(147 22% 64%) 0%, hsl(147 20% 68%) 100%);
   }
 
   .gradient-mint {
-    background: linear-gradient(135deg, hsl(156 33% 67%) 0%, hsl(153 39% 55%) 100%);
+    background: linear-gradient(135deg, hsl(147 25% 75%) 0%, hsl(147 22% 68%) 100%);
   }
 
   /* Swipe card animations */
