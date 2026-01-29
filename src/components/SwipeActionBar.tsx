@@ -17,21 +17,21 @@ export const SwipeActionBar = ({
   disabled = false,
 }: SwipeActionBarProps) => {
   return (
-    <div className="py-4 flex-shrink-0">
-      <div className="flex items-center justify-center gap-6 max-w-md mx-auto px-4">
+    <div className="py-2 flex-shrink-0">
+      <div className="flex items-center justify-center gap-5 max-w-md mx-auto px-4">
         {/* Left: Reject button (❌) */}
         <button
           onClick={onReject}
           disabled={disabled}
           className={cn(
-            "w-16 h-16 rounded-full bg-card shadow-xl flex items-center justify-center transition-all duration-200 border-2 border-destructive/20",
+            "w-12 h-12 rounded-full bg-card shadow-lg flex items-center justify-center transition-all duration-200 border-2 border-destructive/20",
             disabled 
               ? "opacity-50 cursor-not-allowed" 
               : "text-destructive hover:scale-110 hover:bg-destructive hover:text-white hover:border-destructive active:scale-95"
           )}
           aria-label="Weigeren"
         >
-          <X className="w-8 h-8" strokeWidth={2.5} />
+          <X className="w-6 h-6" strokeWidth={2.5} />
         </button>
 
         {/* Center: Accept button (🔨) - Larger */}
@@ -39,14 +39,14 @@ export const SwipeActionBar = ({
           onClick={onAccept}
           disabled={disabled}
           className={cn(
-            "w-20 h-20 rounded-full bg-accent shadow-xl flex items-center justify-center transition-all duration-200 border-2 border-accent",
+            "w-14 h-14 rounded-full bg-accent shadow-lg flex items-center justify-center transition-all duration-200 border-2 border-accent",
             disabled 
               ? "opacity-50 cursor-not-allowed" 
-              : "hover:scale-110 active:scale-95 hover:shadow-2xl"
+              : "hover:scale-110 active:scale-95 hover:shadow-xl"
           )}
           aria-label="Match"
         >
-          <span className="text-4xl">🔨</span>
+          <span className="text-2xl">🔨</span>
         </button>
 
         {/* Right: New project button (➕) */}
@@ -54,14 +54,14 @@ export const SwipeActionBar = ({
           onClick={onThirdAction}
           disabled={disabled || !onThirdAction}
           className={cn(
-            "w-16 h-16 rounded-full bg-card shadow-xl flex items-center justify-center transition-all duration-200 border-2 border-accent/20",
+            "w-12 h-12 rounded-full bg-card shadow-lg flex items-center justify-center transition-all duration-200 border-2 border-accent/20",
             disabled || !onThirdAction
               ? "opacity-50 cursor-not-allowed" 
               : "text-accent hover:scale-110 hover:bg-accent hover:text-white hover:border-accent active:scale-95"
           )}
           aria-label={thirdActionLabel}
         >
-          <Plus className="w-8 h-8" strokeWidth={2.5} />
+          <Plus className="w-6 h-6" strokeWidth={2.5} />
         </button>
       </div>
     </div>
