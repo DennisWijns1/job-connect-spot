@@ -172,7 +172,7 @@ const SwipePage = () => {
   const visibleItems = filteredItems.slice(currentIndex, currentIndex + 2);
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-hidden pb-20">
       {/* Zone 1: Header - Fixed 64px */}
       <SwipeHeader
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
@@ -181,13 +181,10 @@ const SwipePage = () => {
         projectCount={3}
       />
 
-      {/* Zone 4: Safety Layer - Global floating alarm */}
-      <EmergencyButton />
-
-      {/* Zone 2: Swipe Area - Card-first design */}
-      <div className="flex-1 flex items-start justify-center px-4 pt-2 pb-0 min-h-0">
-        {/* Card container with consistent margins and max-width */}
-        <div className="relative w-full max-w-[450px] h-[50vh] aspect-[3/4]">
+      {/* Zone 2: Swipe Area - Card area */}
+      <div className="flex-1 flex items-start justify-center px-4 pt-2 min-h-0">
+        {/* Card container */}
+        <div className="relative w-full max-w-[450px] h-[48vh] aspect-[3/4]">
           {/* Stack indicator - shows edge of next card */}
           {visibleItems.length > 1 && (
             <div className="absolute inset-0 rounded-3xl bg-card/50 border border-border/30 transform translate-y-2 scale-[0.96] -z-10" />
@@ -231,19 +228,22 @@ const SwipePage = () => {
         </div>
       </div>
 
-      {/* Zone 3: Swipe Action Zone - Centered buttons */}
-      <SwipeActionBar
-        onReject={handleSwipeLeft}
-        onAccept={handleSwipeRight}
-        onThirdAction={() => setShowCreateProject(true)}
-        thirdActionLabel={isHandy ? "Nieuw aanbod" : "Nieuw project"}
-        disabled={visibleItems.length === 0}
-      />
-
-      {/* Bottom Navigation */}
-      <div className="flex-shrink-0">
-        <BottomNav />
+      {/* Zone 3: Swipe Action Zone - Fixed above bottom nav */}
+      <div className="flex-shrink-0 pb-2">
+        <SwipeActionBar
+          onReject={handleSwipeLeft}
+          onAccept={handleSwipeRight}
+          onThirdAction={() => setShowCreateProject(true)}
+          thirdActionLabel={isHandy ? "Nieuw aanbod" : "Nieuw project"}
+          disabled={visibleItems.length === 0}
+        />
       </div>
+
+      {/* Zone 4: Emergency button - positioned above bottom nav */}
+      <EmergencyButton />
+
+      {/* Bottom Navigation - Fixed */}
+      <BottomNav />
       {/* Modals - Outside main layout flow */}
       <ProjectSearchModal
         isOpen={showProjectSearch}
