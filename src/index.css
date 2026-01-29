@@ -6,87 +6,97 @@
 
 @layer base {
   :root {
-    /* HandyMatch Design System - Trust, Warmth & Clarity */
+    /* HandyMatch Design System - Modern, Playful & Professional */
     
-    /* Background - Soft Cream #FDFBF7 */
-    --background: 40 60% 98%;
-    /* Text - Soft Anthracite #4F5B66 */
-    --foreground: 210 14% 35%;
+    /* Background - Licht Zand #F4EFEA */
+    --background: 30 33% 93%;
+    
+    /* Primary Text - Nachtblauw #1C2541 */
+    --foreground: 222 40% 18%;
 
-    /* Card - Clean warm white */
-    --card: 40 50% 99%;
-    --card-foreground: 210 14% 35%;
+    /* Card - Warm white, slightly lighter than background */
+    --card: 30 30% 97%;
+    --card-foreground: 222 40% 18%;
 
-    --popover: 40 50% 99%;
-    --popover-foreground: 210 14% 35%;
+    --popover: 30 30% 97%;
+    --popover-foreground: 222 40% 18%;
 
-    /* Primary - Softer Marine Blue #5A7A94 (even lighter for better balance) */
-    --primary: 210 25% 47%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Nachtblauw #1C2541 (for headers, icons, structure) */
+    --primary: 222 40% 18%;
+    --primary-foreground: 30 33% 93%;
 
-    /* Accent - Warm Terracotta #E67E22 */
-    --accent: 28 80% 52%;
-    --accent-foreground: 40 60% 98%;
+    /* Accent - Koraal #FF6B4A (CTA's, swipe actions, highlights) */
+    --accent: 11 100% 64%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Secondary - Light cream for highlights */
-    --secondary: 40 40% 94%;
-    --secondary-foreground: 210 30% 33%;
+    /* Secondary - Light sand for subtle highlights */
+    --secondary: 30 25% 88%;
+    --secondary-foreground: 222 40% 18%;
 
-    --muted: 40 25% 90%;
-    --muted-foreground: 210 14% 45%;
+    /* Muted - Koel grijsblauw #5C677D for body text */
+    --muted: 30 15% 85%;
+    --muted-foreground: 220 15% 43%;
 
-    --destructive: 0 72% 51%;
+    /* Destructive - Coral family red */
+    --destructive: 11 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Sage Green #82A67D */
-    --success: 115 18% 57%;
+    /* Success / Turquoise - #2EC4B6 */
+    --success: 174 62% 47%;
     --success-foreground: 0 0% 100%;
 
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
-    --ring: 28 80% 52%;
+    /* Turquoise accent for AI, badges, new features */
+    --turquoise: 174 62% 47%;
+    --turquoise-foreground: 0 0% 100%;
+
+    --border: 30 20% 85%;
+    --input: 30 20% 85%;
+    --ring: 11 100% 64%;
 
     --radius: 1.25rem;
 
-    /* Custom shadows - Soft and inviting */
-    --shadow-card: 0 8px 32px -8px rgba(58, 85, 112, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
-    --shadow-card-hover: 0 16px 48px -8px rgba(58, 85, 112, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
-    --shadow-button: 0 6px 20px -4px rgba(230, 126, 34, 0.4);
+    /* Custom shadows - Modern and crisp */
+    --shadow-card: 0 8px 32px -8px rgba(28, 37, 65, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 16px 48px -8px rgba(28, 37, 65, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+    --shadow-button: 0 6px 20px -4px rgba(255, 107, 74, 0.4);
     --shadow-soft: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
 
     /* Sidebar */
-    --sidebar-background: 40 60% 98%;
-    --sidebar-foreground: 210 14% 35%;
-    --sidebar-primary: 210 30% 33%;
-    --sidebar-primary-foreground: 40 60% 98%;
-    --sidebar-accent: 28 80% 52%;
-    --sidebar-accent-foreground: 40 60% 98%;
-    --sidebar-border: 40 20% 88%;
-    --sidebar-ring: 28 80% 52%;
+    --sidebar-background: 30 33% 93%;
+    --sidebar-foreground: 222 40% 18%;
+    --sidebar-primary: 222 40% 18%;
+    --sidebar-primary-foreground: 30 33% 93%;
+    --sidebar-accent: 11 100% 64%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 30 20% 85%;
+    --sidebar-ring: 11 100% 64%;
   }
 
   .dark {
-    --background: 210 28% 10%;
-    --foreground: 40 30% 95%;
-    --card: 210 26% 14%;
-    --card-foreground: 40 30% 95%;
-    --popover: 210 26% 14%;
-    --popover-foreground: 40 30% 95%;
-    --primary: 28 80% 55%;
-    --primary-foreground: 210 28% 10%;
-    --accent: 28 80% 52%;
-    --accent-foreground: 210 28% 10%;
-    --secondary: 210 24% 20%;
-    --secondary-foreground: 40 30% 95%;
-    --muted: 210 22% 18%;
-    --muted-foreground: 40 20% 60%;
-    --destructive: 0 60% 50%;
+    /* Dark mode - Nachtblauw as base */
+    --background: 222 40% 12%;
+    --foreground: 30 30% 95%;
+    --card: 222 38% 16%;
+    --card-foreground: 30 30% 95%;
+    --popover: 222 38% 16%;
+    --popover-foreground: 30 30% 95%;
+    --primary: 11 100% 64%;
+    --primary-foreground: 222 40% 12%;
+    --accent: 11 100% 64%;
+    --accent-foreground: 222 40% 12%;
+    --secondary: 222 35% 22%;
+    --secondary-foreground: 30 30% 95%;
+    --muted: 222 30% 20%;
+    --muted-foreground: 30 20% 65%;
+    --destructive: 11 75% 50%;
     --destructive-foreground: 0 0% 100%;
-    --success: 115 18% 50%;
+    --success: 174 62% 47%;
     --success-foreground: 0 0% 100%;
-    --border: 210 22% 20%;
-    --input: 210 22% 20%;
-    --ring: 28 80% 52%;
+    --turquoise: 174 62% 47%;
+    --turquoise-foreground: 0 0% 100%;
+    --border: 222 30% 22%;
+    --input: 222 30% 22%;
+    --ring: 11 100% 64%;
   }
 }
 
@@ -129,7 +139,7 @@
     transform: translateY(-4px);
   }
 
-  /* CTA Button with terracotta glow */
+  /* CTA Button with coral glow */
   .btn-cta {
     @apply bg-accent text-accent-foreground font-semibold rounded-[20px];
     box-shadow: var(--shadow-button);
@@ -138,7 +148,7 @@
 
   .btn-cta:hover {
     @apply brightness-110;
-    box-shadow: 0 8px 28px -4px rgba(230, 126, 34, 0.45);
+    box-shadow: 0 8px 28px -4px rgba(255, 107, 74, 0.45);
     transform: translateY(-2px);
   }
 
@@ -146,19 +156,26 @@
     transform: translateY(0);
   }
 
-  /* Success button with sage green */
+  /* Success button with turquoise */
   .btn-success {
     @apply font-semibold rounded-[20px];
     background-color: hsl(var(--success));
     color: hsl(var(--success-foreground));
-    box-shadow: 0 6px 20px -4px rgba(130, 166, 125, 0.4);
+    box-shadow: 0 6px 20px -4px rgba(46, 196, 182, 0.4);
     transition: all 0.3s ease;
   }
 
   .btn-success:hover {
     @apply brightness-110;
-    box-shadow: 0 8px 28px -4px rgba(130, 166, 125, 0.5);
+    box-shadow: 0 8px 28px -4px rgba(46, 196, 182, 0.5);
     transform: translateY(-2px);
+  }
+
+  /* Turquoise badge for AI, new features, tips */
+  .badge-turquoise {
+    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
+    background-color: hsl(var(--turquoise) / 0.15);
+    color: hsl(var(--turquoise));
   }
 
   /* Trust badge */
@@ -182,19 +199,23 @@
   
   /* Gradient backgrounds */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(208 33% 24%) 0%, hsl(208 33% 32%) 100%);
+    background: linear-gradient(135deg, hsl(222 40% 18%) 0%, hsl(222 40% 25%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(28 80% 52%) 0%, hsl(28 80% 45%) 100%);
+    background: linear-gradient(135deg, hsl(11 100% 64%) 0%, hsl(11 100% 58%) 100%);
   }
 
   .gradient-warm {
-    background: linear-gradient(135deg, hsl(28 80% 52%) 0%, hsl(28 70% 58%) 100%);
+    background: linear-gradient(135deg, hsl(11 100% 64%) 0%, hsl(20 95% 60%) 100%);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, hsl(115 18% 57%) 0%, hsl(115 18% 50%) 100%);
+    background: linear-gradient(135deg, hsl(174 62% 47%) 0%, hsl(174 62% 42%) 100%);
+  }
+
+  .gradient-turquoise {
+    background: linear-gradient(135deg, hsl(174 62% 47%) 0%, hsl(180 55% 45%) 100%);
   }
 
   /* Swipe card animations */

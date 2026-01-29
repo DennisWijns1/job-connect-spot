@@ -43,6 +43,10 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
+        turquoise: {
+          DEFAULT: "hsl(var(--turquoise))",
+          foreground: "hsl(var(--turquoise-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
