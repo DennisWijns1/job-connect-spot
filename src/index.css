@@ -6,110 +6,110 @@
 
 @layer base {
   :root {
-    /* HandyMatch Design System - Bold Artisan */
+    /* HandyMatch Design System - Energetic Work Style */
     
-    /* Background - Warm Slate #F8FAFC */
-    --background: 210 40% 98%;
+    /* Background - Gebroken wit #F9FAF7 */
+    --background: 80 27% 97%;
     
-    /* Primary Text - Charcoal #2D2D2D */
-    --foreground: 0 0% 18%;
+    /* Primary Text - Donker werkgrijs #2B2B2B */
+    --foreground: 0 0% 17%;
 
-    /* Card - Pure White #FFFFFF with shadow-xl */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 18%;
+    /* Card - Zeer licht grijs #EEF1ED */
+    --card: 105 13% 94%;
+    --card-foreground: 0 0% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 18%;
+    --popover-foreground: 0 0% 17%;
 
-    /* Primary - Deep Indigo #3730A3 (structure, headers, navigation) */
-    --primary: 243 50% 41%;
+    /* Primary - Fris werkblauw #3A7D9A (structure, headers, navigation) */
+    --primary: 196 45% 41%;
     --primary-foreground: 0 0% 100%;
 
-    /* Accent - Vivid Sunshine #FDE047 (CTAs, swipe, hammer) */
-    --accent: 51 97% 63%;
+    /* Accent - Helder werkgeel #F5C400 (CTAs, swipe, hammer) */
+    --accent: 48 100% 48%;
     --accent-foreground: 0 0% 0%;
 
-    /* Secondary - Soft Peach for emergency/warnings */
-    --secondary: 20 80% 75%;
-    --secondary-foreground: 0 0% 25%;
+    /* Secondary - Lighter blue for secondary actions */
+    --secondary: 196 35% 85%;
+    --secondary-foreground: 196 45% 30%;
 
-    /* Muted - Soft cool gray for subtle elements */
-    --muted: 210 20% 92%;
-    --muted-foreground: 210 10% 45%;
+    /* Muted - Soft gray for subtle elements */
+    --muted: 105 10% 90%;
+    --muted-foreground: 0 0% 40%;
 
     /* Destructive - Clear red for reject */
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Deep indigo aligned */
-    --success: 243 50% 50%;
+    /* Success - Actief groen #4CAF50 (online, success, confirmation) */
+    --success: 122 39% 49%;
     --success-foreground: 0 0% 100%;
 
-    /* Sunshine accent for highlights */
-    --sunshine: 51 97% 63%;
-    --sunshine-foreground: 0 0% 0%;
+    /* Work yellow for highlights */
+    --workblue: 196 45% 41%;
+    --workblue-foreground: 0 0% 100%;
 
-    /* Indigo - Deep indigo for structure */
-    --indigo: 243 50% 41%;
-    --indigo-foreground: 0 0% 100%;
+    /* Work yellow accent */
+    --workyellow: 48 100% 48%;
+    --workyellow-foreground: 0 0% 0%;
 
-    /* Peach - For emergency button */
-    --peach: 20 80% 75%;
-    --peach-foreground: 0 0% 25%;
+    /* Active green for status */
+    --activegreen: 122 39% 49%;
+    --activegreen-foreground: 0 0% 100%;
 
-    --border: 210 15% 88%;
-    --input: 210 15% 88%;
-    --ring: 51 97% 63%;
+    --border: 105 10% 85%;
+    --input: 105 10% 85%;
+    --ring: 48 100% 48%;
 
-    --radius: 2rem;
+    --radius: 1rem;
 
-    /* Custom shadows - Bold and elevated */
-    --shadow-card: 0 10px 40px -10px rgba(55, 48, 163, 0.15), 0 4px 20px -8px rgba(0, 0, 0, 0.10);
-    --shadow-card-hover: 0 20px 50px -10px rgba(55, 48, 163, 0.20), 0 8px 30px -8px rgba(0, 0, 0, 0.12);
-    --shadow-button: 0 6px 25px -5px rgba(253, 224, 71, 0.60);
-    --shadow-button-indigo: 0 6px 25px -5px rgba(55, 48, 163, 0.45);
-    --shadow-soft: 0 4px 15px -5px rgba(0, 0, 0, 0.08);
+    /* Custom shadows - Clean and professional */
+    --shadow-card: 0 4px 20px -8px rgba(58, 125, 154, 0.15), 0 2px 10px -4px rgba(0, 0, 0, 0.08);
+    --shadow-card-hover: 0 8px 30px -8px rgba(58, 125, 154, 0.20), 0 4px 15px -4px rgba(0, 0, 0, 0.10);
+    --shadow-button: 0 4px 20px -4px rgba(245, 196, 0, 0.50);
+    --shadow-button-blue: 0 4px 20px -4px rgba(58, 125, 154, 0.40);
+    --shadow-soft: 0 2px 10px -4px rgba(0, 0, 0, 0.06);
 
     /* Sidebar */
-    --sidebar-background: 210 40% 98%;
-    --sidebar-foreground: 243 50% 41%;
-    --sidebar-primary: 243 50% 41%;
+    --sidebar-background: 80 27% 97%;
+    --sidebar-foreground: 196 45% 41%;
+    --sidebar-primary: 196 45% 41%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 51 97% 63%;
+    --sidebar-accent: 48 100% 48%;
     --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 210 15% 88%;
-    --sidebar-ring: 51 97% 63%;
+    --sidebar-border: 105 10% 85%;
+    --sidebar-ring: 48 100% 48%;
   }
 
   .dark {
-    /* Dark mode - Deep indigo tinted */
-    --background: 243 30% 10%;
-    --foreground: 210 30% 92%;
-    --card: 243 25% 15%;
-    --card-foreground: 210 30% 92%;
-    --popover: 243 25% 15%;
-    --popover-foreground: 210 30% 92%;
-    --primary: 51 97% 63%;
+    /* Dark mode - Work blue tinted */
+    --background: 196 30% 10%;
+    --foreground: 80 20% 92%;
+    --card: 196 25% 15%;
+    --card-foreground: 80 20% 92%;
+    --popover: 196 25% 15%;
+    --popover-foreground: 80 20% 92%;
+    --primary: 48 100% 48%;
     --primary-foreground: 0 0% 0%;
-    --accent: 51 97% 63%;
+    --accent: 48 100% 48%;
     --accent-foreground: 0 0% 0%;
-    --secondary: 20 70% 65%;
-    --secondary-foreground: 0 0% 15%;
-    --muted: 243 20% 20%;
-    --muted-foreground: 210 15% 55%;
+    --secondary: 196 35% 35%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 196 20% 20%;
+    --muted-foreground: 80 15% 55%;
     --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
-    --success: 243 50% 55%;
+    --success: 122 39% 45%;
     --success-foreground: 0 0% 100%;
-    --sunshine: 51 97% 58%;
-    --sunshine-foreground: 0 0% 0%;
-    --indigo: 243 45% 50%;
-    --indigo-foreground: 0 0% 100%;
-    --peach: 20 70% 65%;
-    --peach-foreground: 0 0% 15%;
-    --border: 243 20% 25%;
-    --input: 243 20% 25%;
-    --ring: 51 97% 63%;
+    --workblue: 196 40% 50%;
+    --workblue-foreground: 0 0% 100%;
+    --workyellow: 48 100% 50%;
+    --workyellow-foreground: 0 0% 0%;
+    --activegreen: 122 39% 45%;
+    --activegreen-foreground: 0 0% 100%;
+    --border: 196 20% 25%;
+    --input: 196 20% 25%;
+    --ring: 48 100% 48%;
   }
 }
 
@@ -129,117 +129,102 @@
 }
 
 @layer utilities {
-  /* Glassmorphism - bold style */
+  /* Glassmorphism - clean style */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl;
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    @apply bg-white/90 backdrop-blur-lg;
+    border: 1px solid rgba(255, 255, 255, 0.8);
   }
 
   .glass-dark {
-    @apply bg-black/25 backdrop-blur-xl;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    @apply bg-black/20 backdrop-blur-lg;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* Card styles - White and elevated with shadow-xl */
+  /* Card styles - Clean and elevated */
   .card-elevated {
-    @apply bg-card rounded-[32px];
+    @apply bg-card rounded-2xl;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.4s ease, transform 0.4s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
 
   .card-elevated:hover {
     box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
+    transform: translateY(-2px);
   }
 
-  /* CTA Button with Vivid Sunshine glow */
+  /* CTA Button with Work Yellow glow */
   .btn-cta {
-    @apply bg-accent text-accent-foreground font-bold rounded-[32px];
+    @apply bg-accent text-accent-foreground font-bold rounded-xl;
     box-shadow: var(--shadow-button);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .btn-cta:hover {
     @apply brightness-105;
-    box-shadow: 0 8px 35px -5px rgba(253, 224, 71, 0.70);
-    transform: translateY(-3px);
+    box-shadow: 0 6px 25px -4px rgba(245, 196, 0, 0.60);
+    transform: translateY(-2px);
   }
 
   .btn-cta:active {
     transform: translateY(0);
   }
 
-  /* Indigo button for structure actions */
-  .btn-indigo {
-    @apply font-bold rounded-[32px];
-    background-color: hsl(var(--indigo));
-    color: hsl(var(--indigo-foreground));
-    box-shadow: var(--shadow-button-indigo);
-    transition: all 0.3s ease;
+  /* Work Blue button for structure actions */
+  .btn-primary {
+    @apply font-bold rounded-xl;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--shadow-button-blue);
+    transition: all 0.2s ease;
   }
 
-  .btn-indigo:hover {
+  .btn-primary:hover {
     @apply brightness-110;
-    box-shadow: 0 8px 35px -5px rgba(55, 48, 163, 0.55);
-    transform: translateY(-3px);
-  }
-
-  /* Peach button for emergency */
-  .btn-peach {
-    @apply font-semibold rounded-[32px];
-    background-color: hsl(var(--peach));
-    color: hsl(var(--peach-foreground));
-    box-shadow: 0 4px 18px -4px rgba(251, 180, 160, 0.45);
-    transition: all 0.3s ease;
-  }
-
-  .btn-peach:hover {
-    @apply brightness-105;
-    box-shadow: 0 6px 24px -4px rgba(251, 180, 160, 0.55);
+    box-shadow: 0 6px 25px -4px rgba(58, 125, 154, 0.50);
     transform: translateY(-2px);
   }
 
-  /* Success button - Indigo aligned */
+  /* Success button - Active Green */
   .btn-success {
-    @apply font-bold rounded-[32px];
+    @apply font-bold rounded-xl;
     background-color: hsl(var(--success));
     color: hsl(var(--success-foreground));
-    box-shadow: var(--shadow-button-indigo);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px -4px rgba(76, 175, 80, 0.40);
+    transition: all 0.2s ease;
   }
 
   .btn-success:hover {
     @apply brightness-110;
-    box-shadow: 0 8px 35px -5px rgba(55, 48, 163, 0.55);
-    transform: translateY(-3px);
+    box-shadow: 0 6px 20px -4px rgba(76, 175, 80, 0.50);
+    transform: translateY(-2px);
   }
 
-  /* Sunshine badge for highlights */
-  .badge-sunshine {
+  /* Work Yellow badge for highlights */
+  .badge-yellow {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold;
-    background-color: hsl(var(--sunshine) / 0.25);
-    color: hsl(45 80% 25%);
+    background-color: hsl(var(--workyellow) / 0.20);
+    color: hsl(48 80% 30%);
   }
 
-  /* Indigo badge for trust/verified */
-  .badge-indigo {
+  /* Work Blue badge for trust/verified */
+  .badge-blue {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold;
-    background-color: hsl(var(--indigo) / 0.15);
-    color: hsl(243 45% 40%);
+    background-color: hsl(var(--workblue) / 0.15);
+    color: hsl(196 45% 35%);
+  }
+
+  /* Success badge for status */
+  .badge-success {
+    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold;
+    background-color: hsl(var(--success) / 0.15);
+    color: hsl(122 39% 35%);
   }
 
   /* Accent badge for highlights */
   .badge-accent {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold;
-    background-color: hsl(var(--accent) / 0.25);
-    color: hsl(45 75% 25%);
-  }
-
-  /* Peach badge for warnings */
-  .badge-peach {
-    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--peach) / 0.30);
-    color: hsl(20 60% 35%);
+    background-color: hsl(var(--accent) / 0.20);
+    color: hsl(48 80% 30%);
   }
 
   /* Trust badge */
@@ -261,29 +246,21 @@
     @apply text-muted-foreground/25;
   }
   
-  /* Gradient backgrounds - Bold Artisan */
+  /* Gradient backgrounds - Energetic Work Style */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(243 50% 41%) 0%, hsl(243 45% 50%) 100%);
+    background: linear-gradient(135deg, hsl(196 45% 41%) 0%, hsl(196 40% 50%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(51 97% 63%) 0%, hsl(48 95% 58%) 100%);
-  }
-
-  .gradient-sunshine {
-    background: linear-gradient(135deg, hsl(51 97% 63%) 0%, hsl(45 92% 58%) 100%);
-  }
-
-  .gradient-warm {
-    background: linear-gradient(135deg, hsl(51 97% 65%) 0%, hsl(20 80% 70%) 100%);
+    background: linear-gradient(135deg, hsl(48 100% 48%) 0%, hsl(45 95% 52%) 100%);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, hsl(243 50% 45%) 0%, hsl(243 45% 55%) 100%);
+    background: linear-gradient(135deg, hsl(122 39% 49%) 0%, hsl(122 35% 55%) 100%);
   }
 
-  .gradient-indigo {
-    background: linear-gradient(135deg, hsl(243 50% 41%) 0%, hsl(243 45% 48%) 100%);
+  .gradient-blue {
+    background: linear-gradient(135deg, hsl(196 45% 41%) 0%, hsl(196 40% 48%) 100%);
   }
 
   /* Swipe card animations */
