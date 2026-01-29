@@ -182,16 +182,16 @@ const SwipePage = () => {
         projectCount={3}
       />
 
-      {/* Zone 2: Swipe Area - Card with 4:5 aspect, max 500px width, 15px from header */}
-      <div className="flex-1 flex items-start justify-center px-4 pt-[15px] min-h-0">
-        {/* Card container - max 500px wide, 4:5 aspect ratio */}
-        <div className="relative w-full max-w-[500px] aspect-[4/5]">
+      {/* Zone 2: Swipe Area - Card area with more top padding */}
+      <div className="flex-1 flex items-start justify-center px-4 pt-10 min-h-0">
+        {/* Card container */}
+        <div className="relative w-full max-w-[450px] h-[55vh] aspect-[3/4]">
           {/* Stack indicator - shows edge of next card */}
           {visibleItems.length > 1 && (
-            <div className="absolute inset-0 rounded-[32px] bg-white/60 shadow-lg transform translate-y-3 scale-[0.96] -z-10" />
+            <div className="absolute inset-0 rounded-3xl bg-card/50 border border-border/30 transform translate-y-2 scale-[0.96] -z-10" />
           )}
           {visibleItems.length > 2 && (
-            <div className="absolute inset-0 rounded-[32px] bg-white/40 shadow-md transform translate-y-6 scale-[0.92] -z-20" />
+            <div className="absolute inset-0 rounded-3xl bg-card/30 border border-border/20 transform translate-y-4 scale-[0.92] -z-20" />
           )}
 
           <AnimatePresence>
@@ -213,12 +213,12 @@ const SwipePage = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="absolute inset-0 flex flex-col items-center justify-center text-center rounded-[32px] bg-card shadow-xl"
+              className="absolute inset-0 flex flex-col items-center justify-center text-center rounded-3xl bg-card border border-border"
             >
               <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <span className="text-5xl">🔍</span>
               </div>
-              <h3 className="font-display font-extrabold text-xl text-foreground mb-2">
+              <h3 className="font-display font-bold text-xl text-foreground mb-2">
                 Niemand meer in de buurt
               </h3>
               <p className="text-muted-foreground text-sm max-w-xs px-4">
@@ -229,8 +229,8 @@ const SwipePage = () => {
         </div>
       </div>
 
-      {/* Zone 3: Swipe Action Zone - Hammer (large yellow) and X (smaller white) */}
-      <div className="flex-shrink-0 pb-8">
+      {/* Zone 3: Swipe Action Zone - X and Hammer centered below card */}
+      <div className="flex-shrink-0 pb-12">
         <SwipeActionBar
           onReject={handleSwipeLeft}
           onAccept={handleSwipeRight}

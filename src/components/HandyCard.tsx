@@ -16,60 +16,58 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
   return (
     <div 
       className={cn(
-        'relative w-full h-full rounded-[32px] overflow-hidden shadow-xl cursor-pointer bg-card',
+        'relative w-full h-full rounded-3xl overflow-hidden shadow-2xl cursor-pointer',
         className
       )}
       onClick={onClick}
     >
-      {/* Full-bleed image with 4:5 aspect */}
-      <div className="absolute inset-0">
-        <img
-          src={mainPhoto}
-          alt={`Werk van ${handy.name}`}
-          className="w-full h-full object-cover"
-        />
-      </div>
+      {/* Full-bleed image */}
+      <img
+        src={mainPhoto}
+        alt={`Werk van ${handy.name}`}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
       
       {/* Online indicator - top right */}
       {handy.isOnline && (
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 z-10 shadow-md">
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs font-bold text-gray-800">Online</span>
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 z-10">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-xs font-medium text-gray-700">Online</span>
         </div>
       )}
       
       {/* Professional badge - top left */}
       {handy.isProfessional && (
         <div className="absolute top-4 left-4 z-10">
-          <Badge className="bg-primary text-primary-foreground border-none shadow-lg font-bold px-3 py-1">
-            <Award className="w-3.5 h-3.5 mr-1" />
+          <Badge className="bg-primary text-primary-foreground border-none shadow-md">
+            <Award className="w-3 h-3 mr-1" />
             Pro
           </Badge>
         </div>
       )}
 
       {/* Gradient overlay - bottom half for content */}
-      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
       {/* Content overlay at bottom */}
-      <div className="absolute inset-x-0 bottom-0 p-6 z-10">
+      <div className="absolute inset-x-0 bottom-0 p-5 z-10">
         {/* Avatar and name row */}
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-3 mb-3">
           <img
             src={handy.avatar}
             alt={handy.name}
-            className="w-16 h-16 rounded-full object-cover border-3 border-white/90 shadow-lg flex-shrink-0"
+            className="w-14 h-14 rounded-full object-cover border-2 border-white/80 shadow-lg flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-display font-extrabold text-2xl text-white truncate">
+              <h3 className="font-display font-bold text-xl text-white truncate">
                 {handy.name}
               </h3>
               {handy.isVerified && (
-                <Shield className="w-5 h-5 text-accent fill-accent/30 flex-shrink-0" />
+                <Shield className="w-5 h-5 text-white fill-white/30 flex-shrink-0" />
               )}
             </div>
-            <p className="text-white/85 text-sm font-semibold truncate">{handy.specialty}</p>
+            <p className="text-white/80 text-sm font-medium truncate">{handy.specialty}</p>
           </div>
         </div>
 
@@ -81,24 +79,24 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
               <span
                 key={i}
                 className={cn(
-                  "text-base",
+                  "text-sm",
                   i < Math.floor(handy.rating) ? "" : "opacity-30 grayscale"
                 )}
               >
                 🔨
               </span>
             ))}
-            <span className="text-white/70 text-xs font-medium ml-1">({handy.reviewCount})</span>
+            <span className="text-white/70 text-xs ml-1">({handy.reviewCount})</span>
           </div>
 
           {/* Price icon-based */}
           <div className="flex items-center gap-1.5 text-white">
             {handy.isQuoteBased ? (
-              <span className="text-sm text-white/70 italic font-medium">Op maat</span>
+              <span className="text-sm text-white/70 italic">Op maat</span>
             ) : (
               <>
                 <Euro className="w-4 h-4 text-accent" />
-                <span className="font-extrabold text-xl">{handy.hourlyRate}</span>
+                <span className="font-bold text-lg">{handy.hourlyRate}</span>
                 <Clock className="w-3.5 h-3.5 text-white/50 ml-0.5" />
               </>
             )}
@@ -106,8 +104,8 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
         </div>
 
         {/* Distance indicator */}
-        <div className="flex items-center gap-1 mt-3 text-white/65 text-xs font-medium">
-          <MapPin className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-1 mt-2 text-white/60 text-xs">
+          <MapPin className="w-3 h-3" />
           <span>{handy.distance} km</span>
         </div>
       </div>
