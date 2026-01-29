@@ -181,12 +181,21 @@ const SwipePage = () => {
         projectCount={3}
       />
 
-      {/* Zone 4: Safety Layer - Global floating alarm (positioned via EmergencyButton) */}
+      {/* Zone 4: Safety Layer - Global floating alarm */}
       <EmergencyButton />
 
-      {/* Zone 2: Swipe Area - Flexible, min 60% viewport */}
-      <div className="flex-1 min-h-[60vh] flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[420px] h-full max-h-[520px]">
+      {/* Zone 2: Swipe Area - Card-first design, 80-85% of available space */}
+      <div className="flex-1 flex items-center justify-center px-4 py-2 min-h-0">
+        {/* Card container with consistent margins and max-width */}
+        <div className="relative w-full max-w-[450px] h-full max-h-[85vh] aspect-[3/4]">
+          {/* Stack indicator - shows edge of next card */}
+          {visibleItems.length > 1 && (
+            <div className="absolute inset-0 rounded-3xl bg-card/50 border border-border/30 transform translate-y-2 scale-[0.96] -z-10" />
+          )}
+          {visibleItems.length > 2 && (
+            <div className="absolute inset-0 rounded-3xl bg-card/30 border border-border/20 transform translate-y-4 scale-[0.92] -z-20" />
+          )}
+
           <AnimatePresence>
             {visibleItems.map((item, index) => (
               <SwipeCard
@@ -196,6 +205,7 @@ const SwipePage = () => {
                 onSwipeLeft={handleSwipeLeft}
                 onSwipeRight={handleSwipeRight}
                 isTop={index === 0}
+                stackIndex={index}
                 onCardClick={() => handleCardClick(item)}
               />
             ))}
@@ -205,7 +215,7 @@ const SwipePage = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="absolute inset-0 flex flex-col items-center justify-center text-center"
+              className="absolute inset-0 flex flex-col items-center justify-center text-center rounded-3xl bg-card border border-border"
             >
               <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                 <span className="text-5xl">🔍</span>
@@ -213,7 +223,7 @@ const SwipePage = () => {
               <h3 className="font-display font-bold text-xl text-foreground mb-2">
                 Niemand meer in de buurt
               </h3>
-              <p className="text-muted-foreground text-sm max-w-xs">
+              <p className="text-muted-foreground text-sm max-w-xs px-4">
                 Probeer je filters aan te passen of kom later terug
               </p>
             </motion.div>
@@ -221,7 +231,7 @@ const SwipePage = () => {
         </div>
       </div>
 
-      {/* Zone 3: Swipe Action Zone - Fixed 96px */}
+      {/* Zone 3: Swipe Action Zone - Centered buttons */}
       <SwipeActionBar
         onReject={handleSwipeLeft}
         onAccept={handleSwipeRight}
@@ -230,11 +240,10 @@ const SwipePage = () => {
         disabled={visibleItems.length === 0}
       />
 
-      {/* Bottom Navigation - Fixed at bottom, outside main zones */}
+      {/* Bottom Navigation */}
       <div className="flex-shrink-0">
         <BottomNav />
       </div>
-
       {/* Modals - Outside main layout flow */}
       <ProjectSearchModal
         isOpen={showProjectSearch}
