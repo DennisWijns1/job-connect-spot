@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Star, X } from 'lucide-react';
+import { Search, Star, KeyRound, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -59,14 +59,18 @@ interface SwipeHeaderProps {
   title: string;
   onOpenSearch?: () => void;
   onOpenFavorites?: () => void;
+  onOpenProjects?: () => void;
   favoriteCount?: number;
+  projectCount?: number;
 }
 
 export const SwipeHeader = ({
   title,
   onOpenSearch,
   onOpenFavorites,
+  onOpenProjects,
   favoriteCount = 0,
+  projectCount = 0,
 }: SwipeHeaderProps) => {
   const navigate = useNavigate();
   const [showFavoritesMenu, setShowFavoritesMenu] = useState(false);
@@ -81,7 +85,7 @@ export const SwipeHeader = ({
 
   return (
     <>
-      {/* Fixed height header: 64px (h-16) */}
+      {/* Zone 1: Header - Fixed 64px height */}
       <header className="h-16 flex-shrink-0 z-40 bg-gradient-to-r from-primary via-primary/90 to-accent/80 text-primary-foreground">
         <div className="h-full flex items-center justify-between px-4">
           {/* Left: Logo + Title */}
@@ -89,13 +93,14 @@ export const SwipeHeader = ({
             <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-sm">HM</span>
             </div>
-            <h1 className="font-display font-bold text-lg truncate max-w-[200px]">
+            <h1 className="font-display font-bold text-lg truncate max-w-[160px]">
               {title}
             </h1>
           </div>
 
-          {/* Right: Always show 2 action icons (search + favorites) */}
+          {/* Right: Exactly 3 action icons - Search, Favorites, Projects */}
           <div className="flex items-center gap-2">
+            {/* Icon 1: Search */}
             <button
               onClick={onOpenSearch}
               className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
@@ -104,15 +109,30 @@ export const SwipeHeader = ({
               <Search className="w-5 h-5" />
             </button>
 
+            {/* Icon 2: Favorites */}
             <button
               onClick={handleFavoritesClick}
-              className="w-10 h-10 rounded-xl bg-accent/30 border border-accent/40 flex items-center justify-center hover:bg-accent/40 transition-colors relative"
+              className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors relative"
               aria-label="Favorieten"
             >
-              <Star className="w-5 h-5 text-white fill-accent" />
+              <Star className="w-5 h-5 text-white fill-accent/50" />
               {(favoriteCount > 0 || mockFavoriteHandies.length > 0) && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                   {favoriteCount || mockFavoriteHandies.length}
+                </span>
+              )}
+            </button>
+
+            {/* Icon 3: Running Projects */}
+            <button
+              onClick={onOpenProjects}
+              className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors relative"
+              aria-label="Lopende projecten"
+            >
+              <KeyRound className="w-5 h-5" />
+              {projectCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                  {projectCount}
                 </span>
               )}
             </button>
