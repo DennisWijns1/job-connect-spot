@@ -4,22 +4,18 @@ import { cn } from '@/lib/utils';
 interface SwipeActionBarProps {
   onReject: () => void;
   onAccept: () => void;
-  onThirdAction?: () => void;
-  thirdActionLabel?: string;
   disabled?: boolean;
 }
 
 export const SwipeActionBar = ({
   onReject,
   onAccept,
-  onThirdAction,
-  thirdActionLabel = "Actie",
   disabled = false,
 }: SwipeActionBarProps) => {
   return (
     <div className="py-3 flex-shrink-0">
-      <div className="flex items-center justify-center gap-6 max-w-md mx-auto px-4">
-        {/* Left: Reject button (❌) - 64x64px */}
+      <div className="flex items-center justify-center gap-8">
+        {/* Reject button (❌) - 64x64px */}
         <button
           onClick={onReject}
           disabled={disabled}
@@ -34,7 +30,7 @@ export const SwipeActionBar = ({
           <X className="w-7 h-7" strokeWidth={2.5} />
         </button>
 
-        {/* Center: Accept button (🔨) - 64x64px */}
+        {/* Accept button (🔨) - 64x64px */}
         <button
           onClick={onAccept}
           disabled={disabled}
@@ -47,21 +43,6 @@ export const SwipeActionBar = ({
           aria-label="Match"
         >
           <span className="text-3xl">🔨</span>
-        </button>
-
-        {/* Right: New project button (➕) - 64x64px */}
-        <button
-          onClick={onThirdAction}
-          disabled={disabled || !onThirdAction}
-          className={cn(
-            "w-16 h-16 rounded-full bg-card shadow-lg flex items-center justify-center transition-all duration-200 border-2 border-accent/20",
-            disabled || !onThirdAction
-              ? "opacity-50 cursor-not-allowed" 
-              : "text-accent hover:scale-110 hover:bg-accent hover:text-white hover:border-accent active:scale-95"
-          )}
-          aria-label={thirdActionLabel}
-        >
-          <Plus className="w-7 h-7" strokeWidth={2.5} />
         </button>
       </div>
     </div>
