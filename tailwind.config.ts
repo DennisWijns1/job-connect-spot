@@ -43,9 +43,9 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        turquoise: {
-          DEFAULT: "hsl(var(--turquoise))",
-          foreground: "hsl(var(--turquoise-foreground))",
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          foreground: "hsl(var(--coral-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
