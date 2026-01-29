@@ -4,9 +4,9 @@ import { BottomNav } from '@/components/BottomNav';
 import { SwipeCard } from '@/components/SwipeCard';
 import { SwipeHeader } from '@/components/SwipeHeader';
 import { SwipeActionBar } from '@/components/SwipeActionBar';
+import { EmergencyButton } from '@/components/EmergencyButton';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { HandyDetailModal } from '@/components/HandyDetailModal';
-
 import { ProjectDetailModal } from '@/components/ProjectDetailModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
@@ -172,15 +172,20 @@ const SwipePage = () => {
   const visibleItems = filteredItems.slice(currentIndex, currentIndex + 2);
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden pb-[72px]">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Zone 1: Header - Fixed 64px */}
       <SwipeHeader
         title={isHandy ? 'Projecten' : currentProblem ? `"${currentProblem}"` : 'Handy\'s'}
         onOpenSearch={() => isHandy ? setShowProjectSearch(true) : setShowProblemDialog(true)}
+        onOpenProjects={() => setShowMyProjects(true)}
+        projectCount={3}
       />
 
-      {/* Zone 2: Swipe Area - Flexible */}
-      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
+      {/* Zone 4: Safety Layer - Global floating alarm (positioned via EmergencyButton) */}
+      <EmergencyButton />
+
+      {/* Zone 2: Swipe Area - Flexible, min 60% viewport */}
+      <div className="flex-1 min-h-[60vh] flex items-center justify-center p-4">
         <div className="relative w-full max-w-[420px] h-full max-h-[520px]">
           <AnimatePresence>
             {visibleItems.map((item, index) => (
@@ -216,7 +221,7 @@ const SwipePage = () => {
         </div>
       </div>
 
-      {/* Zone 3: Action Bar - Fixed 96px - ALWAYS visible for both roles */}
+      {/* Zone 3: Swipe Action Zone - Fixed 96px */}
       <SwipeActionBar
         onReject={handleSwipeLeft}
         onAccept={handleSwipeRight}
@@ -225,8 +230,10 @@ const SwipePage = () => {
         disabled={visibleItems.length === 0}
       />
 
-      {/* Bottom Navigation - Fixed at bottom */}
-      <BottomNav />
+      {/* Bottom Navigation - Fixed at bottom, outside main zones */}
+      <div className="flex-shrink-0">
+        <BottomNav />
+      </div>
 
       {/* Modals - Outside main layout flow */}
       <ProjectSearchModal
