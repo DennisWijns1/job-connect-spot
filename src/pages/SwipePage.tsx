@@ -185,7 +185,7 @@ const SwipePage = () => {
       {/* Zone 2: Swipe Area - Card area with more top padding */}
       <div className="flex-1 flex items-start justify-center px-4 pt-10 min-h-0">
         {/* Card container */}
-        <div className="relative w-full max-w-[450px] h-[42vh] aspect-[3/4]">
+        <div className="relative w-full max-w-[450px] h-[65vh] aspect-[3/4]">
           {/* Stack indicator - shows edge of next card */}
           {visibleItems.length > 1 && (
             <div className="absolute inset-0 rounded-3xl bg-card/50 border border-border/30 transform translate-y-2 scale-[0.96] -z-10" />
@@ -230,7 +230,7 @@ const SwipePage = () => {
       </div>
 
       {/* Zone 3: Swipe Action Zone - X and Hammer centered below card */}
-      <div className="flex-shrink-0 pb-8">
+      <div className="flex-shrink-0 pb-12">
         <SwipeActionBar
           onReject={handleSwipeLeft}
           onAccept={handleSwipeRight}
