@@ -69,10 +69,10 @@ export const SwipeCard = ({
     >
       {/* Like overlay - Hammer */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center bg-accent/30 rounded-3xl z-20 pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center bg-accent/30 rounded-[32px] z-20 pointer-events-none"
         style={{ opacity: likeOpacity }}
       >
-        <div className="bg-accent text-accent-foreground px-8 py-4 rounded-2xl font-bold text-3xl rotate-[-15deg] border-4 border-accent-foreground flex items-center gap-3 shadow-2xl">
+        <div className="bg-accent text-black px-8 py-4 rounded-[24px] font-extrabold text-3xl rotate-[-15deg] border-4 border-black flex items-center gap-3 shadow-2xl">
           <span className="text-4xl">🔨</span>
           MATCH
         </div>
@@ -80,10 +80,10 @@ export const SwipeCard = ({
 
       {/* Nope overlay - X */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center bg-destructive/30 rounded-3xl z-20 pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center bg-destructive/30 rounded-[32px] z-20 pointer-events-none"
         style={{ opacity: nopeOpacity }}
       >
-        <div className="bg-destructive text-destructive-foreground px-8 py-4 rounded-2xl font-bold text-3xl rotate-[15deg] border-4 border-destructive-foreground flex items-center gap-3 shadow-2xl">
+        <div className="bg-destructive text-destructive-foreground px-8 py-4 rounded-[24px] font-extrabold text-3xl rotate-[15deg] border-4 border-destructive-foreground flex items-center gap-3 shadow-2xl">
           <X className="w-10 h-10" />
           NOPE
         </div>
