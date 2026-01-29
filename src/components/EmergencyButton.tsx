@@ -7,7 +7,7 @@ export const EmergencyButton = () => {
 
   return (
     <>
-      {/* Zone 4: Safety Layer - Floating Emergency Button (bottom, above nav) - Terracotta Burst */}
+      {/* Zone 4: Safety Layer - Floating Emergency Button - Soft Peach */}
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-24 right-4 w-10 h-10 rounded-full bg-secondary shadow-lg flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
@@ -31,21 +31,21 @@ export const EmergencyButton = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-card rounded-2xl p-6 max-w-sm w-full shadow-card-hover"
+              className="bg-card rounded-[32px] p-6 max-w-sm w-full shadow-xl"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary/15 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-secondary" />
+                <div className="w-12 h-12 rounded-2xl bg-secondary/20 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-secondary-foreground" />
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                  className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <h2 className="font-display font-bold text-xl text-foreground mb-2">
+              <h2 className="font-display font-extrabold text-xl text-foreground mb-2">
                 Noodhulp
               </h2>
               <p className="text-muted-foreground text-sm mb-6">
@@ -55,7 +55,7 @@ export const EmergencyButton = () => {
               <div className="space-y-3">
                 <a
                   href="tel:112"
-                  className="flex items-center gap-4 w-full p-4 bg-destructive text-destructive-foreground rounded-xl font-semibold hover:brightness-110 transition-all"
+                  className="flex items-center gap-4 w-full p-4 bg-destructive text-destructive-foreground rounded-2xl font-bold hover:brightness-110 transition-all"
                 >
                   <Phone className="w-6 h-6" />
                   <div>
@@ -64,11 +64,11 @@ export const EmergencyButton = () => {
                   </div>
                 </a>
 
-                <button className="flex items-center gap-4 w-full p-4 bg-accent/15 text-accent-foreground rounded-xl font-semibold hover:bg-accent/25 transition-all">
-                  <AlertTriangle className="w-6 h-6 text-accent" />
+                <button className="flex items-center gap-4 w-full p-4 bg-accent/20 text-foreground rounded-2xl font-semibold hover:bg-accent/30 transition-all">
+                  <AlertTriangle className="w-6 h-6 text-accent-foreground" />
                   <div className="text-left">
                     <p className="font-bold">Meld incident</p>
-                    <p className="text-sm opacity-80">Mensen in de buurt verwittigen</p>
+                    <p className="text-sm text-muted-foreground">Mensen in de buurt verwittigen</p>
                   </div>
                 </button>
               </div>

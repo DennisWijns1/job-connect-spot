@@ -17,8 +17,8 @@ export const AddButton = ({
       onClick={onClick}
       disabled={disabled || !onClick}
       className={cn(
-        "fixed bottom-24 left-4 w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 border z-40",
-        "bg-background border-border text-primary",
+        "fixed bottom-24 left-4 w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 z-40",
+        "bg-white border border-border text-primary",
         disabled || !onClick
           ? "opacity-50 cursor-not-allowed" 
           : "hover:scale-110 hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95"
