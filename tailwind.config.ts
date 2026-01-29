@@ -43,17 +43,17 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        sunshine: {
-          DEFAULT: "hsl(var(--sunshine))",
-          foreground: "hsl(var(--sunshine-foreground))",
+        workblue: {
+          DEFAULT: "hsl(var(--workblue))",
+          foreground: "hsl(var(--workblue-foreground))",
         },
-        indigo: {
-          DEFAULT: "hsl(var(--indigo))",
-          foreground: "hsl(var(--indigo-foreground))",
+        workyellow: {
+          DEFAULT: "hsl(var(--workyellow))",
+          foreground: "hsl(var(--workyellow-foreground))",
         },
-        peach: {
-          DEFAULT: "hsl(var(--peach))",
-          foreground: "hsl(var(--peach-foreground))",
+        activegreen: {
+          DEFAULT: "hsl(var(--activegreen))",
+          foreground: "hsl(var(--activegreen-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -78,9 +78,8 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 4px)",
         sm: "calc(var(--radius) - 8px)",
-        "2xl": "2rem",
-        "3xl": "2.5rem",
-        "4xl": "3rem",
+        xl: "1rem",
+        "2xl": "1.5rem",
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -90,9 +89,9 @@ export default {
         'card': 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
         'button': 'var(--shadow-button)',
-        'button-indigo': 'var(--shadow-button-indigo)',
+        'button-blue': 'var(--shadow-button-blue)',
         'soft': 'var(--shadow-soft)',
-        'xl': '0 20px 40px -12px rgba(55, 48, 163, 0.20)',
+        'xl': '0 15px 30px -10px rgba(58, 125, 154, 0.18)',
       },
       keyframes: {
         "accordion-down": {
