@@ -43,13 +43,17 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        butter: {
-          DEFAULT: "hsl(var(--butter))",
-          foreground: "hsl(var(--butter-foreground))",
+        ochre: {
+          DEFAULT: "hsl(var(--ochre))",
+          foreground: "hsl(var(--ochre-foreground))",
         },
-        peach: {
-          DEFAULT: "hsl(var(--peach))",
-          foreground: "hsl(var(--peach-foreground))",
+        terracotta: {
+          DEFAULT: "hsl(var(--terracotta))",
+          foreground: "hsl(var(--terracotta-foreground))",
+        },
+        forest: {
+          DEFAULT: "hsl(var(--forest))",
+          foreground: "hsl(var(--forest-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -85,7 +89,7 @@ export default {
         'card': 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
         'button': 'var(--shadow-button)',
-        'button-eucalyptus': 'var(--shadow-button-eucalyptus)',
+        'button-forest': 'var(--shadow-button-forest)',
         'soft': 'var(--shadow-soft)',
       },
       keyframes: {
