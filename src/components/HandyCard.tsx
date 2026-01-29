@@ -1,6 +1,5 @@
-import { Shield, Award } from 'lucide-react';
+import { Shield, Award, Clock, Euro, MapPin } from 'lucide-react';
 import { HandyProfile } from '@/types/handymatch';
-import { HammerRating } from './HammerRating';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -17,46 +16,47 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
   return (
     <div 
       className={cn(
-        'bg-card rounded-3xl shadow-card overflow-hidden border border-border cursor-pointer h-full flex flex-col',
+        'relative w-full h-full rounded-3xl overflow-hidden shadow-2xl cursor-pointer',
         className
       )}
       onClick={onClick}
     >
-      {/* Work Photo - Fills available space */}
-      <div className="relative flex-1 min-h-0">
-        <img
-          src={mainPhoto}
-          alt={`Werk van ${handy.name}`}
-          className="w-full h-full object-cover"
-        />
-        
-        {/* Online indicator */}
-        {handy.isOnline && (
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-700">Online</span>
-          </div>
-        )}
-        
-        {/* Professional badge */}
-        {handy.isProfessional && (
-          <div className="absolute top-4 left-4">
-            <Badge className="bg-primary text-primary-foreground border-none shadow-md">
-              <Award className="w-3 h-3 mr-1" />
-              Pro
-            </Badge>
-          </div>
-        )}
+      {/* Full-bleed image */}
+      <img
+        src={mainPhoto}
+        alt={`Werk van ${handy.name}`}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      
+      {/* Online indicator - top right */}
+      {handy.isOnline && (
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 z-10">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-xs font-medium text-gray-700">Online</span>
+        </div>
+      )}
+      
+      {/* Professional badge - top left */}
+      {handy.isProfessional && (
+        <div className="absolute top-4 left-4 z-10">
+          <Badge className="bg-primary text-primary-foreground border-none shadow-md">
+            <Award className="w-3 h-3 mr-1" />
+            Pro
+          </Badge>
+        </div>
+      )}
 
-        {/* Gradient overlay at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      {/* Gradient overlay - bottom half for content */}
+      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
-        {/* Name and avatar overlay at bottom of image */}
-        <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
+      {/* Content overlay at bottom */}
+      <div className="absolute inset-x-0 bottom-0 p-5 z-10">
+        {/* Avatar and name row */}
+        <div className="flex items-center gap-3 mb-3">
           <img
             src={handy.avatar}
             alt={handy.name}
-            className="w-14 h-14 rounded-full object-cover border-3 border-white shadow-lg"
+            className="w-14 h-14 rounded-full object-cover border-2 border-white/80 shadow-lg flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
@@ -67,23 +67,46 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
                 <Shield className="w-5 h-5 text-white fill-white/30 flex-shrink-0" />
               )}
             </div>
-            <p className="text-white/90 text-sm font-medium">{handy.specialty}</p>
+            <p className="text-white/80 text-sm font-medium truncate">{handy.specialty}</p>
           </div>
         </div>
-      </div>
 
-      {/* Minimal Content - Only essential info */}
-      <div className="p-4 flex items-center justify-between">
-        {/* Rating */}
-        <HammerRating rating={handy.rating} size="sm" showCount reviewCount={handy.reviewCount} />
+        {/* Icon-based info row */}
+        <div className="flex items-center justify-between">
+          {/* Rating with hammers */}
+          <div className="flex items-center gap-1">
+            {Array.from({ length: 5 }, (_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "text-sm",
+                  i < Math.floor(handy.rating) ? "" : "opacity-30 grayscale"
+                )}
+              >
+                🔨
+              </span>
+            ))}
+            <span className="text-white/70 text-xs ml-1">({handy.reviewCount})</span>
+          </div>
 
-        {/* Price */}
-        <div className="font-display font-bold text-lg text-foreground">
-          {handy.isQuoteBased ? (
-            <span className="text-sm text-muted-foreground">Offerte op maat</span>
-          ) : (
-            <span>€{handy.hourlyRate}<span className="text-sm font-normal text-muted-foreground">/uur</span></span>
-          )}
+          {/* Price icon-based */}
+          <div className="flex items-center gap-1.5 text-white">
+            {handy.isQuoteBased ? (
+              <span className="text-sm text-white/70 italic">Op maat</span>
+            ) : (
+              <>
+                <Euro className="w-4 h-4 text-accent" />
+                <span className="font-bold text-lg">{handy.hourlyRate}</span>
+                <Clock className="w-3.5 h-3.5 text-white/50 ml-0.5" />
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Distance indicator */}
+        <div className="flex items-center gap-1 mt-2 text-white/60 text-xs">
+          <MapPin className="w-3 h-3" />
+          <span>{handy.distance} km</span>
         </div>
       </div>
     </div>
