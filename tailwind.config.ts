@@ -43,13 +43,13 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          foreground: "hsl(var(--coral-foreground))",
+        honey: {
+          DEFAULT: "hsl(var(--honey))",
+          foreground: "hsl(var(--honey-foreground))",
         },
-        mint: {
-          DEFAULT: "hsl(var(--mint))",
-          foreground: "hsl(var(--mint-foreground))",
+        olive: {
+          DEFAULT: "hsl(var(--olive))",
+          foreground: "hsl(var(--olive-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
