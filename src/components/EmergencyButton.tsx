@@ -7,10 +7,10 @@ export const EmergencyButton = () => {
 
   return (
     <>
-      {/* Zone 4: Safety Layer - Floating Emergency Button (bottom-right, always visible) */}
+      {/* Zone 4: Safety Layer - Floating Emergency Button (bottom, above nav) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-36 right-4 w-10 h-10 rounded-full bg-destructive shadow-lg flex items-center justify-center z-50 hover:scale-110 transition-transform active:scale-95"
+        className="fixed bottom-24 right-4 w-10 h-10 rounded-full bg-destructive shadow-lg flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
         aria-label="Noodhulp"
       >
         <AlertTriangle className="w-5 h-5 text-destructive-foreground" />
