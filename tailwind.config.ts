@@ -43,13 +43,13 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        honey: {
-          DEFAULT: "hsl(var(--honey))",
-          foreground: "hsl(var(--honey-foreground))",
+        butter: {
+          DEFAULT: "hsl(var(--butter))",
+          foreground: "hsl(var(--butter-foreground))",
         },
-        olive: {
-          DEFAULT: "hsl(var(--olive))",
-          foreground: "hsl(var(--olive-foreground))",
+        peach: {
+          DEFAULT: "hsl(var(--peach))",
+          foreground: "hsl(var(--peach-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -85,6 +85,7 @@ export default {
         'card': 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
         'button': 'var(--shadow-button)',
+        'button-eucalyptus': 'var(--shadow-button-eucalyptus)',
         'soft': 'var(--shadow-soft)',
       },
       keyframes: {
