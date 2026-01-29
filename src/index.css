@@ -6,104 +6,104 @@
 
 @layer base {
   :root {
-    /* HandyMatch Design System - Natural, Warm & Professional */
+    /* HandyMatch Design System - Light, Warm & Professional */
     
-    /* Background - Gebroken wit #FAF8F3 */
-    --background: 43 42% 97%;
+    /* Background - Warm off-white #FAF8F3 */
+    --background: 43 47% 97%;
     
-    /* Primary Text - Antraciet #2F2F2F */
+    /* Primary Text - Warm antraciet #2F2F2F */
     --foreground: 0 0% 18%;
 
-    /* Card - Licht taupe #CFC7BD */
-    --card: 33 16% 78%;
+    /* Card - Zacht lichtgrijs #ECEBE6 */
+    --card: 50 15% 91%;
     --card-foreground: 0 0% 18%;
 
-    --popover: 43 35% 95%;
+    --popover: 50 18% 93%;
     --popover-foreground: 0 0% 18%;
 
-    /* Primary - Zacht olijfgroen #9BAF8F (headers, navigation, structure) */
-    --primary: 98 17% 62%;
+    /* Primary - Zacht eucalyptusgroen #6FAF9B (headers, navigation, structure) */
+    --primary: 159 28% 56%;
     --primary-foreground: 0 0% 100%;
 
-    /* Accent - Warm honinggeel #E9C46A (CTAs, confirmations) */
-    --accent: 43 74% 66%;
+    /* Accent - Warm botergeel #F2C94C (CTAs, swipe, confirmations) */
+    --accent: 45 86% 62%;
     --accent-foreground: 0 0% 18%;
 
-    /* Secondary - Light olive for subtle highlights */
-    --secondary: 98 14% 80%;
-    --secondary-foreground: 0 0% 18%;
+    /* Secondary - Zacht perzik/koraal #F3A683 (notifications, badges) */
+    --secondary: 20 83% 73%;
+    --secondary-foreground: 0 0% 25%;
 
-    /* Muted - Soft warm taupe for subtle elements */
-    --muted: 33 12% 85%;
+    /* Muted - Soft warm gray for subtle elements */
+    --muted: 50 12% 88%;
     --muted-foreground: 0 0% 40%;
 
     /* Destructive - Soft warm red */
     --destructive: 10 55% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Olive green */
-    --success: 98 17% 62%;
+    /* Success - Eucalyptus green */
+    --success: 159 28% 56%;
     --success-foreground: 0 0% 100%;
 
-    /* Honey accent for highlights */
-    --honey: 43 74% 66%;
-    --honey-foreground: 0 0% 18%;
+    /* Butter yellow accent for highlights */
+    --butter: 45 86% 62%;
+    --butter-foreground: 0 0% 18%;
 
-    /* Olive - Lighter olive for tips, AI help */
-    --olive: 98 20% 72%;
-    --olive-foreground: 0 0% 25%;
+    /* Peach - For notifications, badges, reactions */
+    --peach: 20 83% 73%;
+    --peach-foreground: 0 0% 25%;
 
-    --border: 33 14% 82%;
-    --input: 33 14% 82%;
-    --ring: 43 74% 66%;
+    --border: 50 12% 85%;
+    --input: 50 12% 85%;
+    --ring: 45 86% 62%;
 
     --radius: 1.25rem;
 
-    /* Custom shadows - Natural and soft */
-    --shadow-card: 0 4px 20px -6px rgba(155, 175, 143, 0.15), 0 2px 10px -4px rgba(0, 0, 0, 0.05);
-    --shadow-card-hover: 0 8px 30px -6px rgba(155, 175, 143, 0.22), 0 4px 16px -4px rgba(0, 0, 0, 0.07);
-    --shadow-button: 0 4px 18px -4px rgba(233, 196, 106, 0.45);
-    --shadow-button-olive: 0 4px 16px -4px rgba(155, 175, 143, 0.38);
+    /* Custom shadows - Soft and warm */
+    --shadow-card: 0 4px 20px -6px rgba(111, 175, 155, 0.15), 0 2px 10px -4px rgba(0, 0, 0, 0.05);
+    --shadow-card-hover: 0 8px 30px -6px rgba(111, 175, 155, 0.22), 0 4px 16px -4px rgba(0, 0, 0, 0.07);
+    --shadow-button: 0 4px 18px -4px rgba(242, 201, 76, 0.45);
+    --shadow-button-eucalyptus: 0 4px 16px -4px rgba(111, 175, 155, 0.38);
     --shadow-soft: 0 2px 12px -4px rgba(0, 0, 0, 0.06);
 
     /* Sidebar */
-    --sidebar-background: 43 42% 97%;
-    --sidebar-foreground: 98 17% 50%;
-    --sidebar-primary: 98 17% 62%;
+    --sidebar-background: 43 47% 97%;
+    --sidebar-foreground: 159 28% 46%;
+    --sidebar-primary: 159 28% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 43 74% 66%;
+    --sidebar-accent: 45 86% 62%;
     --sidebar-accent-foreground: 0 0% 18%;
-    --sidebar-border: 33 14% 82%;
-    --sidebar-ring: 43 74% 66%;
+    --sidebar-border: 50 12% 85%;
+    --sidebar-ring: 45 86% 62%;
   }
 
   .dark {
-    /* Dark mode - Warm olive tinted dark */
-    --background: 98 12% 14%;
+    /* Dark mode - Warm eucalyptus tinted dark */
+    --background: 159 12% 14%;
     --foreground: 43 30% 92%;
-    --card: 98 10% 18%;
+    --card: 159 10% 18%;
     --card-foreground: 43 30% 92%;
-    --popover: 98 10% 18%;
+    --popover: 159 10% 18%;
     --popover-foreground: 43 30% 92%;
-    --primary: 43 74% 66%;
+    --primary: 45 86% 62%;
     --primary-foreground: 0 0% 15%;
-    --accent: 43 74% 66%;
+    --accent: 45 86% 62%;
     --accent-foreground: 0 0% 15%;
-    --secondary: 98 12% 25%;
-    --secondary-foreground: 43 30% 92%;
-    --muted: 98 10% 22%;
+    --secondary: 20 70% 65%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 159 10% 22%;
     --muted-foreground: 43 20% 60%;
     --destructive: 10 50% 50%;
     --destructive-foreground: 0 0% 100%;
-    --success: 98 17% 55%;
+    --success: 159 28% 50%;
     --success-foreground: 0 0% 100%;
-    --honey: 43 74% 60%;
-    --honey-foreground: 0 0% 15%;
-    --olive: 98 18% 55%;
-    --olive-foreground: 0 0% 15%;
-    --border: 98 10% 25%;
-    --input: 98 10% 25%;
-    --ring: 43 74% 66%;
+    --butter: 45 86% 55%;
+    --butter-foreground: 0 0% 15%;
+    --peach: 20 75% 65%;
+    --peach-foreground: 0 0% 15%;
+    --border: 159 10% 25%;
+    --input: 159 10% 25%;
+    --ring: 45 86% 62%;
   }
 }
 
@@ -146,7 +146,7 @@
     transform: translateY(-3px);
   }
 
-  /* CTA Button with honey glow */
+  /* CTA Button with butter yellow glow */
   .btn-cta {
     @apply bg-accent text-accent-foreground font-semibold rounded-[20px];
     box-shadow: var(--shadow-button);
@@ -155,7 +155,7 @@
 
   .btn-cta:hover {
     @apply brightness-105;
-    box-shadow: 0 6px 24px -4px rgba(233, 196, 106, 0.55);
+    box-shadow: 0 6px 24px -4px rgba(242, 201, 76, 0.55);
     transform: translateY(-2px);
   }
 
@@ -163,18 +163,33 @@
     transform: translateY(0);
   }
 
-  /* Secondary button with olive */
-  .btn-olive {
+  /* Eucalyptus button for structure actions */
+  .btn-eucalyptus {
     @apply font-semibold rounded-[20px];
     background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    box-shadow: var(--shadow-button-olive);
+    box-shadow: var(--shadow-button-eucalyptus);
     transition: all 0.3s ease;
   }
 
-  .btn-olive:hover {
+  .btn-eucalyptus:hover {
     @apply brightness-105;
-    box-shadow: 0 6px 24px -4px rgba(155, 175, 143, 0.48);
+    box-shadow: 0 6px 24px -4px rgba(111, 175, 155, 0.48);
+    transform: translateY(-2px);
+  }
+
+  /* Peach button for secondary actions */
+  .btn-peach {
+    @apply font-semibold rounded-[20px];
+    background-color: hsl(var(--peach));
+    color: hsl(var(--peach-foreground));
+    box-shadow: 0 4px 16px -4px rgba(243, 166, 131, 0.38);
+    transition: all 0.3s ease;
+  }
+
+  .btn-peach:hover {
+    @apply brightness-105;
+    box-shadow: 0 6px 24px -4px rgba(243, 166, 131, 0.48);
     transform: translateY(-2px);
   }
 
@@ -183,35 +198,35 @@
     @apply font-semibold rounded-[20px];
     background-color: hsl(var(--success));
     color: hsl(var(--success-foreground));
-    box-shadow: var(--shadow-button-olive);
+    box-shadow: var(--shadow-button-eucalyptus);
     transition: all 0.3s ease;
   }
 
   .btn-success:hover {
     @apply brightness-105;
-    box-shadow: 0 6px 24px -4px rgba(155, 175, 143, 0.48);
+    box-shadow: 0 6px 24px -4px rgba(111, 175, 155, 0.48);
     transform: translateY(-2px);
   }
 
-  /* Honey badge for highlights */
-  .badge-honey {
+  /* Butter badge for highlights */
+  .badge-butter {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--honey) / 0.25);
-    color: hsl(43 60% 35%);
+    background-color: hsl(var(--butter) / 0.25);
+    color: hsl(45 70% 35%);
   }
 
-  /* Olive badge for AI, tips, new labels */
-  .badge-olive {
+  /* Peach badge for notifications, reactions */
+  .badge-peach {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--olive) / 0.30);
-    color: hsl(98 20% 38%);
+    background-color: hsl(var(--peach) / 0.30);
+    color: hsl(20 60% 40%);
   }
 
   /* Accent badge for highlights */
   .badge-accent {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
     background-color: hsl(var(--accent) / 0.25);
-    color: hsl(43 55% 35%);
+    color: hsl(45 60% 35%);
   }
 
   /* Trust badge */
@@ -233,29 +248,29 @@
     @apply text-muted-foreground/25;
   }
   
-  /* Gradient backgrounds - Natural gradients */
+  /* Gradient backgrounds - Warm and soft */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(98 17% 62%) 0%, hsl(98 20% 68%) 100%);
+    background: linear-gradient(135deg, hsl(159 28% 56%) 0%, hsl(159 25% 62%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(43 74% 66%) 0%, hsl(40 70% 68%) 100%);
+    background: linear-gradient(135deg, hsl(45 86% 62%) 0%, hsl(42 80% 65%) 100%);
   }
 
-  .gradient-honey {
-    background: linear-gradient(135deg, hsl(43 74% 66%) 0%, hsl(38 68% 68%) 100%);
+  .gradient-butter {
+    background: linear-gradient(135deg, hsl(45 86% 62%) 0%, hsl(40 80% 65%) 100%);
   }
 
   .gradient-warm {
-    background: linear-gradient(135deg, hsl(98 17% 65%) 0%, hsl(43 74% 68%) 100%);
+    background: linear-gradient(135deg, hsl(159 28% 58%) 0%, hsl(45 86% 65%) 100%);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, hsl(98 17% 62%) 0%, hsl(98 15% 66%) 100%);
+    background: linear-gradient(135deg, hsl(159 28% 56%) 0%, hsl(159 25% 60%) 100%);
   }
 
-  .gradient-olive {
-    background: linear-gradient(135deg, hsl(98 20% 72%) 0%, hsl(98 17% 65%) 100%);
+  .gradient-peach {
+    background: linear-gradient(135deg, hsl(20 83% 73%) 0%, hsl(18 78% 70%) 100%);
   }
 
   /* Swipe card animations */
