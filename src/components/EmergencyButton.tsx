@@ -7,13 +7,13 @@ export const EmergencyButton = () => {
 
   return (
     <>
-      {/* Zone 4: Safety Layer - Floating Emergency Button (bottom, above nav) */}
+      {/* Zone 4: Safety Layer - Floating Emergency Button (bottom, above nav) - Terracotta Burst */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 w-10 h-10 rounded-full bg-destructive shadow-lg flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
+        className="fixed bottom-24 right-4 w-10 h-10 rounded-full bg-secondary shadow-lg flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
         aria-label="Noodhulp"
       >
-        <AlertTriangle className="w-5 h-5 text-destructive-foreground" />
+        <AlertTriangle className="w-5 h-5 text-secondary-foreground" />
       </button>
 
       {/* Emergency Modal */}
@@ -31,11 +31,11 @@ export const EmergencyButton = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-card rounded-3xl p-6 max-w-sm w-full shadow-card-hover"
+              className="bg-card rounded-2xl p-6 max-w-sm w-full shadow-card-hover"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-destructive" />
+                <div className="w-12 h-12 rounded-xl bg-secondary/15 flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-secondary" />
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -55,7 +55,7 @@ export const EmergencyButton = () => {
               <div className="space-y-3">
                 <a
                   href="tel:112"
-                  className="flex items-center gap-4 w-full p-4 bg-destructive text-destructive-foreground rounded-2xl font-semibold hover:brightness-110 transition-all"
+                  className="flex items-center gap-4 w-full p-4 bg-destructive text-destructive-foreground rounded-xl font-semibold hover:brightness-110 transition-all"
                 >
                   <Phone className="w-6 h-6" />
                   <div>
@@ -64,8 +64,8 @@ export const EmergencyButton = () => {
                   </div>
                 </a>
 
-                <button className="flex items-center gap-4 w-full p-4 bg-accent/10 text-accent rounded-2xl font-semibold hover:bg-accent/20 transition-all">
-                  <AlertTriangle className="w-6 h-6" />
+                <button className="flex items-center gap-4 w-full p-4 bg-accent/15 text-accent-foreground rounded-xl font-semibold hover:bg-accent/25 transition-all">
+                  <AlertTriangle className="w-6 h-6 text-accent" />
                   <div className="text-left">
                     <p className="font-bold">Meld incident</p>
                     <p className="text-sm opacity-80">Mensen in de buurt verwittigen</p>
