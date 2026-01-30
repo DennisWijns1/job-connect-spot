@@ -2,17 +2,98 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock } from 'lucide-react';
+import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  isError?: boolean;
 }
 
+interface AIResponse {
+  category: string;
+  risk_level: 'green' | 'yellow' | 'red';
+  summary: string;
+  likely_causes: string[];
+  questions_to_confirm: string[];
+  steps: string[];
+  tools_needed: string[];
+  materials_needed: string[];
+  stop_conditions: string[];
+  recommend_handy: boolean;
+  handy_reason: string;
+}
+
+const formatAIResponse = (response: AIResponse): string => {
+  const riskEmoji = response.risk_level === 'red' ? '🔴' : response.risk_level === 'yellow' ? '🟡' : '🟢';
+  const riskLabel = response.risk_level === 'red' ? 'HOOG RISICO' : response.risk_level === 'yellow' ? 'LET OP' : 'VEILIG';
+  
+  let formatted = `${riskEmoji} **${riskLabel}** | 🔎 ${response.category}\n\n`;
+  formatted += `**Samenvatting:** ${response.summary}\n\n`;
+
+  if (response.likely_causes.length > 0) {
+    formatted += `**Mogelijke oorzaken:**\n`;
+    response.likely_causes.forEach(cause => {
+      formatted += `• ${cause}\n`;
+    });
+    formatted += '\n';
+  }
+
+  if (response.questions_to_confirm.length > 0) {
+    formatted += `**❓ Vragen om te bevestigen:**\n`;
+    response.questions_to_confirm.forEach(q => {
+      formatted += `• ${q}\n`;
+    });
+    formatted += '\n';
+  }
+
+  if (response.steps.length > 0 && response.risk_level !== 'red') {
+    formatted += `**📋 Stappenplan:**\n`;
+    response.steps.forEach((step, i) => {
+      formatted += `${i + 1}. ${step}\n`;
+    });
+    formatted += '\n';
+  }
+
+  if (response.tools_needed.length > 0) {
+    formatted += `**🔧 Gereedschap:** ${response.tools_needed.join(', ')}\n`;
+  }
+
+  if (response.materials_needed.length > 0) {
+    formatted += `**📦 Materialen:** ${response.materials_needed.join(', ')}\n`;
+  }
+
+  if (response.stop_conditions.length > 0) {
+    formatted += `\n**⛔ Stopcondities:**\n`;
+    response.stop_conditions.forEach(condition => {
+      formatted += `• ${condition}\n`;
+    });
+  }
+
+  // CTA based on risk level
+  formatted += '\n---\n';
+  if (response.risk_level === 'red') {
+    formatted += `⚠️ **Stop – schakel een Handy in**\n`;
+    if (response.handy_reason) {
+      formatted += `_${response.handy_reason}_\n`;
+    }
+  } else if (response.risk_level === 'yellow') {
+    formatted += `💡 **Twijfel je? Schakel een Handy in**\n`;
+  } else {
+    formatted += `✅ **Lukt het niet na 2 pogingen? Schakel een Handy in**\n`;
+  }
+
+  formatted += '\n_Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in._';
+
+  return formatted;
+};
+
 const AIHelpPage = () => {
+  const { toast } = useToast();
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = userType === 'handy';
 
@@ -68,37 +149,98 @@ const AIHelpPage = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageText = input;
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const seekerResponses = [
-        `Ik begrijp het probleem! 🔧 Hier zijn enkele stappen die je kunt proberen:\n\n1. Controleer eerst of de stroom/water is afgesloten\n2. Inspecteer visueel of er duidelijke schade is\n3. Probeer de eenvoudigste oplossing eerst\n\nWil je dat ik een Handy in de buurt zoek om te helpen?`,
-        `Dat is een veelvoorkomend probleem! 💡 Hier is wat je kunt doen:\n\n• Check of alle verbindingen stevig vastzitten\n• Kijk of er geen verstoppingen zijn\n• Probeer het apparaat/onderdeel te resetten\n\nAls dit niet werkt, kan ik je verbinden met een professional.`,
-      ];
+    try {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      const handyResponses = [
-        `Goede vraag! 💼 Hier zijn mijn tips:\n\n1. Analyseer de scope van het project eerst grondig\n2. Bereken je uren + materiaalkosten + 15-20% marge\n3. Wees transparant naar de klant over wat inbegrepen is\n\nWil je een specifieke prijsberekening maken?`,
-        `Dat is belangrijk voor je succes! 📈 Mijn advies:\n\n• Communiceer duidelijk en proactief met klanten\n• Geef realistische tijdsinschattingen\n• Vraag om reviews na een geslaagde klus\n\nKan ik je ergens specifiek mee helpen?`,
-      ];
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assist`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            text: messageText,
+            userType: isHandy ? 'handy' : 'seeker',
+            images: [],
+          }),
+          signal: controller.signal,
+        }
+      );
 
-      const responses = isHandy ? handyResponses : seekerResponses;
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Fout: ${response.status}`);
+      }
+
+      const aiResponse: AIResponse = await response.json();
+      const formattedContent = formatAIResponse(aiResponse);
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: responses[Math.floor(Math.random() * responses.length)],
+        content: formattedContent,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('AI assist error:', error);
+      
+      let errorMessage = 'Er is een fout opgetreden. Probeer het opnieuw.';
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = 'De AI reageert niet op tijd. Probeer het later opnieuw.';
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage = 'Geen internetverbinding. Controleer je netwerk en probeer opnieuw.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      toast({
+        title: 'AI Fout',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+
+      const errorAiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `❌ **Fout:** ${errorMessage}\n\n_Probeer het opnieuw of neem contact op met een Handy._`,
+        timestamp: new Date(),
+        isError: true,
+      };
+
+      setMessages((prev) => [...prev, errorAiMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleSuggestion = (text: string) => {
     setInput(text);
+  };
+
+  const getRiskIcon = (content: string) => {
+    if (content.includes('🔴') || content.includes('HOOG RISICO')) {
+      return <AlertTriangle className="w-4 h-4 text-red-500" />;
+    } else if (content.includes('🟡') || content.includes('LET OP')) {
+      return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+    } else if (content.includes('🟢') || content.includes('VEILIG')) {
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    }
+    return null;
   };
 
   return (
@@ -117,18 +259,42 @@ const AIHelpPage = () => {
               className={`flex mb-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.role === 'assistant' && (
-                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center mr-3 flex-shrink-0">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-3 flex-shrink-0 ${message.isError ? 'bg-destructive' : 'bg-primary'}`}>
                   <Bot className="w-5 h-5 text-primary-foreground" />
                 </div>
               )}
               <div
-                className={`max-w-[75%] p-4 rounded-2xl ${
+                className={`max-w-[85%] p-4 rounded-2xl ${
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground rounded-br-sm'
+                    : message.isError
+                    ? 'bg-destructive/10 border border-destructive/20 rounded-bl-sm'
                     : 'bg-card shadow-soft rounded-bl-sm border border-border'
                 }`}
               >
-                <p className="text-sm whitespace-pre-line">{message.content}</p>
+                {message.role === 'assistant' && !message.isError && getRiskIcon(message.content) && (
+                  <div className="flex items-center gap-2 mb-2">
+                    {getRiskIcon(message.content)}
+                  </div>
+                )}
+                <div className="text-sm whitespace-pre-line">
+                  {message.content.split('\n').map((line, i) => {
+                    // Simple markdown-like formatting
+                    let formattedLine = line;
+                    
+                    // Bold text
+                    formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    // Italic text
+                    formattedLine = formattedLine.replace(/_(.*?)_/g, '<em>$1</em>');
+                    
+                    return (
+                      <span 
+                        key={i} 
+                        dangerouslySetInnerHTML={{ __html: formattedLine + (i < message.content.split('\n').length - 1 ? '<br/>' : '') }} 
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </motion.div>
           ))}
@@ -182,7 +348,10 @@ const AIHelpPage = () => {
       <div className="sticky bottom-24 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-background via-background to-transparent pt-4">
         <div className="flex items-center gap-3">
           {!isHandy && (
-            <button className="w-12 h-12 rounded-xl bg-card shadow-soft flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border">
+            <button 
+              className="w-12 h-12 rounded-xl bg-card shadow-soft flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
+              onClick={() => toast({ title: 'Foto upload', description: 'Foto upload wordt binnenkort toegevoegd!' })}
+            >
               <Camera className="w-6 h-6" />
             </button>
           )}
@@ -190,13 +359,14 @@ const AIHelpPage = () => {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              onKeyDown={(e) => e.key === 'Enter' && !isTyping && handleSend()}
               placeholder={isHandy ? 'Stel je vraag...' : 'Beschrijf je probleem...'}
               className="h-12 rounded-xl pr-12 bg-card border-border"
+              disabled={isTyping}
             />
             <button
               onClick={handleSend}
-              disabled={!input.trim()}
+              disabled={!input.trim() || isTyping}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />
