@@ -1,10 +1,32 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+
+interface AIResponse {
+  title: string;
+  category: string;
+  risk_level: 'GREEN' | 'YELLOW' | 'RED';
+  risk_badge: string;
+  summary: string;
+  likely_causes: string[];
+  questions_to_confirm: string[];
+  step_by_step: string[];
+  tools_needed: string[];
+  materials_needed: string[];
+  stop_conditions: string[];
+  next_best_action: 'self_fix' | 'lesson' | 'book_handy';
+  lesson_suggestion: { suggested: boolean; topic: string; why: string };
+  handy_suggestion: { suggested: boolean; why: string; urgency: 'low' | 'medium' | 'high' };
+  disclaimer_short: string;
+  confidence: number;
+  confidence_note: string;
+}
 
 interface Message {
   id: string;
@@ -12,97 +34,20 @@ interface Message {
   content: string;
   timestamp: Date;
   isError?: boolean;
+  aiResponse?: AIResponse;
 }
-
-interface AIResponse {
-  category: string;
-  risk_level: 'green' | 'yellow' | 'red';
-  summary: string;
-  likely_causes: string[];
-  questions_to_confirm: string[];
-  steps: string[];
-  tools_needed: string[];
-  materials_needed: string[];
-  stop_conditions: string[];
-  recommend_handy: boolean;
-  handy_reason: string;
-}
-
-const formatAIResponse = (response: AIResponse): string => {
-  const riskEmoji = response.risk_level === 'red' ? '🔴' : response.risk_level === 'yellow' ? '🟡' : '🟢';
-  const riskLabel = response.risk_level === 'red' ? 'HOOG RISICO' : response.risk_level === 'yellow' ? 'LET OP' : 'VEILIG';
-  
-  let formatted = `${riskEmoji} **${riskLabel}** | 🔎 ${response.category}\n\n`;
-  formatted += `**Samenvatting:** ${response.summary}\n\n`;
-
-  if (response.likely_causes.length > 0) {
-    formatted += `**Mogelijke oorzaken:**\n`;
-    response.likely_causes.forEach(cause => {
-      formatted += `• ${cause}\n`;
-    });
-    formatted += '\n';
-  }
-
-  if (response.questions_to_confirm.length > 0) {
-    formatted += `**❓ Vragen om te bevestigen:**\n`;
-    response.questions_to_confirm.forEach(q => {
-      formatted += `• ${q}\n`;
-    });
-    formatted += '\n';
-  }
-
-  if (response.steps.length > 0 && response.risk_level !== 'red') {
-    formatted += `**📋 Stappenplan:**\n`;
-    response.steps.forEach((step, i) => {
-      formatted += `${i + 1}. ${step}\n`;
-    });
-    formatted += '\n';
-  }
-
-  if (response.tools_needed.length > 0) {
-    formatted += `**🔧 Gereedschap:** ${response.tools_needed.join(', ')}\n`;
-  }
-
-  if (response.materials_needed.length > 0) {
-    formatted += `**📦 Materialen:** ${response.materials_needed.join(', ')}\n`;
-  }
-
-  if (response.stop_conditions.length > 0) {
-    formatted += `\n**⛔ Stopcondities:**\n`;
-    response.stop_conditions.forEach(condition => {
-      formatted += `• ${condition}\n`;
-    });
-  }
-
-  // CTA based on risk level
-  formatted += '\n---\n';
-  if (response.risk_level === 'red') {
-    formatted += `⚠️ **Stop – schakel een Handy in**\n`;
-    if (response.handy_reason) {
-      formatted += `_${response.handy_reason}_\n`;
-    }
-  } else if (response.risk_level === 'yellow') {
-    formatted += `💡 **Twijfel je? Schakel een Handy in**\n`;
-  } else {
-    formatted += `✅ **Lukt het niet na 2 pogingen? Schakel een Handy in**\n`;
-  }
-
-  formatted += '\n_Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in._';
-
-  return formatted;
-};
 
 const AIHelpPage = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = userType === 'handy';
 
-  // Different suggestions for seekers vs handymen
   const seekerSuggestions = [
     { icon: Lightbulb, text: 'Lamp flikkert constant', category: 'Elektriciteit' },
-    { icon: Droplets, text: 'Afvoer loopt niet door', category: 'Loodgieter' },
-    { icon: Hammer, text: 'Tegel is gebarsten', category: 'Tegels' },
-    { icon: Wrench, text: 'Kraan lekt water', category: 'Loodgieter' },
+    { icon: Droplets, text: 'Afvoer loopt niet door', category: 'Afvoer' },
+    { icon: Hammer, text: 'Tegel is gebarsten', category: 'Muren/Verf' },
+    { icon: Wrench, text: 'Kraan lekt water', category: 'Sanitair' },
   ];
 
   const handySuggestions = [
@@ -154,7 +99,6 @@ const AIHelpPage = () => {
     setIsTyping(true);
 
     try {
-      // Create AbortController for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -167,9 +111,10 @@ const AIHelpPage = () => {
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            text: messageText,
+            message: messageText,
             userType: isHandy ? 'handy' : 'seeker',
-            images: [],
+            photoProvided: false,
+            categoryHint: null,
           }),
           signal: controller.signal,
         }
@@ -177,22 +122,48 @@ const AIHelpPage = () => {
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Fout: ${response.status}`);
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        const errorMessage = result.error || `Fout: ${response.status}`;
+        const fallbackData = result.fallback;
+
+        toast({
+          title: 'AI Fout',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+
+        if (fallbackData) {
+          const aiMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: fallbackData.summary,
+            timestamp: new Date(),
+            aiResponse: fallbackData,
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          const errorAiMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: `❌ ${errorMessage}\n\nProbeer het opnieuw of neem contact op met een Handy.`,
+            timestamp: new Date(),
+            isError: true,
+          };
+          setMessages((prev) => [...prev, errorAiMessage]);
+        }
+      } else {
+        const aiResponse: AIResponse = result.data;
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: aiResponse.summary,
+          timestamp: new Date(),
+          aiResponse,
+        };
+        setMessages((prev) => [...prev, aiMessage]);
       }
-
-      const aiResponse: AIResponse = await response.json();
-      const formattedContent = formatAIResponse(aiResponse);
-
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: formattedContent,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error('AI assist error:', error);
       
@@ -203,13 +174,11 @@ const AIHelpPage = () => {
           errorMessage = 'De AI reageert niet op tijd. Probeer het later opnieuw.';
         } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
           errorMessage = 'Geen internetverbinding. Controleer je netwerk en probeer opnieuw.';
-        } else {
-          errorMessage = error.message;
         }
       }
 
       toast({
-        title: 'AI Fout',
+        title: 'Verbindingsfout',
         description: errorMessage,
         variant: 'destructive',
       });
@@ -217,7 +186,7 @@ const AIHelpPage = () => {
       const errorAiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `❌ **Fout:** ${errorMessage}\n\n_Probeer het opnieuw of neem contact op met een Handy._`,
+        content: `❌ ${errorMessage}`,
         timestamp: new Date(),
         isError: true,
       };
@@ -232,15 +201,183 @@ const AIHelpPage = () => {
     setInput(text);
   };
 
-  const getRiskIcon = (content: string) => {
-    if (content.includes('🔴') || content.includes('HOOG RISICO')) {
-      return <AlertTriangle className="w-4 h-4 text-red-500" />;
-    } else if (content.includes('🟡') || content.includes('LET OP')) {
-      return <AlertCircle className="w-4 h-4 text-yellow-500" />;
-    } else if (content.includes('🟢') || content.includes('VEILIG')) {
-      return <CheckCircle className="w-4 h-4 text-green-500" />;
+  const handleCTAClick = (action: 'self_fix' | 'lesson' | 'book_handy', topic?: string) => {
+    if (action === 'book_handy') {
+      navigate('/swipe');
+    } else if (action === 'lesson' && topic) {
+      navigate(`/learning?topic=${encodeURIComponent(topic)}`);
     }
-    return null;
+  };
+
+  const getRiskStyles = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'GREEN':
+        return {
+          bg: 'bg-success/10',
+          border: 'border-success/30',
+          text: 'text-success',
+          icon: CheckCircle,
+        };
+      case 'RED':
+        return {
+          bg: 'bg-destructive/10',
+          border: 'border-destructive/30',
+          text: 'text-destructive',
+          icon: AlertTriangle,
+        };
+      default:
+        return {
+          bg: 'bg-accent/10',
+          border: 'border-accent/30',
+          text: 'text-accent-foreground',
+          icon: AlertCircle,
+        };
+    }
+  };
+
+  const renderAIResponse = (aiResponse: AIResponse) => {
+    const riskStyles = getRiskStyles(aiResponse.risk_level);
+    const RiskIcon = riskStyles.icon;
+
+    return (
+      <div className="space-y-4">
+        {/* Risk Badge */}
+        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${riskStyles.bg} ${riskStyles.border} border`}>
+          <RiskIcon className={`w-4 h-4 ${riskStyles.text}`} />
+          <span className={riskStyles.text}>{aiResponse.risk_badge}</span>
+        </div>
+
+        {/* Title & Category */}
+        <div>
+          <h3 className="font-semibold text-foreground">{aiResponse.title}</h3>
+          <span className="text-xs text-muted-foreground">{aiResponse.category}</span>
+        </div>
+
+        {/* Summary */}
+        <p className="text-sm text-foreground">{aiResponse.summary}</p>
+
+        {/* Likely Causes */}
+        {aiResponse.likely_causes.length > 0 && (
+          <div>
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Mogelijke oorzaken</h4>
+            <ul className="space-y-1">
+              {aiResponse.likely_causes.map((cause, i) => (
+                <li key={i} className="text-sm flex items-start gap-2">
+                  <span className="text-accent mt-0.5">•</span>
+                  <span>{cause}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Questions to Confirm */}
+        {aiResponse.questions_to_confirm.length > 0 && (
+          <div className="bg-muted/50 rounded-xl p-3">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">❓ Vragen om te bevestigen</h4>
+            <ul className="space-y-1">
+              {aiResponse.questions_to_confirm.map((q, i) => (
+                <li key={i} className="text-sm">{q}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Step by Step */}
+        {aiResponse.step_by_step.length > 0 && aiResponse.risk_level !== 'RED' && (
+          <div>
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📋 Stappenplan</h4>
+            <ol className="space-y-2">
+              {aiResponse.step_by_step.map((step, i) => (
+                <li key={i} className="text-sm flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* Tools & Materials */}
+        {(aiResponse.tools_needed.length > 0 || aiResponse.materials_needed.length > 0) && (
+          <div className="flex flex-wrap gap-4">
+            {aiResponse.tools_needed.length > 0 && (
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">🔧 Gereedschap</h4>
+                <div className="flex flex-wrap gap-1">
+                  {aiResponse.tools_needed.map((tool, i) => (
+                    <span key={i} className="text-xs bg-muted px-2 py-1 rounded-full">{tool}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {aiResponse.materials_needed.length > 0 && (
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📦 Materialen</h4>
+                <div className="flex flex-wrap gap-1">
+                  {aiResponse.materials_needed.map((mat, i) => (
+                    <span key={i} className="text-xs bg-muted px-2 py-1 rounded-full">{mat}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Stop Conditions */}
+        {aiResponse.stop_conditions.length > 0 && (
+          <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-3">
+            <h4 className="text-xs font-semibold text-destructive uppercase mb-2">⛔ Stopcondities</h4>
+            <ul className="space-y-1">
+              {aiResponse.stop_conditions.map((condition, i) => (
+                <li key={i} className="text-sm text-destructive/90">{condition}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* CTA Buttons */}
+        <div className="pt-2 space-y-2">
+          {aiResponse.next_best_action === 'self_fix' && (
+            <Button 
+              className="w-full btn-cta"
+              onClick={() => handleCTAClick('self_fix')}
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Ik probeer dit zelf
+            </Button>
+          )}
+          
+          {aiResponse.next_best_action === 'lesson' && aiResponse.lesson_suggestion.suggested && (
+            <Button 
+              className="w-full btn-forest"
+              onClick={() => handleCTAClick('lesson', aiResponse.lesson_suggestion.topic)}
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Bekijk les: {aiResponse.lesson_suggestion.topic}
+            </Button>
+          )}
+          
+          {(aiResponse.next_best_action === 'book_handy' || aiResponse.handy_suggestion.suggested) && (
+            <Button 
+              className={`w-full ${aiResponse.risk_level === 'RED' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'btn-cta'}`}
+              onClick={() => handleCTAClick('book_handy')}
+            >
+              <Hammer className="w-4 h-4 mr-2" />
+              Schakel een Handy in
+              {aiResponse.handy_suggestion.urgency === 'high' && (
+                <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">Dringend</span>
+              )}
+            </Button>
+          )}
+        </div>
+
+        {/* Disclaimer */}
+        <p className="text-xs text-muted-foreground pt-2 border-t border-border">
+          {aiResponse.disclaimer_short}
+        </p>
+      </div>
+    );
   };
 
   return (
@@ -272,29 +409,11 @@ const AIHelpPage = () => {
                     : 'bg-card shadow-soft rounded-bl-sm border border-border'
                 }`}
               >
-                {message.role === 'assistant' && !message.isError && getRiskIcon(message.content) && (
-                  <div className="flex items-center gap-2 mb-2">
-                    {getRiskIcon(message.content)}
-                  </div>
+                {message.role === 'assistant' && message.aiResponse ? (
+                  renderAIResponse(message.aiResponse)
+                ) : (
+                  <p className="text-sm whitespace-pre-line">{message.content}</p>
                 )}
-                <div className="text-sm whitespace-pre-line">
-                  {message.content.split('\n').map((line, i) => {
-                    // Simple markdown-like formatting
-                    let formattedLine = line;
-                    
-                    // Bold text
-                    formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    // Italic text
-                    formattedLine = formattedLine.replace(/_(.*?)_/g, '<em>$1</em>');
-                    
-                    return (
-                      <span 
-                        key={i} 
-                        dangerouslySetInnerHTML={{ __html: formattedLine + (i < message.content.split('\n').length - 1 ? '<br/>' : '') }} 
-                      />
-                    );
-                  })}
-                </div>
               </div>
             </motion.div>
           ))}
@@ -333,7 +452,7 @@ const AIHelpPage = () => {
               <button
                 key={idx}
                 onClick={() => handleSuggestion(problem.text)}
-                className="p-3 bg-card rounded-xl text-left hover:bg-secondary hover:shadow-soft transition-all group border border-border"
+                className="p-3 bg-card rounded-xl text-left hover:bg-secondary/20 hover:shadow-soft transition-all group border border-border"
               >
                 <problem.icon className="w-5 h-5 text-accent mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">{problem.text}</p>
