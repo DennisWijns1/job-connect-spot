@@ -6,110 +6,110 @@
 
 @layer base {
   :root {
-    /* HandyMatch Design System - Craft & Trust */
+    /* HandyMatch Design System - Diep Petrol & Zachte Abrikoos */
     
-    /* Background - Linnen Wit #F4F1EA */
-    --background: 42 31% 94%;
+    /* Background - Warm Crème #FAF7F0 */
+    --background: 40 45% 96%;
     
     /* Primary Text - Charcoal Black #2D2D2D */
     --foreground: 0 0% 18%;
 
-    /* Card - Soft Ash #E0E0DB */
-    --card: 60 6% 86%;
+    /* Card - Slightly darker cream for contrast */
+    --card: 40 30% 93%;
     --card-foreground: 0 0% 18%;
 
-    --popover: 60 8% 88%;
+    --popover: 40 35% 94%;
     --popover-foreground: 0 0% 18%;
 
-    /* Primary - Deep Forest #1B3022 (structure, headers, navigation) */
-    --primary: 141 31% 15%;
-    --primary-foreground: 42 31% 94%;
+    /* Primary - Diep Petrol #134E4A (headers, navigation, structure) */
+    --primary: 175 63% 19%;
+    --primary-foreground: 40 45% 96%;
 
-    /* Accent - Electric Ochre #E2B007 (CTAs, swipe, confirmations) */
-    --accent: 46 93% 46%;
+    /* Accent - Zachte Abrikoos #FB923C (details only, not large surfaces) */
+    --accent: 24 95% 61%;
     --accent-foreground: 0 0% 15%;
 
-    /* Secondary - Terracotta Burst #D9624F (notifications, badges) */
-    --secondary: 7 66% 58%;
+    /* Secondary - Warm terracotta for badges/notifications */
+    --secondary: 24 80% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Muted - Soft warm gray for subtle elements */
-    --muted: 50 8% 82%;
+    /* Muted - Warm gray */
+    --muted: 35 15% 85%;
     --muted-foreground: 0 0% 40%;
 
-    /* Destructive - Terracotta aligned */
-    --destructive: 7 66% 50%;
+    /* Destructive - Red for errors */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Deep Forest green */
-    --success: 141 31% 25%;
+    /* Success - Teal green aligned with petrol */
+    --success: 175 50% 30%;
     --success-foreground: 0 0% 100%;
 
-    /* Ochre accent for highlights */
-    --ochre: 46 93% 46%;
+    /* Ochre - Zachte Abrikoos for highlights */
+    --ochre: 24 95% 61%;
     --ochre-foreground: 0 0% 15%;
 
-    /* Terracotta - For notifications, badges, warnings */
-    --terracotta: 7 66% 58%;
+    /* Terracotta - For notifications, badges */
+    --terracotta: 24 80% 55%;
     --terracotta-foreground: 0 0% 100%;
 
-    /* Forest - Deep green for structure */
-    --forest: 141 31% 15%;
-    --forest-foreground: 42 31% 94%;
+    /* Forest/Petrol - Deep petrol for structure */
+    --forest: 175 63% 19%;
+    --forest-foreground: 40 45% 96%;
 
-    --border: 50 8% 78%;
-    --input: 50 8% 78%;
-    --ring: 46 93% 46%;
+    --border: 35 20% 82%;
+    --input: 35 20% 82%;
+    --ring: 24 95% 61%;
 
     --radius: 1rem;
 
     /* Custom shadows - Deep and professional */
-    --shadow-card: 0 4px 24px -6px rgba(27, 48, 34, 0.12), 0 2px 12px -4px rgba(0, 0, 0, 0.06);
-    --shadow-card-hover: 0 8px 32px -6px rgba(27, 48, 34, 0.18), 0 4px 18px -4px rgba(0, 0, 0, 0.08);
-    --shadow-button: 0 4px 20px -4px rgba(226, 176, 7, 0.50);
-    --shadow-button-forest: 0 4px 18px -4px rgba(27, 48, 34, 0.45);
-    --shadow-soft: 0 2px 12px -4px rgba(0, 0, 0, 0.08);
+    --shadow-card: 0 4px 24px -6px rgba(19, 78, 74, 0.10), 0 2px 12px -4px rgba(0, 0, 0, 0.05);
+    --shadow-card-hover: 0 8px 32px -6px rgba(19, 78, 74, 0.16), 0 4px 18px -4px rgba(0, 0, 0, 0.07);
+    --shadow-button: 0 4px 20px -4px rgba(251, 146, 60, 0.45);
+    --shadow-button-forest: 0 4px 18px -4px rgba(19, 78, 74, 0.40);
+    --shadow-soft: 0 2px 12px -4px rgba(0, 0, 0, 0.06);
 
     /* Sidebar */
-    --sidebar-background: 42 31% 94%;
-    --sidebar-foreground: 141 31% 15%;
-    --sidebar-primary: 141 31% 15%;
-    --sidebar-primary-foreground: 42 31% 94%;
-    --sidebar-accent: 46 93% 46%;
+    --sidebar-background: 40 45% 96%;
+    --sidebar-foreground: 175 63% 19%;
+    --sidebar-primary: 175 63% 19%;
+    --sidebar-primary-foreground: 40 45% 96%;
+    --sidebar-accent: 24 95% 61%;
     --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 50 8% 78%;
-    --sidebar-ring: 46 93% 46%;
+    --sidebar-border: 35 20% 82%;
+    --sidebar-ring: 24 95% 61%;
   }
 
   .dark {
-    /* Dark mode - Deep forest tinted */
-    --background: 141 20% 10%;
-    --foreground: 42 25% 90%;
-    --card: 141 18% 14%;
-    --card-foreground: 42 25% 90%;
-    --popover: 141 18% 14%;
-    --popover-foreground: 42 25% 90%;
-    --primary: 46 93% 50%;
+    /* Dark mode - Deep petrol tinted */
+    --background: 175 30% 8%;
+    --foreground: 40 25% 90%;
+    --card: 175 25% 12%;
+    --card-foreground: 40 25% 90%;
+    --popover: 175 25% 12%;
+    --popover-foreground: 40 25% 90%;
+    --primary: 24 95% 61%;
     --primary-foreground: 0 0% 10%;
-    --accent: 46 93% 50%;
+    --accent: 24 95% 61%;
     --accent-foreground: 0 0% 10%;
-    --secondary: 7 60% 55%;
+    --secondary: 24 75% 50%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 141 12% 20%;
-    --muted-foreground: 42 15% 55%;
-    --destructive: 7 60% 45%;
+    --muted: 175 15% 18%;
+    --muted-foreground: 40 15% 55%;
+    --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
-    --success: 141 31% 35%;
+    --success: 175 50% 35%;
     --success-foreground: 0 0% 100%;
-    --ochre: 46 93% 50%;
+    --ochre: 24 95% 61%;
     --ochre-foreground: 0 0% 10%;
-    --terracotta: 7 60% 55%;
+    --terracotta: 24 75% 50%;
     --terracotta-foreground: 0 0% 100%;
-    --forest: 141 25% 25%;
-    --forest-foreground: 42 25% 90%;
-    --border: 141 15% 22%;
-    --input: 141 15% 22%;
-    --ring: 46 93% 50%;
+    --forest: 175 40% 22%;
+    --forest-foreground: 40 25% 90%;
+    --border: 175 20% 20%;
+    --input: 175 20% 20%;
+    --ring: 24 95% 61%;
   }
 }
 
@@ -152,7 +152,7 @@
     transform: translateY(-3px);
   }
 
-  /* CTA Button with Electric Ochre glow */
+  /* CTA Button with Zachte Abrikoos glow */
   .btn-cta {
     @apply bg-accent text-accent-foreground font-semibold rounded-2xl;
     box-shadow: var(--shadow-button);
@@ -161,7 +161,7 @@
 
   .btn-cta:hover {
     @apply brightness-105;
-    box-shadow: 0 6px 28px -4px rgba(226, 176, 7, 0.60);
+    box-shadow: 0 6px 28px -4px rgba(251, 146, 60, 0.55);
     transform: translateY(-2px);
   }
 
@@ -169,7 +169,7 @@
     transform: translateY(0);
   }
 
-  /* Forest button for structure actions */
+  /* Petrol button for structure actions */
   .btn-forest {
     @apply font-semibold rounded-2xl;
     background-color: hsl(var(--forest));
@@ -180,7 +180,7 @@
 
   .btn-forest:hover {
     @apply brightness-110;
-    box-shadow: 0 6px 28px -4px rgba(27, 48, 34, 0.55);
+    box-shadow: 0 6px 28px -4px rgba(19, 78, 74, 0.50);
     transform: translateY(-2px);
   }
 
@@ -189,17 +189,17 @@
     @apply font-semibold rounded-2xl;
     background-color: hsl(var(--terracotta));
     color: hsl(var(--terracotta-foreground));
-    box-shadow: 0 4px 18px -4px rgba(217, 98, 79, 0.40);
+    box-shadow: 0 4px 18px -4px rgba(251, 146, 60, 0.35);
     transition: all 0.3s ease;
   }
 
   .btn-terracotta:hover {
     @apply brightness-105;
-    box-shadow: 0 6px 24px -4px rgba(217, 98, 79, 0.50);
+    box-shadow: 0 6px 24px -4px rgba(251, 146, 60, 0.45);
     transform: translateY(-2px);
   }
 
-  /* Success button - Deep forest */
+  /* Success button - Teal */
   .btn-success {
     @apply font-semibold rounded-2xl;
     background-color: hsl(var(--success));
@@ -210,42 +210,42 @@
 
   .btn-success:hover {
     @apply brightness-110;
-    box-shadow: 0 6px 28px -4px rgba(27, 48, 34, 0.55);
+    box-shadow: 0 6px 28px -4px rgba(19, 78, 74, 0.50);
     transform: translateY(-2px);
   }
 
   /* Ochre badge for highlights */
   .badge-ochre {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--ochre) / 0.20);
-    color: hsl(46 80% 30%);
+    background-color: hsl(var(--ochre) / 0.18);
+    color: hsl(24 70% 35%);
   }
 
   /* Terracotta badge for notifications, warnings */
   .badge-terracotta {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--terracotta) / 0.20);
-    color: hsl(7 55% 40%);
+    background-color: hsl(var(--terracotta) / 0.18);
+    color: hsl(24 65% 38%);
   }
 
   /* Accent badge for highlights */
   .badge-accent {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--accent) / 0.20);
-    color: hsl(46 75% 30%);
+    background-color: hsl(var(--accent) / 0.18);
+    color: hsl(24 70% 35%);
   }
 
-  /* Forest badge for trust/verified */
+  /* Forest/Petrol badge for trust/verified */
   .badge-forest {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    background-color: hsl(var(--forest) / 0.15);
-    color: hsl(141 30% 25%);
+    background-color: hsl(var(--forest) / 0.12);
+    color: hsl(175 50% 25%);
   }
 
   /* Trust badge */
   .trust-badge {
     @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium;
-    @apply bg-primary/15 text-primary;
+    @apply bg-primary/12 text-primary;
   }
 
   /* Hammer rating */
@@ -261,33 +261,33 @@
     @apply text-muted-foreground/25;
   }
   
-  /* Gradient backgrounds - Craft & Trust */
+  /* Gradient backgrounds - Petrol & Abrikoos */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(141 31% 15%) 0%, hsl(141 28% 22%) 100%);
+    background: linear-gradient(135deg, hsl(175 63% 19%) 0%, hsl(175 55% 25%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(46 93% 46%) 0%, hsl(42 88% 50%) 100%);
+    background: linear-gradient(135deg, hsl(24 95% 61%) 0%, hsl(28 90% 55%) 100%);
   }
 
   .gradient-ochre {
-    background: linear-gradient(135deg, hsl(46 93% 46%) 0%, hsl(40 85% 50%) 100%);
+    background: linear-gradient(135deg, hsl(24 95% 61%) 0%, hsl(30 85% 55%) 100%);
   }
 
   .gradient-warm {
-    background: linear-gradient(135deg, hsl(46 93% 50%) 0%, hsl(7 66% 58%) 100%);
+    background: linear-gradient(135deg, hsl(24 95% 65%) 0%, hsl(20 80% 55%) 100%);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, hsl(141 31% 20%) 0%, hsl(141 28% 28%) 100%);
+    background: linear-gradient(135deg, hsl(175 50% 28%) 0%, hsl(175 45% 35%) 100%);
   }
 
   .gradient-terracotta {
-    background: linear-gradient(135deg, hsl(7 66% 58%) 0%, hsl(5 60% 52%) 100%);
+    background: linear-gradient(135deg, hsl(24 80% 55%) 0%, hsl(20 75% 50%) 100%);
   }
 
   .gradient-forest {
-    background: linear-gradient(135deg, hsl(141 31% 15%) 0%, hsl(141 25% 20%) 100%);
+    background: linear-gradient(135deg, hsl(175 63% 19%) 0%, hsl(175 50% 25%) 100%);
   }
 
   /* Swipe card animations */
