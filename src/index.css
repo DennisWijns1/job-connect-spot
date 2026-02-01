@@ -29,9 +29,9 @@
     --accent: 24 95% 61%;
     --accent-foreground: 0 0% 15%;
 
-    /* Secondary - Warm terracotta for badges/notifications */
-    --secondary: 24 80% 55%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Zachte Abrikoos voor grote oppervlakken (nav bars, hovers) */
+    --secondary: 28 35% 88%;
+    --secondary-foreground: 0 0% 20%;
 
     /* Muted - Warm gray */
     --muted: 35 15% 85%;
@@ -93,8 +93,8 @@
     --primary-foreground: 0 0% 10%;
     --accent: 24 95% 61%;
     --accent-foreground: 0 0% 10%;
-    --secondary: 24 75% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 28 25% 25%;
+    --secondary-foreground: 40 25% 90%;
     --muted: 175 15% 18%;
     --muted-foreground: 40 15% 55%;
     --destructive: 0 70% 45%;

@@ -25,7 +25,7 @@ export const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-secondary border-t border-secondary/20 safe-area-bottom z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-secondary border-t border-border/30 safe-area-bottom z-50">
       <div className="flex items-center justify-around py-2">
         {navItems.map(({ icon: Icon, label, path, highlight }) => {
           const isActive = location.pathname === path;
@@ -35,14 +35,14 @@ export const BottomNav = () => {
               onClick={() => navigate(path)}
               className={cn(
                 'flex flex-col items-center gap-0.5 px-2 py-2 rounded-[16px] transition-all duration-300 relative',
-                highlight && !isActive && 'text-primary',
+                highlight && !isActive && 'text-accent',
                 isActive
-                  ? 'text-primary bg-primary/20'
-                  : !highlight && 'text-secondary-foreground/70 hover:text-secondary-foreground hover:bg-primary/10'
+                  ? 'text-primary bg-primary/15'
+                  : !highlight && 'text-foreground/60 hover:text-foreground hover:bg-primary/10'
               )}
             >
               {highlight && !isActive && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full animate-pulse" />
               )}
               <Icon
                 className={cn(

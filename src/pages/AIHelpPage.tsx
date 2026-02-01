@@ -452,7 +452,7 @@ const AIHelpPage = () => {
               <button
                 key={idx}
                 onClick={() => handleSuggestion(problem.text)}
-                className="p-3 bg-card rounded-xl text-left hover:bg-secondary/20 hover:shadow-soft transition-all group border border-border"
+                className="p-3 bg-card rounded-xl text-left hover:bg-secondary hover:shadow-soft transition-all group border border-border"
               >
                 <problem.icon className="w-5 h-5 text-accent mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">{problem.text}</p>
