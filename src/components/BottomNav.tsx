@@ -9,10 +9,10 @@ export const BottomNav = () => {
   const isSeeker = userType === 'seeker';
 
   const navItems = isSeeker ? [
-    { icon: Home, label: 'Swipe', path: '/swipe' },
+    { icon: Bot, label: 'AI Hulp', path: '/ai' },
     { icon: Map, label: 'Kaart', path: '/map' },
     { icon: MessagesSquare, label: 'Quick Chat', path: '/quick-chat', highlight: true },
-    { icon: Bot, label: 'AI Hulp', path: '/ai' },
+    { icon: Home, label: 'Swipe', path: '/swipe' },
     { icon: MessageCircle, label: 'Chats', path: '/chats' },
     { icon: User, label: 'Profiel', path: '/profile' },
   ] : [
