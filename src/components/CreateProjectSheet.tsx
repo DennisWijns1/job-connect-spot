@@ -5,14 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { 
   Camera, 
   MapPin, 
-  AlertCircle, 
   Send,
   X,
-  Loader2
+  Loader2,
+  Euro
 } from 'lucide-react';
 
 interface CreateProjectSheetProps {
@@ -39,6 +40,8 @@ export const CreateProjectSheet = ({ isOpen, onClose }: CreateProjectSheetProps)
   const [urgency, setUrgency] = useState('medium');
   const [photos, setPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [budgetType, setBudgetType] = useState<'fixed' | 'hourly'>('fixed');
+  const [maxBudget, setMaxBudget] = useState([250]);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -156,6 +159,56 @@ export const CreateProjectSheet = ({ isOpen, onClose }: CreateProjectSheetProps)
                   {opt.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Budget / Hourly Rate */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2">
+              <Euro className="w-4 h-4" />
+              Maximaal budget
+            </Label>
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => {
+                  setBudgetType('fixed');
+                  setMaxBudget([250]);
+                }}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
+                  budgetType === 'fixed'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                Vast budget
+              </button>
+              <button
+                onClick={() => {
+                  setBudgetType('hourly');
+                  setMaxBudget([50]);
+                }}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
+                  budgetType === 'hourly'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                Uurtarief
+              </button>
+            </div>
+            <Slider
+              value={maxBudget}
+              onValueChange={setMaxBudget}
+              max={budgetType === 'fixed' ? 500 : 100}
+              step={budgetType === 'fixed' ? 25 : 5}
+              className="w-full"
+            />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>€0{budgetType === 'hourly' ? '/uur' : ''}</span>
+              <span className="font-semibold text-lg text-foreground">
+                €{maxBudget[0]}{budgetType === 'hourly' ? '/uur' : ''}
+              </span>
+              <span>€{budgetType === 'fixed' ? '500' : '100'}{budgetType === 'hourly' ? '/uur' : ''}</span>
             </div>
           </div>
 
