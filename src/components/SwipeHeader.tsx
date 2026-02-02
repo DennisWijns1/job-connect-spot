@@ -1,59 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Star, KeyRound, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { HammerRating } from './HammerRating';
-
-interface FavoriteHandy {
-  id: string;
-  name: string;
-  avatar: string;
-  specialty: string;
-  rating: number;
-  reviewCount: number;
-  location: string;
-}
-
-// Mock data - zou uit database komen
-const mockFavoriteHandies: FavoriteHandy[] = [
-  { 
-    id: '1', 
-    name: 'Jan Peeters', 
-    avatar: 'https://randomuser.me/api/portraits/men/32.jpg', 
-    specialty: 'Loodgieter', 
-    rating: 4.8,
-    reviewCount: 127,
-    location: 'Leuven'
-  },
-  { 
-    id: '2', 
-    name: 'Mieke Janssen', 
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg', 
-    specialty: 'Elektricien', 
-    rating: 4.9,
-    reviewCount: 89,
-    location: 'Brussel'
-  },
-  { 
-    id: '3', 
-    name: 'Peter Van den Berg', 
-    avatar: 'https://randomuser.me/api/portraits/men/55.jpg', 
-    specialty: 'Dakdekker', 
-    rating: 4.7,
-    reviewCount: 56,
-    location: 'Antwerpen'
-  },
-  { 
-    id: '4', 
-    name: 'Lisa De Smet', 
-    avatar: 'https://randomuser.me/api/portraits/women/68.jpg', 
-    specialty: 'Schilder', 
-    rating: 4.6,
-    reviewCount: 34,
-    location: 'Gent'
-  },
-];
+import { getFavorites, type FavoriteHandy } from '@/stores/favoritesStore';
 
 interface SwipeHeaderProps {
   title: string;
@@ -74,6 +25,11 @@ export const SwipeHeader = ({
 }: SwipeHeaderProps) => {
   const navigate = useNavigate();
   const [showFavoritesMenu, setShowFavoritesMenu] = useState(false);
+  const [favorites, setFavorites] = useState<FavoriteHandy[]>([]);
+
+  useEffect(() => {
+    setFavorites(getFavorites());
+  }, [showFavoritesMenu]);
 
   const handleFavoritesClick = () => {
     if (onOpenFavorites) {
@@ -116,9 +72,9 @@ export const SwipeHeader = ({
               aria-label="Favorieten"
             >
               <Star className="w-5 h-5 text-white fill-accent/50" />
-              {(favoriteCount > 0 || mockFavoriteHandies.length > 0) && (
+              {(favoriteCount > 0 || favorites.length > 0) && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
-                  {favoriteCount || mockFavoriteHandies.length}
+                  {favoriteCount || favorites.length}
                 </span>
               )}
             </button>
@@ -171,7 +127,7 @@ export const SwipeHeader = ({
               </div>
 
               <ScrollArea className="max-h-[60vh]">
-                {mockFavoriteHandies.length === 0 ? (
+                {favorites.length === 0 ? (
                   <div className="p-8 text-center">
                     <Star className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                     <p className="text-muted-foreground">Je hebt nog geen favorieten</p>
@@ -181,7 +137,7 @@ export const SwipeHeader = ({
                   </div>
                 ) : (
                   <div className="p-3 space-y-2">
-                    {mockFavoriteHandies.map((handy) => (
+                    {favorites.map((handy) => (
                       <button
                         key={handy.id}
                         onClick={() => {

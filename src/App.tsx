@@ -18,6 +18,7 @@ import InstructorHomePage from "./pages/InstructorHomePage";
 import InstructorRegisterPage from "./pages/InstructorRegisterPage";
 import InstructorDashboardPage from "./pages/InstructorDashboardPage";
 import CreateLessonPage from "./pages/CreateLessonPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/instructor/register" element={<InstructorRegisterPage />} />
           <Route path="/instructor/dashboard" element={<InstructorDashboardPage />} />
           <Route path="/instructor/lesson/new" element={<CreateLessonPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

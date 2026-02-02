@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { HammerRating } from '@/components/HammerRating';
 import { CalendarSection } from '@/components/CalendarSection';
+import { CreateProjectSheet } from '@/components/CreateProjectSheet';
+import { FavoritesSheet } from '@/components/FavoritesSheet';
+import { LocationEditSheet, getStoredAddress, type UserAddress } from '@/components/LocationEditSheet';
 import {
   User,
   Camera,
@@ -26,8 +29,16 @@ const ProfilePage = () => {
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = userType === 'handy';
   const [isOnline, setIsOnline] = useState(true);
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [showLocationEdit, setShowLocationEdit] = useState(false);
+  const [userAddress, setUserAddress] = useState<UserAddress>(getStoredAddress());
 
   const user = JSON.parse(localStorage.getItem('handymatch_user') || '{}');
+
+  useEffect(() => {
+    setUserAddress(getStoredAddress());
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('handymatch_userType');
@@ -45,9 +56,9 @@ const ProfilePage = () => {
         { icon: Shield, label: 'Verificatie', description: 'Word geverifieerd', path: '/profile/verify' },
       ]
     : [
-        { icon: Plus, label: 'Project plaatsen', description: 'Beschrijf je klus', path: '/project/new' },
-        { icon: Star, label: 'Favorieten', description: 'Opgeslagen Handy\'s', path: '/favorites' },
-        { icon: MapPin, label: 'Locatie', description: 'Bewerk je adres', path: '/profile/location' },
+        { icon: Plus, label: 'Project plaatsen', description: 'Beschrijf je klus', action: 'createProject' },
+        { icon: Star, label: 'Favorieten', description: 'Opgeslagen Handy\'s', action: 'favorites' },
+        { icon: MapPin, label: 'Locatie', description: `${userAddress.street}, ${userAddress.postalCode} ${userAddress.city}`, action: 'location' },
       ];
 
   return (
@@ -118,7 +129,19 @@ const ProfilePage = () => {
           {menuItems.map((item, index) => (
             <button
               key={item.label}
-              onClick={() => toast.info('Deze functie komt binnenkort!')}
+              onClick={() => {
+                if ('action' in item) {
+                  if (item.action === 'createProject') {
+                    setShowCreateProject(true);
+                  } else if (item.action === 'favorites') {
+                    setShowFavorites(true);
+                  } else if (item.action === 'location') {
+                    setShowLocationEdit(true);
+                  }
+                } else if ('path' in item) {
+                  toast.info('Deze functie komt binnenkort!');
+                }
+              }}
               className={`w-full flex items-center gap-4 p-4 hover:bg-background transition-colors text-left ${
                 index !== menuItems.length - 1 ? 'border-b border-border' : ''
               }`}
@@ -128,7 +151,7 @@ const ProfilePage = () => {
               </div>
               <div className="flex-1">
                 <p className="font-medium text-foreground">{item.label}</p>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
+                <p className="text-sm text-muted-foreground truncate max-w-[200px]">{item.description}</p>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </button>
@@ -151,7 +174,7 @@ const ProfilePage = () => {
           className="bg-card rounded-3xl overflow-hidden shadow-card"
         >
           <button
-            onClick={() => toast.info('Instellingen komen binnenkort!')}
+            onClick={() => navigate('/settings')}
             className="w-full flex items-center gap-4 p-4 hover:bg-background transition-colors text-left border-b border-border"
           >
             <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
@@ -178,6 +201,21 @@ const ProfilePage = () => {
           </button>
         </motion.div>
       </div>
+
+      {/* Sheets */}
+      <CreateProjectSheet 
+        isOpen={showCreateProject} 
+        onClose={() => setShowCreateProject(false)} 
+      />
+      <FavoritesSheet 
+        isOpen={showFavorites} 
+        onClose={() => setShowFavorites(false)} 
+      />
+      <LocationEditSheet 
+        isOpen={showLocationEdit} 
+        onClose={() => setShowLocationEdit(false)}
+        onSave={(addr) => setUserAddress(addr)}
+      />
 
       <BottomNav />
     </div>
