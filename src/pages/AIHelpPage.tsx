@@ -197,8 +197,115 @@ const AIHelpPage = () => {
     }
   };
 
-  const handleSuggestion = (text: string) => {
-    setInput(text);
+  const handleSuggestion = async (text: string) => {
+    // Directly submit the suggestion to AI instead of filling the input
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: text,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsTyping(true);
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assist`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            message: text,
+            userType: isHandy ? 'handy' : 'seeker',
+            photoProvided: false,
+            categoryHint: null,
+          }),
+          signal: controller.signal,
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        const errorMessage = result.error || `Fout: ${response.status}`;
+        const fallbackData = result.fallback;
+
+        toast({
+          title: 'AI Fout',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+
+        if (fallbackData) {
+          const aiMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: fallbackData.summary,
+            timestamp: new Date(),
+            aiResponse: fallbackData,
+          };
+          setMessages((prev) => [...prev, aiMessage]);
+        } else {
+          const errorAiMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: `❌ ${errorMessage}\n\nProbeer het opnieuw of neem contact op met een Handy.`,
+            timestamp: new Date(),
+            isError: true,
+          };
+          setMessages((prev) => [...prev, errorAiMessage]);
+        }
+      } else {
+        const aiResponse: AIResponse = result.data;
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: aiResponse.summary,
+          timestamp: new Date(),
+          aiResponse,
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+      }
+    } catch (error) {
+      console.error('AI assist error:', error);
+      
+      let errorMessage = 'Er is een fout opgetreden. Probeer het opnieuw.';
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = 'De AI reageert niet op tijd. Probeer het later opnieuw.';
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage = 'Geen internetverbinding. Controleer je netwerk en probeer opnieuw.';
+        }
+      }
+
+      toast({
+        title: 'Verbindingsfout',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+
+      const errorAiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `❌ ${errorMessage}`,
+        timestamp: new Date(),
+        isError: true,
+      };
+
+      setMessages((prev) => [...prev, errorAiMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleCTAClick = (action: 'self_fix' | 'lesson' | 'book_handy', topic?: string) => {
