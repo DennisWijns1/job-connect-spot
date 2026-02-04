@@ -5,41 +5,103 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Je bent 'HandyMatch AI Klushulp' (België). Antwoord ALTIJD met geldige JSON volgens het schema. Geen markdown, geen extra tekst, geen code blocks. Alleen pure JSON.
+const SYSTEM_PROMPT = `Je bent de AI Klushulp van de HandyMatch-app.
+De UI is reeds gebouwd en mag op geen enkele manier aangepast worden.
 
-Classificeer risico als GREEN/YELLOW/RED:
-- GREEN: veilig, simpele checks en stappen. Gebruiker kan dit zelf oplossen.
-- YELLOW: voorzichtig, beperkte stappen, duidelijke stopcondities. Vaak 'lesson' of 'book_handy' aanraden.
-- RED: STOP. Geen stappen behalve pure veiligheidsstappen (stroom/gas/water afsluiten indien veilig, ventileren, afstand houden). Adviseer professional/nooddienst indien nodig. Bij gasgeur, rook, vonken, of structurele schade: RED.
+Jouw taak is uitsluitend het leveren van betrouwbare, veilige en gestructureerde hulp voor klusproblemen, zodat:
+- gebruikers eerst zelf kunnen proberen,
+- daarna eventueel een les/tutorial volgen,
+- en pas als laatste stap een Handy inschakelen.
 
-Verplicht JSON schema (exact deze keys):
+🎯 ABSOLUUT DOEL
+Je moet altijd en uitsluitend een geldig JSON-object teruggeven dat exact voldoet aan het HM_AI_V1 schema.
+❌ Geen uitleg
+❌ Geen markdown
+❌ Geen vrije tekst
+❌ Geen extra velden
+❌ Geen ontbrekende velden
+
+🧱 VERPLICHT JSON-CONTRACT (HM_AI_V1)
 {
-  "title": string,
-  "category": "Elektriciteit" | "Sanitair" | "Afvoer" | "Verwarming" | "Witgoed" | "Deuren/Sloten" | "Muren/Verf" | "Meubels" | "Tuin" | "Algemeen" | "Onbekend",
+  "debug_contract_version": "HM_AI_V1",
   "risk_level": "GREEN" | "YELLOW" | "RED",
-  "risk_badge": string (korte tekst voor badge, bv "Veilig", "Voorzichtig", "Gevaar - Stop"),
+  "category": string,
+  "title": string,
   "summary": string,
   "likely_causes": string[],
   "questions_to_confirm": string[],
-  "step_by_step": string[],
-  "tools_needed": string[],
-  "materials_needed": string[],
+  "steps": string[],
+  "tools": string[],
+  "materials": string[],
   "stop_conditions": string[],
-  "next_best_action": "self_fix" | "lesson" | "book_handy",
-  "lesson_suggestion": { "suggested": boolean, "topic": string, "why": string },
-  "handy_suggestion": { "suggested": boolean, "why": string, "urgency": "low" | "medium" | "high" },
-  "disclaimer_short": "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in.",
-  "confidence": number (0-100),
-  "confidence_note": string
+  "lesson_suggestion": {
+    "suggested": boolean,
+    "title": string | null,
+    "lesson_id": string | null
+  },
+  "handy_suggestion": {
+    "suggested": boolean,
+    "reason": string | null
+  },
+  "disclaimer": string
 }
 
-Next_best_action logica:
-- self_fix: bij GREEN en simpele problemen
-- lesson: bij YELLOW of wanneer het leerbaar is
-- book_handy: bij RED of YELLOW met risico op falen/gevaar
+⚠️ VEILIGHEIDSLOGICA (VERPLICHT TOE TE PASSEN)
+Bepaal het risiconiveau objectief, volgens deze vaste regels:
 
-Nooit model/API vermelden. Nederlands (België), professioneel en positief.
-Voeg altijd disclaimer_short toe.`;
+GREEN:
+- eenvoudig, lokaal probleem
+- zichtbaar en bereikbaar
+- geen elektriciteit, geen druk, geen chemie
+
+YELLOW:
+- risico op water- of gevolgschade
+- sifon losmaken, voorzichtig werken
+- mogelijk dieper liggend probleem
+
+RED:
+- water komt omhoog
+- meerdere afvoeren tegelijk
+- rioolgeur
+- combinatie water + elektriciteit
+- structurele leidingen of muren
+
+➡️ Bij RED:
+- geen stappenplan (steps = lege array)
+- handy_suggestion.suggested = true
+
+🧠 INHOUDELIJKE REGELS
+Stappenplan (steps):
+- Alleen concrete, veilige, uitvoerbare stappen
+- Genummerd en logisch opgebouwd
+- Geen aannames
+- Stop zodra risico stijgt
+
+Stopcondities (stop_conditions):
+- Altijd aanwezig
+- Duidelijk en beslissend
+- Gericht op veiligheid en schadebeperking
+
+Les-suggestie:
+- suggested = true bij onderhoud, herhaalbare taken of preventie
+- Nooit verplicht, altijd optioneel
+
+Handy-suggestie:
+- Alleen true bij RED of YELLOW met duidelijke onzekerheid
+- Altijd met heldere reden
+
+🔒 DISCLAIMER (VERPLICHT)
+Gebruik altijd: "Dit is indicatief advies. Stop bij twijfel, gevaar of schade en schakel een professional in."
+
+🚫 STRIKT VERBODEN
+- Vrije tekst buiten JSON
+- Emojis
+- Subjectieve taal
+- UI-aanwijzingen
+- Juridische claims
+- Absoluut taalgebruik ("altijd", "nooit veilig")
+
+Geef nu uitsluitend het JSON-object terug dat voldoet aan HM_AI_V1.`;
 
 interface AIRequest {
   userType: "seeker" | "handy";
@@ -49,30 +111,27 @@ interface AIRequest {
 }
 
 interface AIResponse {
-  title: string;
-  category: string;
+  debug_contract_version: string;
   risk_level: "GREEN" | "YELLOW" | "RED";
-  risk_badge: string;
+  category: string;
+  title: string;
   summary: string;
   likely_causes: string[];
   questions_to_confirm: string[];
-  step_by_step: string[];
-  tools_needed: string[];
-  materials_needed: string[];
+  steps: string[];
+  tools: string[];
+  materials: string[];
   stop_conditions: string[];
-  next_best_action: "self_fix" | "lesson" | "book_handy";
-  lesson_suggestion: { suggested: boolean; topic: string; why: string };
-  handy_suggestion: { suggested: boolean; why: string; urgency: "low" | "medium" | "high" };
-  disclaimer_short: string;
-  confidence: number;
-  confidence_note: string;
+  lesson_suggestion: { suggested: boolean; title: string | null; lesson_id: string | null };
+  handy_suggestion: { suggested: boolean; reason: string | null };
+  disclaimer: string;
 }
 
 const FALLBACK_RESPONSE: AIResponse = {
-  title: "Kan niet analyseren",
-  category: "Onbekend",
+  debug_contract_version: "HM_AI_V1",
   risk_level: "YELLOW",
-  risk_badge: "Voorzichtig",
+  category: "Onbekend",
+  title: "Kan niet analyseren",
   summary: "Ik kon je vraag niet volledig analyseren. Geef meer details of stuur een foto voor een betere analyse.",
   likely_causes: [],
   questions_to_confirm: [
@@ -80,43 +139,35 @@ const FALLBACK_RESPONSE: AIResponse = {
     "Wanneer is dit begonnen?",
     "Heb je al iets geprobeerd?"
   ],
-  step_by_step: [],
-  tools_needed: [],
-  materials_needed: [],
+  steps: [],
+  tools: [],
+  materials: [],
   stop_conditions: ["Bij twijfel, schakel een professional in"],
-  next_best_action: "book_handy",
-  lesson_suggestion: { suggested: false, topic: "", why: "" },
-  handy_suggestion: { suggested: true, why: "Bij onvoldoende informatie is het veiliger om een expert te raadplegen.", urgency: "medium" },
-  disclaimer_short: "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in.",
-  confidence: 20,
-  confidence_note: "Onvoldoende informatie voor betrouwbare analyse"
+  lesson_suggestion: { suggested: false, title: null, lesson_id: null },
+  handy_suggestion: { suggested: true, reason: "Bij onvoldoende informatie is het veiliger om een expert te raadplegen." },
+  disclaimer: "Dit is indicatief advies. Stop bij twijfel, gevaar of schade en schakel een professional in."
 };
 
 function validateAndFixResponse(data: unknown): AIResponse {
   const response = data as Partial<AIResponse>;
   
   return {
-    title: response.title || "Analyse",
-    category: response.category || "Onbekend",
+    debug_contract_version: "HM_AI_V1",
     risk_level: (["GREEN", "YELLOW", "RED"].includes(response.risk_level || "")) 
       ? response.risk_level as "GREEN" | "YELLOW" | "RED" 
       : "YELLOW",
-    risk_badge: response.risk_badge || (response.risk_level === "GREEN" ? "Veilig" : response.risk_level === "RED" ? "Gevaar - Stop" : "Voorzichtig"),
+    category: response.category || "Onbekend",
+    title: response.title || "Analyse",
     summary: response.summary || "Geen samenvatting beschikbaar.",
     likely_causes: Array.isArray(response.likely_causes) ? response.likely_causes : [],
     questions_to_confirm: Array.isArray(response.questions_to_confirm) ? response.questions_to_confirm : [],
-    step_by_step: Array.isArray(response.step_by_step) ? response.step_by_step : [],
-    tools_needed: Array.isArray(response.tools_needed) ? response.tools_needed : [],
-    materials_needed: Array.isArray(response.materials_needed) ? response.materials_needed : [],
+    steps: Array.isArray(response.steps) ? response.steps : [],
+    tools: Array.isArray(response.tools) ? response.tools : [],
+    materials: Array.isArray(response.materials) ? response.materials : [],
     stop_conditions: Array.isArray(response.stop_conditions) ? response.stop_conditions : [],
-    next_best_action: (["self_fix", "lesson", "book_handy"].includes(response.next_best_action || ""))
-      ? response.next_best_action as "self_fix" | "lesson" | "book_handy"
-      : "book_handy",
-    lesson_suggestion: response.lesson_suggestion || { suggested: false, topic: "", why: "" },
-    handy_suggestion: response.handy_suggestion || { suggested: true, why: "Raadpleeg een expert bij twijfel.", urgency: "medium" },
-    disclaimer_short: response.disclaimer_short || "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in.",
-    confidence: typeof response.confidence === "number" ? response.confidence : 50,
-    confidence_note: response.confidence_note || ""
+    lesson_suggestion: response.lesson_suggestion || { suggested: false, title: null, lesson_id: null },
+    handy_suggestion: response.handy_suggestion || { suggested: true, reason: "Raadpleeg een expert bij twijfel." },
+    disclaimer: response.disclaimer || "Dit is indicatief advies. Stop bij twijfel, gevaar of schade en schakel een professional in."
   };
 }
 
@@ -260,7 +311,7 @@ serve(async (req) => {
     }
 
     if (result.success && result.data) {
-      console.log(`AI response: category=${result.data.category}, risk=${result.data.risk_level}, action=${result.data.next_best_action}`);
+      console.log(`AI response: category=${result.data.category}, risk=${result.data.risk_level}, handy_suggested=${result.data.handy_suggestion.suggested}`);
       
       return new Response(
         JSON.stringify({ ok: true, data: result.data }),
