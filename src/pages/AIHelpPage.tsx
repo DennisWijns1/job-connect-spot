@@ -8,24 +8,29 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
+// HM_AI_V1 contract interface
 interface AIResponse {
-  title: string;
-  category: string;
+  debug_contract_version: string;
   risk_level: 'GREEN' | 'YELLOW' | 'RED';
-  risk_badge: string;
+  category: string;
+  title: string;
   summary: string;
   likely_causes: string[];
   questions_to_confirm: string[];
-  step_by_step: string[];
-  tools_needed: string[];
-  materials_needed: string[];
+  steps: string[];
+  tools: string[];
+  materials: string[];
   stop_conditions: string[];
-  next_best_action: 'self_fix' | 'lesson' | 'book_handy';
-  lesson_suggestion: { suggested: boolean; topic: string; why: string };
-  handy_suggestion: { suggested: boolean; why: string; urgency: 'low' | 'medium' | 'high' };
-  disclaimer_short: string;
-  confidence: number;
-  confidence_note: string;
+  lesson_suggestion: { 
+    suggested: boolean; 
+    title: string | null; 
+    lesson_id: string | null;
+  };
+  handy_suggestion: { 
+    suggested: boolean; 
+    reason: string | null;
+  };
+  disclaimer: string;
 }
 
 interface Message {
@@ -345,13 +350,19 @@ const AIHelpPage = () => {
   const renderAIResponse = (aiResponse: AIResponse) => {
     const riskStyles = getRiskStyles(aiResponse.risk_level);
     const RiskIcon = riskStyles.icon;
+    
+    const riskBadgeText = aiResponse.risk_level === 'GREEN' 
+      ? '✓ Veilig zelf te doen' 
+      : aiResponse.risk_level === 'YELLOW' 
+      ? '⚠ Voorzichtigheid geboden' 
+      : '⛔ Schakel een professional in';
 
     return (
       <div className="space-y-4">
         {/* Risk Badge */}
         <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${riskStyles.bg} ${riskStyles.border} border`}>
           <RiskIcon className={`w-4 h-4 ${riskStyles.text}`} />
-          <span className={riskStyles.text}>{aiResponse.risk_badge}</span>
+          <span className={riskStyles.text}>{riskBadgeText}</span>
         </div>
 
         {/* Title & Category */}
@@ -391,11 +402,11 @@ const AIHelpPage = () => {
         )}
 
         {/* Step by Step */}
-        {aiResponse.step_by_step.length > 0 && aiResponse.risk_level !== 'RED' && (
+        {aiResponse.steps && aiResponse.steps.length > 0 && aiResponse.risk_level !== 'RED' && (
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📋 Stappenplan</h4>
             <ol className="space-y-2">
-              {aiResponse.step_by_step.map((step, i) => (
+              {aiResponse.steps.map((step, i) => (
                 <li key={i} className="text-sm flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                   <span>{step}</span>
@@ -406,23 +417,23 @@ const AIHelpPage = () => {
         )}
 
         {/* Tools & Materials */}
-        {(aiResponse.tools_needed.length > 0 || aiResponse.materials_needed.length > 0) && (
+        {((aiResponse.tools && aiResponse.tools.length > 0) || (aiResponse.materials && aiResponse.materials.length > 0)) && (
           <div className="flex flex-wrap gap-4">
-            {aiResponse.tools_needed.length > 0 && (
+            {aiResponse.tools && aiResponse.tools.length > 0 && (
               <div>
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">🔧 Gereedschap</h4>
                 <div className="flex flex-wrap gap-1">
-                  {aiResponse.tools_needed.map((tool, i) => (
+                  {aiResponse.tools.map((tool, i) => (
                     <span key={i} className="text-xs bg-muted px-2 py-1 rounded-full">{tool}</span>
                   ))}
                 </div>
               </div>
             )}
-            {aiResponse.materials_needed.length > 0 && (
+            {aiResponse.materials && aiResponse.materials.length > 0 && (
               <div>
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📦 Materialen</h4>
                 <div className="flex flex-wrap gap-1">
-                  {aiResponse.materials_needed.map((mat, i) => (
+                  {aiResponse.materials.map((mat, i) => (
                     <span key={i} className="text-xs bg-muted px-2 py-1 rounded-full">{mat}</span>
                   ))}
                 </div>
@@ -445,7 +456,7 @@ const AIHelpPage = () => {
 
         {/* CTA Buttons */}
         <div className="pt-2 space-y-2">
-          {aiResponse.next_best_action === 'self_fix' && (
+          {aiResponse.risk_level === 'GREEN' && !aiResponse.handy_suggestion.suggested && (
             <Button 
               className="w-full btn-cta"
               onClick={() => handleCTAClick('self_fix')}
@@ -455,24 +466,24 @@ const AIHelpPage = () => {
             </Button>
           )}
           
-          {aiResponse.next_best_action === 'lesson' && aiResponse.lesson_suggestion.suggested && (
+          {aiResponse.lesson_suggestion.suggested && aiResponse.lesson_suggestion.title && (
             <Button 
               className="w-full btn-forest"
-              onClick={() => handleCTAClick('lesson', aiResponse.lesson_suggestion.topic)}
+              onClick={() => handleCTAClick('lesson', aiResponse.lesson_suggestion.title!)}
             >
               <BookOpen className="w-4 h-4 mr-2" />
-              Bekijk les: {aiResponse.lesson_suggestion.topic}
+              Bekijk les: {aiResponse.lesson_suggestion.title}
             </Button>
           )}
           
-          {(aiResponse.next_best_action === 'book_handy' || aiResponse.handy_suggestion.suggested) && (
+          {(aiResponse.risk_level === 'RED' || aiResponse.handy_suggestion.suggested) && (
             <Button 
               className={`w-full ${aiResponse.risk_level === 'RED' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'btn-cta'}`}
               onClick={() => handleCTAClick('book_handy')}
             >
               <Hammer className="w-4 h-4 mr-2" />
               Schakel een Handy in
-              {aiResponse.handy_suggestion.urgency === 'high' && (
+              {aiResponse.risk_level === 'RED' && (
                 <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">Dringend</span>
               )}
             </Button>
@@ -481,7 +492,7 @@ const AIHelpPage = () => {
 
         {/* Disclaimer */}
         <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-          {aiResponse.disclaimer_short}
+          {aiResponse.disclaimer}
         </p>
       </div>
     );
