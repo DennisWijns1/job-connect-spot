@@ -11,25 +11,27 @@ import { useToast } from '@/hooks/use-toast';
 // HM_AI_V1 contract interface
 interface AIResponse {
   debug_contract_version: string;
+  user_type: 'seeker' | 'handy';
+  input_type: 'text_only' | 'text_with_photo';
+  vision_confidence: 'high' | 'medium' | 'low' | null;
+  understood: boolean;
   risk_level: 'GREEN' | 'YELLOW' | 'RED';
   category: string;
-  title: string;
-  summary: string;
-  likely_causes: string[];
-  questions_to_confirm: string[];
-  steps: string[];
-  tools: string[];
-  materials: string[];
+  main_issue: string | null;
+  issue_location_description: string | null;
+  what_is_visible: string[];
+  suggested_steps: string[];
   stop_conditions: string[];
+  next_action: 'continue_self_fix' | 'request_more_info' | 'lesson' | 'book_handy';
   lesson_suggestion: { 
     suggested: boolean; 
-    title: string | null; 
-    lesson_id: string | null;
+    topic: string | null;
   };
   handy_suggestion: { 
     suggested: boolean; 
     reason: string | null;
   };
+  explanation_if_uncertain: string | null;
   disclaimer: string;
 }
 
@@ -163,7 +165,7 @@ const AIHelpPage = () => {
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: aiResponse.summary,
+          content: aiResponse.main_issue || aiResponse.explanation_if_uncertain || 'Analyse voltooid',
           timestamp: new Date(),
           aiResponse,
         };
@@ -274,7 +276,7 @@ const AIHelpPage = () => {
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: aiResponse.summary,
+          content: aiResponse.main_issue || aiResponse.explanation_if_uncertain || 'Analyse voltooid',
           timestamp: new Date(),
           aiResponse,
         };
@@ -365,48 +367,48 @@ const AIHelpPage = () => {
           <span className={riskStyles.text}>{riskBadgeText}</span>
         </div>
 
-        {/* Title & Category */}
-        <div>
-          <h3 className="font-semibold text-foreground">{aiResponse.title}</h3>
-          <span className="text-xs text-muted-foreground">{aiResponse.category}</span>
-        </div>
-
-        {/* Summary */}
-        <p className="text-sm text-foreground">{aiResponse.summary}</p>
-
-        {/* Likely Causes */}
-        {aiResponse.likely_causes.length > 0 && (
+        {/* Main Issue & Category */}
+        {aiResponse.main_issue && (
           <div>
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Mogelijke oorzaken</h4>
+            <h3 className="font-semibold text-foreground">{aiResponse.main_issue}</h3>
+            <span className="text-xs text-muted-foreground">{aiResponse.category}</span>
+          </div>
+        )}
+
+        {/* Issue Location Description */}
+        {aiResponse.issue_location_description && (
+          <p className="text-sm text-foreground">{aiResponse.issue_location_description}</p>
+        )}
+
+        {/* What is visible (photo analysis) */}
+        {aiResponse.what_is_visible && aiResponse.what_is_visible.length > 0 && (
+          <div>
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Wat ik zie</h4>
             <ul className="space-y-1">
-              {aiResponse.likely_causes.map((cause, i) => (
+              {aiResponse.what_is_visible.map((item, i) => (
                 <li key={i} className="text-sm flex items-start gap-2">
                   <span className="text-accent mt-0.5">•</span>
-                  <span>{cause}</span>
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* Questions to Confirm */}
-        {aiResponse.questions_to_confirm.length > 0 && (
+        {/* Explanation if uncertain */}
+        {!aiResponse.understood && aiResponse.explanation_if_uncertain && (
           <div className="bg-muted/50 rounded-xl p-3">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">❓ Vragen om te bevestigen</h4>
-            <ul className="space-y-1">
-              {aiResponse.questions_to_confirm.map((q, i) => (
-                <li key={i} className="text-sm">{q}</li>
-              ))}
-            </ul>
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">❓ Meer info nodig</h4>
+            <p className="text-sm">{aiResponse.explanation_if_uncertain}</p>
           </div>
         )}
 
         {/* Step by Step */}
-        {aiResponse.steps && aiResponse.steps.length > 0 && aiResponse.risk_level !== 'RED' && (
+        {aiResponse.understood && aiResponse.suggested_steps && aiResponse.suggested_steps.length > 0 && aiResponse.risk_level !== 'RED' && (
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📋 Stappenplan</h4>
             <ol className="space-y-2">
-              {aiResponse.steps.map((step, i) => (
+              {aiResponse.suggested_steps.map((step, i) => (
                 <li key={i} className="text-sm flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                   <span>{step}</span>
@@ -416,34 +418,8 @@ const AIHelpPage = () => {
           </div>
         )}
 
-        {/* Tools & Materials */}
-        {((aiResponse.tools && aiResponse.tools.length > 0) || (aiResponse.materials && aiResponse.materials.length > 0)) && (
-          <div className="flex flex-wrap gap-4">
-            {aiResponse.tools && aiResponse.tools.length > 0 && (
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">🔧 Gereedschap</h4>
-                <div className="flex flex-wrap gap-1">
-                  {aiResponse.tools.map((tool, i) => (
-                    <span key={i} className="text-xs bg-muted px-2 py-1 rounded-full">{tool}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {aiResponse.materials && aiResponse.materials.length > 0 && (
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📦 Materialen</h4>
-                <div className="flex flex-wrap gap-1">
-                  {aiResponse.materials.map((mat, i) => (
-                    <span key={i} className="text-xs bg-muted px-2 py-1 rounded-full">{mat}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Stop Conditions */}
-        {aiResponse.stop_conditions.length > 0 && (
+        {aiResponse.stop_conditions && aiResponse.stop_conditions.length > 0 && (
           <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-3">
             <h4 className="text-xs font-semibold text-destructive uppercase mb-2">⛔ Stopcondities</h4>
             <ul className="space-y-1">
@@ -454,9 +430,9 @@ const AIHelpPage = () => {
           </div>
         )}
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons based on next_action */}
         <div className="pt-2 space-y-2">
-          {aiResponse.risk_level === 'GREEN' && !aiResponse.handy_suggestion.suggested && (
+          {aiResponse.next_action === 'continue_self_fix' && (
             <Button 
               className="w-full btn-cta"
               onClick={() => handleCTAClick('self_fix')}
@@ -466,17 +442,17 @@ const AIHelpPage = () => {
             </Button>
           )}
           
-          {aiResponse.lesson_suggestion.suggested && aiResponse.lesson_suggestion.title && (
+          {aiResponse.next_action === 'lesson' && aiResponse.lesson_suggestion.suggested && aiResponse.lesson_suggestion.topic && (
             <Button 
               className="w-full btn-forest"
-              onClick={() => handleCTAClick('lesson', aiResponse.lesson_suggestion.title!)}
+              onClick={() => handleCTAClick('lesson', aiResponse.lesson_suggestion.topic!)}
             >
               <BookOpen className="w-4 h-4 mr-2" />
-              Bekijk les: {aiResponse.lesson_suggestion.title}
+              Bekijk les: {aiResponse.lesson_suggestion.topic}
             </Button>
           )}
           
-          {(aiResponse.risk_level === 'RED' || aiResponse.handy_suggestion.suggested) && (
+          {(aiResponse.next_action === 'book_handy' || aiResponse.handy_suggestion.suggested) && (
             <Button 
               className={`w-full ${aiResponse.risk_level === 'RED' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'btn-cta'}`}
               onClick={() => handleCTAClick('book_handy')}
@@ -487,6 +463,10 @@ const AIHelpPage = () => {
                 <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">Dringend</span>
               )}
             </Button>
+          )}
+          
+          {aiResponse.handy_suggestion.reason && (
+            <p className="text-xs text-muted-foreground text-center">{aiResponse.handy_suggestion.reason}</p>
           )}
         </div>
 

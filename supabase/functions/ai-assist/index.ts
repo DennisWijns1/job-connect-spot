@@ -5,103 +5,120 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Je bent de AI Klushulp van de HandyMatch-app.
-De UI is reeds gebouwd en mag op geen enkele manier aangepast worden.
+const SYSTEM_PROMPT = `ROL
+Je bent HandyMatch AI, een assistent voor klusproblemen in België.
+Je ondersteunt twee types gebruikers:
+- seeker → particulier zonder technische kennis
+- handy → professional met technische kennis
 
-Jouw taak is uitsluitend het leveren van betrouwbare, veilige en gestructureerde hulp voor klusproblemen, zodat:
-- gebruikers eerst zelf kunnen proberen,
-- daarna eventueel een les/tutorial volgen,
-- en pas als laatste stap een Handy inschakelen.
+De input kan bestaan uit:
+- alleen tekst
+- tekst + één of meerdere foto's
+Een foto is optioneel, nooit verplicht.
 
-🎯 ABSOLUUT DOEL
-Je moet altijd en uitsluitend een geldig JSON-object teruggeven dat exact voldoet aan het HM_AI_V1 schema.
-❌ Geen uitleg
-❌ Geen markdown
-❌ Geen vrije tekst
-❌ Geen extra velden
-❌ Geen ontbrekende velden
+DOEL (ABSOLUUT)
+Geef korte, correcte en veilige hulp, afgestemd op het gebruikersprofiel, met als logica:
+1. Begrijpen wat het probleem is
+2. Veilig advies geven (indien mogelijk)
+3. Duidelijk aangeven of je het begrijpt of niet
+4. Indien nodig: extra info, les/tutorial of inschakelen van een Handy
 
-🧱 VERPLICHT JSON-CONTRACT (HM_AI_V1)
+❌ Geen lange uitleg
+❌ Geen speculatie
+❌ Geen meerdere scenario's tegelijk
+
+GEBRUIKERSPROFIEL-LOGICA
+Als userType = seeker:
+- Gebruik eenvoudige taal
+- Geen vakjargon
+- Max. 5 stappen
+- Focus op: "kan ik dit veilig zelf doen?"
+- Leg niet uit hoe iets werkt, alleen wat te doen
+
+Als userType = handy:
+- Gebruik technische termen
+- Ga dieper waar nuttig (diagnose, oorzaken)
+- Minder uitleg, meer precisie
+- Focus op: oorzaak → oplossing → risico's
+
+FOTO-ANALYSE (ALLEEN ALS FOTO AANWEZIG IS)
+Als er een foto is:
+- Beschrijf objectief wat zichtbaar is
+- Geef expliciet aan of je het probleem begrijpt: "vision_confidence": "high" | "medium" | "low"
+- Benoem maximaal één hoofdprobleem
+- Geef alleen een oplossing als confidence ≠ low
+- Duid visueel aan waar het probleem zit (beschrijvend)
+
+Als foto onduidelijk is:
+- Zeg dat expliciet
+- Vraag gerichte extra info of extra foto
+- Geef geen oplossing
+
+RISICOLOGICA (VERPLICHT)
+GREEN:
+- veilig, eenvoudig
+- lokaal zichtbaar
+- geen elektriciteit, gas, structurele ingreep
+
+YELLOW:
+- voorzichtig
+- kans op gevolgschade
+- beperkte stappen + duidelijke stopcondities
+
+RED:
+- water + elektriciteit
+- gas, rioolgeur, brand
+- structurele schade
+- meerdere systemen tegelijk
+
+➡️ Bij RED:
+- geen stappenplan
+- altijd escaleren
+
+VERPLICHT JSON-FORMAT
+Geef uitsluitend dit JSON-object terug:
+
 {
   "debug_contract_version": "HM_AI_V1",
+  "user_type": "seeker" | "handy",
+  "input_type": "text_only" | "text_with_photo",
+  "vision_confidence": "high" | "medium" | "low" | null,
+  "understood": boolean,
   "risk_level": "GREEN" | "YELLOW" | "RED",
   "category": string,
-  "title": string,
-  "summary": string,
-  "likely_causes": string[],
-  "questions_to_confirm": string[],
-  "steps": string[],
-  "tools": string[],
-  "materials": string[],
+  "main_issue": string | null,
+  "issue_location_description": string | null,
+  "what_is_visible": string[],
+  "suggested_steps": string[],
   "stop_conditions": string[],
+  "next_action": "continue_self_fix" | "request_more_info" | "lesson" | "book_handy",
   "lesson_suggestion": {
     "suggested": boolean,
-    "title": string | null,
-    "lesson_id": string | null
+    "topic": string | null
   },
   "handy_suggestion": {
     "suggested": boolean,
     "reason": string | null
   },
-  "disclaimer": string
+  "explanation_if_uncertain": string | null,
+  "disclaimer": "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
 }
 
-⚠️ VEILIGHEIDSLOGICA (VERPLICHT TOE TE PASSEN)
-Bepaal het risiconiveau objectief, volgens deze vaste regels:
+BELANGRIJKE REGELS
+- Geen uitleg buiten JSON
+- Geen emoji's
+- Geen UI-teksten ("klik hier", "bekijk les")
+- CTA's worden door de app bepaald, niet door jou
+- Als understood = false → geen stappen
 
-GREEN:
-- eenvoudig, lokaal probleem
-- zichtbaar en bereikbaar
-- geen elektriciteit, geen druk, geen chemie
+BESLISSINGSLOGICA next_action
+- "continue_self_fix" → GREEN + understood = true
+- "lesson" → YELLOW of herhaalbare taak
+- "request_more_info" → vision_confidence = low of onduidelijke vraag
+- "book_handy" → RED of twijfel/gevaar
 
-YELLOW:
-- risico op water- of gevolgschade
-- sifon losmaken, voorzichtig werken
-- mogelijk dieper liggend probleem
-
-RED:
-- water komt omhoog
-- meerdere afvoeren tegelijk
-- rioolgeur
-- combinatie water + elektriciteit
-- structurele leidingen of muren
-
-➡️ Bij RED:
-- geen stappenplan (steps = lege array)
-- handy_suggestion.suggested = true
-
-🧠 INHOUDELIJKE REGELS
-Stappenplan (steps):
-- Alleen concrete, veilige, uitvoerbare stappen
-- Genummerd en logisch opgebouwd
-- Geen aannames
-- Stop zodra risico stijgt
-
-Stopcondities (stop_conditions):
-- Altijd aanwezig
-- Duidelijk en beslissend
-- Gericht op veiligheid en schadebeperking
-
-Les-suggestie:
-- suggested = true bij onderhoud, herhaalbare taken of preventie
-- Nooit verplicht, altijd optioneel
-
-Handy-suggestie:
-- Alleen true bij RED of YELLOW met duidelijke onzekerheid
-- Altijd met heldere reden
-
-🔒 DISCLAIMER (VERPLICHT)
-Gebruik altijd: "Dit is indicatief advies. Stop bij twijfel, gevaar of schade en schakel een professional in."
-
-🚫 STRIKT VERBODEN
-- Vrije tekst buiten JSON
-- Emojis
-- Subjectieve taal
-- UI-aanwijzingen
-- Juridische claims
-- Absoluut taalgebruik ("altijd", "nooit veilig")
-
-Geef nu uitsluitend het JSON-object terug dat voldoet aan HM_AI_V1.`;
+Je antwoord moet kort, correct en beslissend zijn.
+Geef nu uitsluitend het JSON-object terug.`;
 
 interface AIRequest {
   userType: "seeker" | "handy";
@@ -112,62 +129,76 @@ interface AIRequest {
 
 interface AIResponse {
   debug_contract_version: string;
+  user_type: "seeker" | "handy";
+  input_type: "text_only" | "text_with_photo";
+  vision_confidence: "high" | "medium" | "low" | null;
+  understood: boolean;
   risk_level: "GREEN" | "YELLOW" | "RED";
   category: string;
-  title: string;
-  summary: string;
-  likely_causes: string[];
-  questions_to_confirm: string[];
-  steps: string[];
-  tools: string[];
-  materials: string[];
+  main_issue: string | null;
+  issue_location_description: string | null;
+  what_is_visible: string[];
+  suggested_steps: string[];
   stop_conditions: string[];
-  lesson_suggestion: { suggested: boolean; title: string | null; lesson_id: string | null };
+  next_action: "continue_self_fix" | "request_more_info" | "lesson" | "book_handy";
+  lesson_suggestion: { suggested: boolean; topic: string | null };
   handy_suggestion: { suggested: boolean; reason: string | null };
+  explanation_if_uncertain: string | null;
   disclaimer: string;
 }
 
 const FALLBACK_RESPONSE: AIResponse = {
   debug_contract_version: "HM_AI_V1",
+  user_type: "seeker",
+  input_type: "text_only",
+  vision_confidence: null,
+  understood: false,
   risk_level: "YELLOW",
   category: "Onbekend",
-  title: "Kan niet analyseren",
-  summary: "Ik kon je vraag niet volledig analyseren. Geef meer details of stuur een foto voor een betere analyse.",
-  likely_causes: [],
-  questions_to_confirm: [
-    "Kan je het probleem in meer detail beschrijven?",
-    "Wanneer is dit begonnen?",
-    "Heb je al iets geprobeerd?"
-  ],
-  steps: [],
-  tools: [],
-  materials: [],
+  main_issue: null,
+  issue_location_description: null,
+  what_is_visible: [],
+  suggested_steps: [],
   stop_conditions: ["Bij twijfel, schakel een professional in"],
-  lesson_suggestion: { suggested: false, title: null, lesson_id: null },
+  next_action: "request_more_info",
+  lesson_suggestion: { suggested: false, topic: null },
   handy_suggestion: { suggested: true, reason: "Bij onvoldoende informatie is het veiliger om een expert te raadplegen." },
-  disclaimer: "Dit is indicatief advies. Stop bij twijfel, gevaar of schade en schakel een professional in."
+  explanation_if_uncertain: "Ik kon je vraag niet volledig analyseren. Geef meer details of stuur een foto.",
+  disclaimer: "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
 };
 
-function validateAndFixResponse(data: unknown): AIResponse {
+function validateAndFixResponse(data: unknown, userType: string, photoProvided: boolean): AIResponse {
   const response = data as Partial<AIResponse>;
+  
+  const riskLevel = (["GREEN", "YELLOW", "RED"].includes(response.risk_level || "")) 
+    ? response.risk_level as "GREEN" | "YELLOW" | "RED" 
+    : "YELLOW";
+  
+  const understood = response.understood !== undefined ? response.understood : true;
+  
+  let nextAction: AIResponse["next_action"] = response.next_action || "continue_self_fix";
+  if (!["continue_self_fix", "request_more_info", "lesson", "book_handy"].includes(nextAction)) {
+    nextAction = riskLevel === "RED" ? "book_handy" : understood ? "continue_self_fix" : "request_more_info";
+  }
   
   return {
     debug_contract_version: "HM_AI_V1",
-    risk_level: (["GREEN", "YELLOW", "RED"].includes(response.risk_level || "")) 
-      ? response.risk_level as "GREEN" | "YELLOW" | "RED" 
-      : "YELLOW",
+    user_type: userType === "handy" ? "handy" : "seeker",
+    input_type: photoProvided ? "text_with_photo" : "text_only",
+    vision_confidence: photoProvided ? (response.vision_confidence || "medium") : null,
+    understood,
+    risk_level: riskLevel,
     category: response.category || "Onbekend",
-    title: response.title || "Analyse",
-    summary: response.summary || "Geen samenvatting beschikbaar.",
-    likely_causes: Array.isArray(response.likely_causes) ? response.likely_causes : [],
-    questions_to_confirm: Array.isArray(response.questions_to_confirm) ? response.questions_to_confirm : [],
-    steps: Array.isArray(response.steps) ? response.steps : [],
-    tools: Array.isArray(response.tools) ? response.tools : [],
-    materials: Array.isArray(response.materials) ? response.materials : [],
+    main_issue: response.main_issue || null,
+    issue_location_description: response.issue_location_description || null,
+    what_is_visible: Array.isArray(response.what_is_visible) ? response.what_is_visible : [],
+    suggested_steps: Array.isArray(response.suggested_steps) ? response.suggested_steps : [],
     stop_conditions: Array.isArray(response.stop_conditions) ? response.stop_conditions : [],
-    lesson_suggestion: response.lesson_suggestion || { suggested: false, title: null, lesson_id: null },
-    handy_suggestion: response.handy_suggestion || { suggested: true, reason: "Raadpleeg een expert bij twijfel." },
-    disclaimer: response.disclaimer || "Dit is indicatief advies. Stop bij twijfel, gevaar of schade en schakel een professional in."
+    next_action: nextAction,
+    lesson_suggestion: response.lesson_suggestion || { suggested: false, topic: null },
+    handy_suggestion: response.handy_suggestion || { suggested: riskLevel === "RED", reason: riskLevel === "RED" ? "Schakel een professional in." : null },
+    explanation_if_uncertain: response.explanation_if_uncertain || null,
+    disclaimer: response.disclaimer || "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
   };
 }
 
@@ -239,8 +270,7 @@ async function callAI(messages: Array<{ role: string; content: string }>): Promi
 
     try {
       const parsed = JSON.parse(jsonStr);
-      const validated = validateAndFixResponse(parsed);
-      return { success: true, data: validated };
+      return { success: true, data: parsed };
     } catch (parseError) {
       console.error("Failed to parse AI response:", content);
       return { success: false, error: "Ongeldig antwoordformaat" };
@@ -311,10 +341,11 @@ serve(async (req) => {
     }
 
     if (result.success && result.data) {
-      console.log(`AI response: category=${result.data.category}, risk=${result.data.risk_level}, handy_suggested=${result.data.handy_suggestion.suggested}`);
+      const validated = validateAndFixResponse(result.data, userType, photoProvided);
+      console.log(`AI response: category=${validated.category}, risk=${validated.risk_level}, next_action=${validated.next_action}`);
       
       return new Response(
-        JSON.stringify({ ok: true, data: result.data }),
+        JSON.stringify({ ok: true, data: validated }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
