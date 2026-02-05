@@ -53,8 +53,15 @@ const MapPage = () => {
   const isSeeker = userType === 'seeker';
   const isHandy = userType === 'handy';
 
-  const handleStartChat = (id: string, name: string) => {
-    navigate('/chats', { state: { newChatWith: id, handyName: name } });
+  const handleStartChat = (id: string, name: string, avatar: string) => {
+    navigate(`/chat/new-${id}`, { 
+      state: { 
+        isNewChat: true,
+        handyId: id, 
+        handyName: name,
+        handyAvatar: avatar
+      } 
+    });
   };
 
   const handleApplyForProject = (projectTitle: string) => {
@@ -174,7 +181,7 @@ const MapPage = () => {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleStartChat(handy.id, handy.name);
+                      handleStartChat(handy.id, handy.name, handy.avatar);
                     }}
                     className="mt-3 w-full py-2.5 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-xl text-xs font-semibold hover:brightness-110 transition-all flex items-center justify-center gap-2"
                   >

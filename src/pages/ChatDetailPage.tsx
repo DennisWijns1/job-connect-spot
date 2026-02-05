@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/components/Header';
 import { mockChats } from '@/data/mockData';
 import { Send, Calendar, Phone, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -11,8 +10,32 @@ import { toast } from 'sonner';
 
 const ChatDetailPage = () => {
   const { id } = useParams();
-  const chat = mockChats.find(c => c.id === id);
-  const [messages, setMessages] = useState(chat?.messages || []);
+  const location = useLocation();
+  
+  // State uit navigatie voor nieuwe chat
+  const navState = location.state as {
+    isNewChat?: boolean;
+    handyId?: string;
+    handyName?: string;
+    handyAvatar?: string;
+  } | null;
+  
+  const isNewChat = navState?.isNewChat && id?.startsWith('new-');
+  const existingChat = mockChats.find(c => c.id === id);
+  
+  // Participant bepalen
+  const participant = isNewChat 
+    ? {
+        id: navState!.handyId!,
+        name: navState!.handyName!,
+        avatar: navState!.handyAvatar!,
+        isOnline: true,
+      }
+    : existingChat?.participant;
+  
+  const [messages, setMessages] = useState(
+    isNewChat ? [] : (existingChat?.messages || [])
+  );
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,11 +63,11 @@ const ChatDetailPage = () => {
 
   const handleAppointment = () => {
     toast.success('Afspraakverzoek verzonden!', {
-      description: `${chat?.participant.name} ontvangt je verzoek`,
+      description: `${participant?.name} ontvangt je verzoek`,
     });
   };
 
-  if (!chat) {
+  if (!participant) {
     return <div>Chat niet gevonden</div>;
   }
 
@@ -62,20 +85,20 @@ const ChatDetailPage = () => {
             </button>
             <div className="relative">
               <img
-                src={chat.participant.avatar}
-                alt={chat.participant.name}
+                src={participant.avatar}
+                alt={participant.name}
                 className="w-10 h-10 rounded-xl object-cover"
               />
-              {chat.participant.isOnline && (
+              {participant.isOnline && (
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-card" />
               )}
             </div>
             <div>
               <h1 className="font-semibold text-foreground">
-                {chat.participant.name}
+                {participant.name}
               </h1>
               <p className="text-xs text-muted-foreground">
-                {chat.participant.isOnline ? 'Online' : 'Offline'}
+                {participant.isOnline ? 'Online' : 'Offline'}
               </p>
             </div>
           </div>
@@ -93,43 +116,59 @@ const ChatDetailPage = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        <AnimatePresence mode="popLayout">
-          {messages.map((message) => (
-            <motion.div
-              key={message.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex mb-4 ${message.senderId === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[75%] p-4 rounded-2xl ${
-                  message.senderId === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-sm'
-                    : 'bg-card shadow-soft rounded-bl-sm'
-                }`}
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <img 
+              src={participant.avatar} 
+              alt={participant.name}
+              className="w-20 h-20 rounded-full object-cover mb-4 border-4 border-card shadow-lg"
+            />
+            <h3 className="font-semibold text-lg text-foreground">
+              Start een gesprek met {participant.name}
+            </h3>
+            <p className="text-muted-foreground text-sm mt-2 max-w-[250px]">
+              Beschrijf je klus of stel een vraag!
+            </p>
+          </div>
+        ) : (
+          <AnimatePresence mode="popLayout">
+            {messages.map((message) => (
+              <motion.div
+                key={message.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex mb-4 ${message.senderId === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="text-sm">{message.text}</p>
-                <p className={`text-xs mt-1 ${
-                  message.senderId === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                }`}>
-                  {formatDistanceToNow(message.timestamp, { addSuffix: true, locale: nl })}
-                </p>
+                <div
+                  className={`max-w-[75%] p-4 rounded-2xl ${
+                    message.senderId === 'user'
+                      ? 'bg-primary text-primary-foreground rounded-br-sm'
+                      : 'bg-card shadow-soft rounded-bl-sm'
+                  }`}
+                >
+                  <p className="text-sm">{message.text}</p>
+                  <p className={`text-xs mt-1 ${
+                    message.senderId === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                  }`}>
+                    {formatDistanceToNow(message.timestamp, { addSuffix: true, locale: nl })}
+                  </p>
 
-                {message.isAppointmentRequest && (
-                  <div className="mt-3 pt-3 border-t border-current/20">
-                    <button
-                      onClick={handleAppointment}
-                      className="w-full py-2 px-4 rounded-xl bg-success/20 text-success font-medium text-sm flex items-center justify-center gap-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Afspraak bevestigen
-                    </button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                  {message.isAppointmentRequest && (
+                    <div className="mt-3 pt-3 border-t border-current/20">
+                      <button
+                        onClick={handleAppointment}
+                        className="w-full py-2 px-4 rounded-xl bg-success/20 text-success font-medium text-sm flex items-center justify-center gap-2"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        Afspraak bevestigen
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
