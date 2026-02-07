@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { EmergencyButton } from '@/components/EmergencyButton';
+import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { MessageCircle, Hammer, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-const onlineHandys = mockHandyProfiles.filter(h => h.isOnline);
+const allOnlineHandys = mockHandyProfiles.filter(h => h.isOnline);
 
 // Leuven landmarks and streets
 const leuvenStreets = [
@@ -25,14 +26,6 @@ const landmarks = [
   { name: 'Stadspark', x: 100, y: 280, emoji: '🌳' },
 ];
 
-// Mock coordinates for handys (for seekers)
-const handyLocations = [
-  { ...onlineHandys[0], top: '28%', left: '48%' },
-  { ...onlineHandys[1], top: '18%', left: '65%' },
-  { ...onlineHandys[2], top: '48%', left: '28%' },
-  { ...onlineHandys[3], top: '38%', left: '72%' },
-  { ...onlineHandys[4], top: '62%', left: '55%' },
-].filter(h => h?.isOnline);
 
 // Mock coordinates for projects (for handymen)
 const projectLocations = mockProjects.map((project, index) => ({
@@ -52,6 +45,47 @@ const MapPage = () => {
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isSeeker = userType === 'seeker';
   const isHandy = userType === 'handy';
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filteredHandys, setFilteredHandys] = useState(allOnlineHandys);
+
+  // Create handy locations from filtered data
+  const handyLocations = [
+    { ...filteredHandys[0], top: '28%', left: '48%' },
+    { ...filteredHandys[1], top: '18%', left: '65%' },
+    { ...filteredHandys[2], top: '48%', left: '28%' },
+    { ...filteredHandys[3], top: '38%', left: '72%' },
+    { ...filteredHandys[4], top: '62%', left: '55%' },
+  ].filter(h => h?.isOnline);
+
+  const handleFilterApply = (filters: { problem: string; distance: number; minRating: number; maxPrice: number }) => {
+    let filtered = allOnlineHandys;
+    
+    // Filter by rating
+    if (filters.minRating > 0) {
+      filtered = filtered.filter(h => h.rating >= filters.minRating);
+    }
+    
+    // Filter by price (hourly rate)
+    if (filters.maxPrice < 100) {
+      filtered = filtered.filter(h => (h.hourlyRate || 0) <= filters.maxPrice);
+    }
+    
+    // Filter by problem/specialty
+    if (filters.problem.trim()) {
+      const searchLower = filters.problem.toLowerCase();
+      filtered = filtered.filter(h => 
+        h.specialty.toLowerCase().includes(searchLower) ||
+        h.name.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    setFilteredHandys(filtered);
+    setShowFilterModal(false);
+    
+    if (filtered.length === 0) {
+      toast.info('Geen handys gevonden met deze filters');
+    }
+  };
 
   const handleStartChat = (id: string, name: string, avatar: string) => {
     navigate(`/chat/new-${id}`, { 
@@ -72,7 +106,12 @@ const MapPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Kaart" showFavorites />
+      <Header 
+        title="Kaart" 
+        showFavorites 
+        showSearch 
+        onOpenSearch={() => setShowFilterModal(true)} 
+      />
 
       <div className="relative h-[calc(100vh-180px)] mx-4 mt-4 rounded-3xl overflow-hidden shadow-card">
         {/* Map Background */}
@@ -284,6 +323,13 @@ const MapPage = () => {
 
       {isSeeker && <EmergencyButton />}
       <BottomNav />
+
+      {/* Filter Modal */}
+      <ProblemInputDialog
+        isOpen={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onSubmit={handleFilterApply}
+      />
     </div>
   );
 };

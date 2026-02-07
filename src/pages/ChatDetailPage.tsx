@@ -6,7 +6,7 @@ import { Send, Calendar, Phone, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { toast } from 'sonner';
+import { AddToCalendarSheet, AppointmentData } from '@/components/AddToCalendarSheet';
 
 const ChatDetailPage = () => {
   const { id } = useParams();
@@ -37,6 +37,7 @@ const ChatDetailPage = () => {
     isNewChat ? [] : (existingChat?.messages || [])
   );
   const [input, setInput] = useState('');
+  const [showCalendarSheet, setShowCalendarSheet] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -62,9 +63,12 @@ const ChatDetailPage = () => {
   };
 
   const handleAppointment = () => {
-    toast.success('Afspraakverzoek verzonden!', {
-      description: `${participant?.name} ontvangt je verzoek`,
-    });
+    setShowCalendarSheet(true);
+  };
+
+  const handleConfirmAppointment = (appointment: AppointmentData) => {
+    // Hier kun je de afspraak opslaan in de database
+    console.log('Afspraak bevestigd:', appointment);
   };
 
   if (!participant) {
@@ -204,6 +208,14 @@ const ChatDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Add to Calendar Sheet */}
+      <AddToCalendarSheet
+        isOpen={showCalendarSheet}
+        onClose={() => setShowCalendarSheet(false)}
+        participantName={participant?.name || 'Onbekend'}
+        onConfirm={handleConfirmAppointment}
+      />
     </div>
   );
 };
