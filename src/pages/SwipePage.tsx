@@ -49,8 +49,8 @@ const SwipePage = () => {
     }
   }, [showProblemDialog, hasShownProblemDialog, isHandy]);
 
-  const filterByProblem = useCallback((problem: string) => {
-    const lowerProblem = problem.toLowerCase();
+  const filterByProblem = useCallback((filters: { problem: string; distance: number; minRating: number; maxPrice: number }) => {
+    const lowerProblem = filters.problem.toLowerCase();
     
     const keywordMap: Record<string, string[]> = {
       'kraan': ['loodgieter', 'sanitair', 'lekken'],
@@ -75,10 +75,11 @@ const SwipePage = () => {
       }
     });
 
-    if (matchingCategories.length === 0) {
-      setFilteredItems(allItems);
-    } else {
-      const filtered = (allItems as HandyProfile[]).filter(profile => {
+    let filtered = allItems as HandyProfile[];
+    
+    // Filter by problem/specialty
+    if (matchingCategories.length > 0) {
+      filtered = filtered.filter(profile => {
         const specialtyMatch = matchingCategories.some(cat => 
           profile.specialty.toLowerCase().includes(cat)
         );
@@ -87,16 +88,30 @@ const SwipePage = () => {
         );
         return specialtyMatch || specialtiesMatch;
       });
-      
-      setFilteredItems(filtered.length > 0 ? filtered : allItems);
     }
     
+    // Filter by minimum rating
+    if (filters.minRating > 0) {
+      filtered = filtered.filter(profile => profile.rating >= filters.minRating);
+    }
+    
+    // Filter by max price
+    if (filters.maxPrice < 100) {
+      filtered = filtered.filter(profile => (profile.hourlyRate || 0) <= filters.maxPrice);
+    }
+    
+    setFilteredItems(filtered.length > 0 ? filtered : allItems);
     setCurrentIndex(0);
-    setCurrentProblem(problem);
+    setCurrentProblem(filters.problem);
     setShowProblemDialog(false);
-    toast.success(`Zoeken naar: "${problem}"`, {
-      description: 'We tonen nu de beste matches voor jouw probleem',
-    });
+    
+    if (filters.problem) {
+      toast.success(`Zoeken naar: "${filters.problem}"`, {
+        description: 'We tonen nu de beste matches voor jouw probleem',
+      });
+    } else {
+      toast.success('Filters toegepast');
+    }
   }, [allItems]);
 
   const handleProjectSearch = useCallback((filters: ProjectFilters) => {

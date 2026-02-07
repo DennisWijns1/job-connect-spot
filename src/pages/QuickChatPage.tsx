@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
+import { ProblemInputDialog } from '@/components/ProblemInputDialog';
 import { Send, MessageCircle, Video, Clock, User, Phone, Mic, MicOff, VideoOff, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,7 @@ import { toast } from 'sonner';
 
 const MAX_CALL_DURATION = 300; // 5 minutes in seconds
 
-const availableHandys = mockHandyProfiles.filter(h => h.isOnline).slice(0, 4);
+const allAvailableHandys = mockHandyProfiles.filter(h => h.isOnline).slice(0, 4);
 
 interface ChatMessage {
   id: string;
@@ -21,7 +22,7 @@ interface ChatMessage {
 }
 
 const QuickChatPage = () => {
-  const [selectedHandy, setSelectedHandy] = useState<typeof availableHandys[0] | null>(null);
+  const [selectedHandy, setSelectedHandy] = useState<typeof allAvailableHandys[0] | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [messageInput, setMessageInput] = useState('');
   const [isInCall, setIsInCall] = useState(false);
@@ -29,6 +30,8 @@ const QuickChatPage = () => {
   const [timeRemaining, setTimeRemaining] = useState(MAX_CALL_DURATION);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filteredHandys, setFilteredHandys] = useState(allAvailableHandys);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const formatTime = (seconds: number) => {
@@ -65,7 +68,7 @@ const QuickChatPage = () => {
     return () => clearInterval(interval);
   }, [isInCall]);
 
-  const startChat = (handy: typeof availableHandys[0]) => {
+  const startChat = (handy: typeof allAvailableHandys[0]) => {
     setSelectedHandy(handy);
     setChatMessages([
       {
@@ -76,6 +79,36 @@ const QuickChatPage = () => {
         isUser: false,
       },
     ]);
+  };
+
+  const handleFilterApply = (filters: { problem: string; distance: number; minRating: number; maxPrice: number }) => {
+    let filtered = allAvailableHandys;
+    
+    // Filter by rating
+    if (filters.minRating > 0) {
+      filtered = filtered.filter(h => h.rating >= filters.minRating);
+    }
+    
+    // Filter by price (hourly rate)
+    if (filters.maxPrice < 100) {
+      filtered = filtered.filter(h => (h.hourlyRate || 0) <= filters.maxPrice);
+    }
+    
+    // Filter by problem/specialty (simple text match)
+    if (filters.problem.trim()) {
+      const searchLower = filters.problem.toLowerCase();
+      filtered = filtered.filter(h => 
+        h.specialty.toLowerCase().includes(searchLower) ||
+        h.name.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    setFilteredHandys(filtered);
+    setShowFilterModal(false);
+    
+    if (filtered.length === 0) {
+      toast.info('Geen handys gevonden met deze filters');
+    }
   };
 
   const sendMessage = () => {
@@ -143,7 +176,12 @@ const QuickChatPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Quick Chat" showBack />
+      <Header 
+        title="Quick Chat" 
+        showBack 
+        showSearch 
+        onOpenSearch={() => setShowFilterModal(true)} 
+      />
 
       <div className="px-4 py-6">
         <AnimatePresence mode="wait">
@@ -192,43 +230,56 @@ const QuickChatPage = () => {
               </h3>
 
               <div className="space-y-3">
-                {availableHandys.map((handy, index) => (
-                  <motion.div
-                    key={handy.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-card rounded-2xl p-4 border border-border hover:border-accent/50 transition-all group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        <img
-                          src={handy.avatar}
-                          alt={handy.name}
-                          className="w-14 h-14 rounded-xl object-cover"
-                        />
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-card" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-foreground truncate">{handy.name}</h4>
-                        <p className="text-sm text-muted-foreground truncate">{handy.specialty}</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-xs font-medium">{handy.rating}</span>
-                          <span className="text-sm">🔨</span>
+                {filteredHandys.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">Geen handys gevonden</p>
+                    <Button
+                      variant="link"
+                      onClick={() => setFilteredHandys(allAvailableHandys)}
+                      className="text-accent"
+                    >
+                      Filters wissen
+                    </Button>
+                  </div>
+                ) : (
+                  filteredHandys.map((handy, index) => (
+                    <motion.div
+                      key={handy.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-card rounded-2xl p-4 border border-border hover:border-accent/50 transition-all group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <img
+                            src={handy.avatar}
+                            alt={handy.name}
+                            className="w-14 h-14 rounded-xl object-cover"
+                          />
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-card" />
                         </div>
-                      </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-foreground truncate">{handy.name}</h4>
+                          <p className="text-sm text-muted-foreground truncate">{handy.specialty}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="text-xs font-medium">{handy.rating}</span>
+                            <span className="text-sm">🔨</span>
+                          </div>
+                        </div>
 
-                      <Button
-                        onClick={() => startChat(handy)}
-                        className="bg-gradient-to-r from-accent to-accent/80 hover:brightness-110 text-accent-foreground rounded-xl px-4"
-                      >
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        Chat
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
+                        <Button
+                          onClick={() => startChat(handy)}
+                          className="bg-gradient-to-r from-accent to-accent/80 hover:brightness-110 text-accent-foreground rounded-xl px-4"
+                        >
+                          <MessageCircle className="w-4 h-4 mr-2" />
+                          Chat
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
               </div>
             </motion.div>
           ) : isConnecting ? (
@@ -411,6 +462,13 @@ const QuickChatPage = () => {
       </div>
 
       {!isInCall && !isConnecting && <BottomNav />}
+
+      {/* Filter Modal */}
+      <ProblemInputDialog
+        isOpen={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onSubmit={handleFilterApply}
+      />
     </div>
   );
 };

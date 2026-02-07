@@ -7,10 +7,17 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { categories } from '@/data/mockData';
 
+export interface FilterData {
+  problem: string;
+  distance: number;
+  minRating: number;
+  maxPrice: number;
+}
+
 interface ProblemInputDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (problem: string) => void;
+  onSubmit: (filters: FilterData) => void;
 }
 
 const suggestionPrompts = [
@@ -34,14 +41,22 @@ export const ProblemInputDialog = ({ isOpen, onClose, onSubmit }: ProblemInputDi
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const handleSubmit = () => {
-    if (problem.trim()) {
-      onSubmit(problem.trim());
-      setProblem('');
-    }
+    onSubmit({
+      problem: problem.trim(),
+      distance: distanceKm[0],
+      minRating: minRating[0],
+      maxPrice: hourlyRate[1],
+    });
+    setProblem('');
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    onSubmit(suggestion);
+    onSubmit({
+      problem: suggestion,
+      distance: distanceKm[0],
+      minRating: minRating[0],
+      maxPrice: hourlyRate[1],
+    });
     setProblem('');
   };
 
