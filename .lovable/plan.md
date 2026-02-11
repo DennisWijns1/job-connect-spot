@@ -1,193 +1,176 @@
 
-# Plan: Afspraak in Agenda Zetten + Zoekfilters voor Quick Chat & Kaart
+
+# Plan: Camera + AI Vision Analyse Implementatie
 
 ## Overzicht
 
-Er worden twee functionaliteiten toegevoegd:
-1. **Afspraak naar agenda toevoegen** - Wanneer een datum/tijd in de chat wordt voorgesteld, kan de gebruiker dit direct in de agenda zetten
-2. **Zoekfilters voor Quick Chat & Kaart** - Het vergrootglas-icoon toevoegen zodat gebruikers kunnen filteren op afstand, specialiteit, etc.
+De camera-knop in de AI Klushulp werkt momenteel niet (toont alleen een toast). Dit plan implementeert volledige foto-upload, AI Vision analyse met visual markers, en SVG overlay rendering.
 
 ---
 
-## Deel 1: Afspraak in Agenda Zetten
+## Wijzigingen
 
-### Wat er gebeurt nu
-- In de chat verschijnt een bericht met `isAppointmentRequest: true`
-- De knop "Afspraak bevestigen" toont alleen een toast melding
-- Er wordt niks opgeslagen of toegevoegd aan de agenda
+### 1. Edge Function: `supabase/functions/ai-assist/index.ts`
 
-### Nieuwe flow
+**Wat verandert:**
+- Accept `photo` (base64 string) in request body naast `message`
+- Stuur foto als multimodal content naar Gemini (image_url met base64 data URI)
+- Voeg `visual_markers` toe aan het verplichte JSON-schema in de system prompt
+- Update `AIResponse` interface en `validateAndFixResponse` met `visual_markers`
+- Update `FALLBACK_RESPONSE` met leeg `visual_markers` array
 
-```text
-┌─────────────────────────────────────┐
-│  Handy stuurt bericht:              │
-│  "Ik kan morgen om 14u langskomen"  │
-│  ┌─────────────────────────────────┐│
-│  │ 📅 Afspraak bevestigen          ││
-│  └─────────────────────────────────┘│
-└─────────────────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────┐
-│  📅 Afspraak Toevoegen              │
-│                                     │
-│  Met: Jan De Smedt                  │
-│                                     │
-│  Datum:  [Calendar picker]          │
-│  Tijd:   [10:00] - [11:00]          │
-│  Locatie: [________________]        │
-│  Notitie: [________________]        │
-│                                     │
-│  ┌─────────────────────────────────┐│
-│  │ ✓ Toevoegen aan agenda          ││
-│  └─────────────────────────────────┘│
-│                                     │
-│  Exporteren naar:                   │
-│  [Google] [Apple/Outlook]           │
-└─────────────────────────────────────┘
+**Nieuw request formaat:**
+```json
+{
+  "userType": "seeker",
+  "message": "Mijn kraan lekt",
+  "photo": "base64_encoded_image_data",
+  "categoryHint": null
+}
 ```
 
-### Componenten
+**Multimodal message opbouw:**
+Wanneer `photo` aanwezig is, wordt de user message een array van content parts:
+```json
+[
+  { "type": "text", "text": "beschrijving + context" },
+  { "type": "image_url", "image_url": { "url": "data:image/jpeg;base64,..." } }
+]
+```
 
-**1. Nieuwe component: `AddToCalendarSheet.tsx`**
-
-Een sheet dialog met:
-- Participant naam (Handy waarmee je chat)
-- Date picker voor datum
-- Time pickers voor start- en eindtijd
-- Optionele locatie en notitie velden
-- "Toevoegen aan agenda" knop
-- Export knoppen voor Google Calendar en Apple/Outlook (ICS)
-
-**2. Aanpassing `ChatDetailPage.tsx`**
-- State toevoegen voor de AddToCalendarSheet
-- `handleAppointment` functie aanpassen om de sheet te openen
-- Afspraakgegevens doorgeven (participant naam, voorgestelde tijd indien beschikbaar)
-
----
-
-## Deel 2: Zoekfilters voor Quick Chat & Kaart
-
-### Wat er nu is
-- **SwipePage** heeft het `SwipeHeader` component met een zoek-icoon dat `ProblemInputDialog` opent
-- **QuickChatPage** en **MapPage** gebruiken de standaard `Header` component zonder zoekfilter
-
-### Nieuwe situatie
-
-Beide pagina's krijgen een zoek/filter knop in de header die dezelfde `ProblemInputDialog` opent (of vergelijkbare filter modal).
-
-### Visuele vergelijking
-
-```text
-NU:                                    NA:
-┌─────────────────────────────┐       ┌─────────────────────────────┐
-│ ← HM Quick Chat             │       │ ← HM Quick Chat    [🔍]    │
-├─────────────────────────────┤       ├─────────────────────────────┤
-│ Beschikbare Handy's         │       │ Beschikbare Handy's         │
-│ ...                         │       │ ...                         │
-└─────────────────────────────┘       └─────────────────────────────┘
-
-┌─────────────────────────────┐       ┌─────────────────────────────┐
-│ ★ HM Kaart                  │       │ ★ HM Kaart          [🔍]   │
-├─────────────────────────────┤       ├─────────────────────────────┤
-│ [Map content]               │       │ [Map content]               │
-└─────────────────────────────┘       └─────────────────────────────┘
+**Extra JSON-veld in system prompt:**
+```json
+"visual_markers": [
+  {
+    "type": "circle" | "arrow",
+    "x": 0.0-1.0,
+    "y": 0.0-1.0,
+    "radius": number | null,
+    "direction": "up" | "down" | "left" | "right" | null
+  }
+]
 ```
 
 ---
 
-## Technische Wijzigingen
+### 2. Frontend: `src/pages/AIHelpPage.tsx`
 
-### Nieuwe bestanden
+**Wat verandert:**
 
-| Bestand | Beschrijving |
-|---------|--------------|
-| `src/components/AddToCalendarSheet.tsx` | Sheet voor afspraak toevoegen aan agenda |
+**a) Camera/foto functionaliteit:**
+- Hidden `<input type="file" accept="image/*" capture="environment">` element
+- Camera knop onClick triggert dit input element
+- Op mobiel opent dit de native camera, op desktop de file picker
+- Na selectie: lees bestand als base64 via `FileReader`
+- Sla base64 + preview URL op in state (`photoBase64`, `photoPreview`)
+- Toon kleine preview thumbnail naast de input wanneer foto geselecteerd is
+- Verwijder-knop (X) om foto te annuleren
 
-### Aan te passen bestanden
+**b) Versturen met foto:**
+- `handleSend` stuurt `photo: photoBase64` mee in request body wanneer aanwezig
+- User message toont de foto-preview in de chat bubble
+- Na verzenden: reset `photoBase64` en `photoPreview`
+
+**c) Message interface uitbreiden:**
+- Voeg `photoUrl?: string` toe aan `Message` interface
+- Voeg `visual_markers` toe aan `AIResponse` interface
+
+**d) SVG Overlay rendering:**
+- Nieuw `renderPhotoWithOverlay` functie
+- Toont de afbeelding in een `<div style="position: relative">`
+- Rendert `<svg>` overlay met viewBox="0 0 1 1" (genormaliseerde coordinaten)
+- Voor `circle` markers: `<circle>` op (x, y) met radius, rode stroke
+- Voor `arrow` markers: `<line>` met pijlpunt in opgegeven richting
+- SVG schaalt mee met de afbeelding via `preserveAspectRatio`
+
+**e) Rendering in `renderAIResponse`:**
+- Controleer of het bericht een foto bevat en AI `visual_markers` heeft teruggegeven
+- Render `renderPhotoWithOverlay` boven het stappenplan
+- Bij `vision_confidence === 'low'`: toon melding om nieuwe foto te sturen, geen stappen
+
+---
+
+## Technische Details
+
+### Bestanden te wijzigen
 
 | Bestand | Wijziging |
 |---------|-----------|
-| `src/pages/ChatDetailPage.tsx` | AddToCalendarSheet integreren, handleAppointment aanpassen |
-| `src/pages/QuickChatPage.tsx` | Header aanpassen met `showSearch`, filter state & modal toevoegen |
-| `src/pages/MapPage.tsx` | Header aanpassen met `showSearch`, filter state & modal toevoegen |
+| `supabase/functions/ai-assist/index.ts` | Multimodal support, visual_markers in schema |
+| `src/pages/AIHelpPage.tsx` | Camera input, foto state, overlay rendering |
 
----
-
-## Implementatie Details
-
-### AddToCalendarSheet component
+### AIResponse interface update
 
 ```typescript
-interface AddToCalendarSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  participantName: string;
-  onConfirm: (appointment: AppointmentData) => void;
+interface VisualMarker {
+  type: 'circle' | 'arrow';
+  x: number;
+  y: number;
+  radius: number | null;
+  direction: 'up' | 'down' | 'left' | 'right' | null;
 }
 
-interface AppointmentData {
-  title: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  location?: string;
-  notes?: string;
+interface AIResponse {
+  // ... bestaande velden ...
+  visual_markers: VisualMarker[];
 }
 ```
 
-Features:
-- Calendar date picker (Shadcn Calendar component)
-- Time inputs voor start en eind
-- Google Calendar URL generator (hergebruik van CalendarSection)
-- ICS download functie (hergebruik van CalendarSection)
-- Opslaan in lokale state/mock data
+### Camera flow
 
-### QuickChatPage aanpassingen
-
-1. Header props toevoegen:
-```typescript
-<Header 
-  title="Quick Chat" 
-  showBack 
-  showSearch 
-  onOpenSearch={() => setShowFilterModal(true)} 
-/>
+```text
+[Camera icoon] --> <input type="file" accept="image/*" capture="environment">
+      |
+      v
+FileReader.readAsDataURL(file)
+      |
+      v
+State: photoBase64, photoPreview
+      |
+      v
+[Preview thumbnail naast input] [X knop]
+      |
+      v
+handleSend() --> POST { message, photo: base64, userType }
+      |
+      v
+Edge Function --> Gemini multimodal --> JSON + visual_markers
+      |
+      v
+renderPhotoWithOverlay() --> SVG circles/arrows op foto
 ```
 
-2. State voor filter modal:
-```typescript
-const [showFilterModal, setShowFilterModal] = useState(false);
+### SVG Overlay structuur
+
+```text
+┌──────────────────────────────┐
+│  <div position: relative>    │
+│  ┌──────────────────────────┐│
+│  │ <img src={photo} />      ││
+│  │                          ││
+│  │   ○ (circle marker)      ││
+│  │        ↓ (arrow marker)  ││
+│  │                          ││
+│  └──────────────────────────┘│
+│  <svg position: absolute     │
+│   top:0 left:0 100% x 100%> │
+│   viewBox="0 0 1 1"         │
+│  </svg>                     │
+│  </div>                     │
+└──────────────────────────────┘
 ```
-
-3. Filter functie voor beschikbare handys:
-```typescript
-const handleFilter = (filters) => {
-  // Filter availableHandys op basis van afstand, rating, specialiteit
-};
-```
-
-### MapPage aanpassingen
-
-Dezelfde structuur als QuickChatPage:
-- `showSearch` prop toevoegen aan Header
-- State voor filter modal
-- Filter logica voor handyLocations of projectLocations
 
 ---
 
 ## Resultaat
 
-Na implementatie:
+1. Gebruiker klikt camera-icoon -> native camera (mobiel) of file picker (desktop) opent
+2. Foto wordt geconverteerd naar base64 en als preview getoond
+3. Bij verzenden gaat foto + tekst naar de edge function
+4. Gemini analyseert de foto multimodaal
+5. AI response bevat visual_markers met genormaliseerde coordinaten
+6. Foto wordt getoond met SVG overlay (rode cirkels/pijlen)
+7. Stappenplan verschijnt onder de foto, aangepast aan seeker/handy profiel
+8. Bij RED risico: geen stappen, alleen escalatie
+9. Bij confidence = low: vraag om betere foto
 
-1. **Chat afspraken**:
-   - Klik op "Afspraak bevestigen" in chat
-   - Sheet opent met datum/tijd selector
-   - Kies datum en tijden
-   - Voeg toe aan lokale agenda OF exporteer naar Google/Apple
-
-2. **Zoekfilters**:
-   - Op Quick Chat en Kaart verschijnt het vergrootglas-icoon
-   - Klikken opent dezelfde filter modal als bij Swipe
-   - Filteren op afstand, specialiteit, rating, uurtarief
-   - Resultaten worden direct gefilterd
