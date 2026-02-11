@@ -3,10 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight } from 'lucide-react';
+import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+
+interface VisualMarker {
+  type: 'circle' | 'arrow';
+  x: number;
+  y: number;
+  radius: number | null;
+  direction: 'up' | 'down' | 'left' | 'right' | null;
+}
 
 // HM_AI_V1 contract interface
 interface AIResponse {
@@ -20,6 +28,7 @@ interface AIResponse {
   main_issue: string | null;
   issue_location_description: string | null;
   what_is_visible: string[];
+  visual_markers: VisualMarker[];
   suggested_steps: string[];
   stop_conditions: string[];
   next_action: 'continue_self_fix' | 'request_more_info' | 'lesson' | 'book_handy';
@@ -42,6 +51,7 @@ interface Message {
   timestamp: Date;
   isError?: boolean;
   aiResponse?: AIResponse;
+  photoUrl?: string;
 }
 
 const AIHelpPage = () => {
@@ -80,7 +90,10 @@ const AIHelpPage = () => {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [photoBase64, setPhotoBase64] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -90,24 +103,47 @@ const AIHelpPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'Bestand te groot', description: 'Maximaal 5MB toegestaan.', variant: 'destructive' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      // Extract base64 without the data:image/...;base64, prefix
+      const base64 = dataUrl.split(',')[1];
+      setPhotoBase64(base64);
+      setPhotoPreview(dataUrl);
     };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be selected again
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
-    setMessages((prev) => [...prev, userMessage]);
-    const messageText = input;
-    setInput('');
+  const clearPhoto = () => {
+    setPhotoBase64(null);
+    setPhotoPreview(null);
+  };
+
+  const sendToAI = async (messageText: string, photo: string | null, photoPreviewUrl: string | null) => {
     setIsTyping(true);
-
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+      const body: any = {
+        message: messageText,
+        userType: isHandy ? 'handy' : 'seeker',
+        categoryHint: null,
+      };
+      if (photo) {
+        body.photo = photo;
+      }
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assist`,
@@ -117,12 +153,7 @@ const AIHelpPage = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({
-            message: messageText,
-            userType: isHandy ? 'handy' : 'seeker',
-            photoProvided: false,
-            categoryHint: null,
-          }),
+          body: JSON.stringify(body),
           signal: controller.signal,
         }
       );
@@ -145,9 +176,10 @@ const AIHelpPage = () => {
           const aiMessage: Message = {
             id: (Date.now() + 1).toString(),
             role: 'assistant',
-            content: fallbackData.summary,
+            content: fallbackData.summary || fallbackData.explanation_if_uncertain || 'Er ging iets mis.',
             timestamp: new Date(),
             aiResponse: fallbackData,
+            photoUrl: photoPreviewUrl || undefined,
           };
           setMessages((prev) => [...prev, aiMessage]);
         } else {
@@ -168,6 +200,7 @@ const AIHelpPage = () => {
           content: aiResponse.main_issue || aiResponse.explanation_if_uncertain || 'Analyse voltooid',
           timestamp: new Date(),
           aiResponse,
+          photoUrl: photoPreviewUrl || undefined,
         };
         setMessages((prev) => [...prev, aiMessage]);
       }
@@ -204,8 +237,29 @@ const AIHelpPage = () => {
     }
   };
 
+  const handleSend = async () => {
+    if (!input.trim() && !photoBase64) return;
+
+    const messageText = input.trim() || (photoBase64 ? 'Bekijk deze foto en analyseer het probleem.' : '');
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: messageText,
+      timestamp: new Date(),
+      photoUrl: photoPreview || undefined,
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const currentPhoto = photoBase64;
+    const currentPhotoPreview = photoPreview;
+    setInput('');
+    clearPhoto();
+
+    await sendToAI(messageText, currentPhoto, currentPhotoPreview);
+  };
+
   const handleSuggestion = async (text: string) => {
-    // Directly submit the suggestion to AI instead of filling the input
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -214,105 +268,7 @@ const AIHelpPage = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setIsTyping(true);
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assist`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            message: text,
-            userType: isHandy ? 'handy' : 'seeker',
-            photoProvided: false,
-            categoryHint: null,
-          }),
-          signal: controller.signal,
-        }
-      );
-
-      clearTimeout(timeoutId);
-
-      const result = await response.json();
-
-      if (!response.ok || !result.ok) {
-        const errorMessage = result.error || `Fout: ${response.status}`;
-        const fallbackData = result.fallback;
-
-        toast({
-          title: 'AI Fout',
-          description: errorMessage,
-          variant: 'destructive',
-        });
-
-        if (fallbackData) {
-          const aiMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: fallbackData.summary,
-            timestamp: new Date(),
-            aiResponse: fallbackData,
-          };
-          setMessages((prev) => [...prev, aiMessage]);
-        } else {
-          const errorAiMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: `❌ ${errorMessage}\n\nProbeer het opnieuw of neem contact op met een Handy.`,
-            timestamp: new Date(),
-            isError: true,
-          };
-          setMessages((prev) => [...prev, errorAiMessage]);
-        }
-      } else {
-        const aiResponse: AIResponse = result.data;
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: aiResponse.main_issue || aiResponse.explanation_if_uncertain || 'Analyse voltooid',
-          timestamp: new Date(),
-          aiResponse,
-        };
-        setMessages((prev) => [...prev, aiMessage]);
-      }
-    } catch (error) {
-      console.error('AI assist error:', error);
-      
-      let errorMessage = 'Er is een fout opgetreden. Probeer het opnieuw.';
-      
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          errorMessage = 'De AI reageert niet op tijd. Probeer het later opnieuw.';
-        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-          errorMessage = 'Geen internetverbinding. Controleer je netwerk en probeer opnieuw.';
-        }
-      }
-
-      toast({
-        title: 'Verbindingsfout',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-
-      const errorAiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `❌ ${errorMessage}`,
-        timestamp: new Date(),
-        isError: true,
-      };
-
-      setMessages((prev) => [...prev, errorAiMessage]);
-    } finally {
-      setIsTyping(false);
-    }
+    await sendToAI(text, null, null);
   };
 
   const handleCTAClick = (action: 'self_fix' | 'lesson' | 'book_handy', topic?: string) => {
@@ -349,7 +305,67 @@ const AIHelpPage = () => {
     }
   };
 
-  const renderAIResponse = (aiResponse: AIResponse) => {
+  const renderPhotoWithOverlay = (photoUrl: string, markers: VisualMarker[]) => {
+    return (
+      <div className="relative w-full rounded-xl overflow-hidden mb-3">
+        <img src={photoUrl} alt="Analyse foto" className="w-full h-auto block" />
+        {markers.length > 0 && (
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 1 1"
+            preserveAspectRatio="none"
+            style={{ pointerEvents: 'none' }}
+          >
+            {markers.map((marker, i) => {
+              if (marker.type === 'circle') {
+                return (
+                  <circle
+                    key={i}
+                    cx={marker.x}
+                    cy={marker.y}
+                    r={marker.radius || 0.05}
+                    fill="none"
+                    stroke="red"
+                    strokeWidth="0.005"
+                  />
+                );
+              }
+              if (marker.type === 'arrow') {
+                const arrowLen = 0.08;
+                let dx = 0, dy = 0;
+                switch (marker.direction) {
+                  case 'up': dy = -arrowLen; break;
+                  case 'down': dy = arrowLen; break;
+                  case 'left': dx = -arrowLen; break;
+                  case 'right': dx = arrowLen; break;
+                  default: dy = -arrowLen;
+                }
+                const x2 = marker.x + dx;
+                const y2 = marker.y + dy;
+                return (
+                  <g key={i}>
+                    <line
+                      x1={marker.x}
+                      y1={marker.y}
+                      x2={x2}
+                      y2={y2}
+                      stroke="red"
+                      strokeWidth="0.005"
+                    />
+                    {/* Arrowhead */}
+                    <circle cx={x2} cy={y2} r="0.008" fill="red" />
+                  </g>
+                );
+              }
+              return null;
+            })}
+          </svg>
+        )}
+      </div>
+    );
+  };
+
+  const renderAIResponse = (aiResponse: AIResponse, messagePhotoUrl?: string) => {
     const riskStyles = getRiskStyles(aiResponse.risk_level);
     const RiskIcon = riskStyles.icon;
     
@@ -361,6 +377,18 @@ const AIHelpPage = () => {
 
     return (
       <div className="space-y-4">
+        {/* Photo with visual markers overlay */}
+        {messagePhotoUrl && aiResponse.input_type === 'text_with_photo' && (
+          renderPhotoWithOverlay(messagePhotoUrl, aiResponse.visual_markers || [])
+        )}
+
+        {/* Low confidence warning */}
+        {aiResponse.vision_confidence === 'low' && (
+          <div className="bg-muted/50 rounded-xl p-3">
+            <p className="text-sm text-muted-foreground">📷 De foto is onduidelijk. Stuur een nieuwe, scherpere foto voor een betere analyse.</p>
+          </div>
+        )}
+
         {/* Risk Badge */}
         <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${riskStyles.bg} ${riskStyles.border} border`}>
           <RiskIcon className={`w-4 h-4 ${riskStyles.text}`} />
@@ -403,8 +431,8 @@ const AIHelpPage = () => {
           </div>
         )}
 
-        {/* Step by Step */}
-        {aiResponse.understood && aiResponse.suggested_steps && aiResponse.suggested_steps.length > 0 && aiResponse.risk_level !== 'RED' && (
+        {/* Step by Step - hide when confidence is low or RED risk */}
+        {aiResponse.understood && aiResponse.suggested_steps && aiResponse.suggested_steps.length > 0 && aiResponse.risk_level !== 'RED' && aiResponse.vision_confidence !== 'low' && (
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">📋 Stappenplan</h4>
             <ol className="space-y-2">
@@ -507,8 +535,12 @@ const AIHelpPage = () => {
                     : 'bg-card shadow-soft rounded-bl-sm border border-border'
                 }`}
               >
+                {/* User photo preview in message */}
+                {message.role === 'user' && message.photoUrl && (
+                  <img src={message.photoUrl} alt="Bijgevoegde foto" className="w-full rounded-lg mb-2" />
+                )}
                 {message.role === 'assistant' && message.aiResponse ? (
-                  renderAIResponse(message.aiResponse)
+                  renderAIResponse(message.aiResponse, message.photoUrl)
                 ) : (
                   <p className="text-sm whitespace-pre-line">{message.content}</p>
                 )}
@@ -561,13 +593,38 @@ const AIHelpPage = () => {
         </div>
       )}
 
+      {/* Photo preview */}
+      {photoPreview && (
+        <div className="px-4 pb-2">
+          <div className="relative inline-block">
+            <img src={photoPreview} alt="Preview" className="h-16 w-16 object-cover rounded-lg border border-border" />
+            <button
+              onClick={clearPhoto}
+              className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handlePhotoSelect}
+      />
+
       {/* Input */}
       <div className="sticky bottom-24 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-background via-background to-transparent pt-4">
         <div className="flex items-center gap-3">
           {!isHandy && (
             <button 
               className="w-12 h-12 rounded-xl bg-card shadow-soft flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
-              onClick={() => toast({ title: 'Foto upload', description: 'Foto upload wordt binnenkort toegevoegd!' })}
+              onClick={() => fileInputRef.current?.click()}
             >
               <Camera className="w-6 h-6" />
             </button>
@@ -583,7 +640,7 @@ const AIHelpPage = () => {
             />
             <button
               onClick={handleSend}
-              disabled={!input.trim() || isTyping}
+              disabled={(!input.trim() && !photoBase64) || isTyping}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />

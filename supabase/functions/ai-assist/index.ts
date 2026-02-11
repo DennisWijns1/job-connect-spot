@@ -47,7 +47,7 @@ Als er een foto is:
 - Geef expliciet aan of je het probleem begrijpt: "vision_confidence": "high" | "medium" | "low"
 - Benoem maximaal één hoofdprobleem
 - Geef alleen een oplossing als confidence ≠ low
-- Duid visueel aan waar het probleem zit (beschrijvend)
+- Duid visueel aan waar het probleem zit met visual_markers (genormaliseerde coordinaten 0-1)
 
 Als foto onduidelijk is:
 - Zeg dat expliciet
@@ -89,6 +89,15 @@ Geef uitsluitend dit JSON-object terug:
   "main_issue": string | null,
   "issue_location_description": string | null,
   "what_is_visible": string[],
+  "visual_markers": [
+    {
+      "type": "circle" | "arrow",
+      "x": 0.0-1.0,
+      "y": 0.0-1.0,
+      "radius": number | null,
+      "direction": "up" | "down" | "left" | "right" | null
+    }
+  ],
   "suggested_steps": string[],
   "stop_conditions": string[],
   "next_action": "continue_self_fix" | "request_more_info" | "lesson" | "book_handy",
@@ -103,6 +112,15 @@ Geef uitsluitend dit JSON-object terug:
   "explanation_if_uncertain": string | null,
   "disclaimer": "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
 }
+
+VISUAL_MARKERS REGELS
+- Alleen invullen als er een foto is bijgevoegd
+- Coordinaten zijn genormaliseerd: x en y zijn waarden tussen 0.0 en 1.0
+- (0,0) is linksboven, (1,1) is rechtsonder
+- type "circle": markeer een probleemgebied met x, y en radius (0.01-0.15)
+- type "arrow": wijs naar een specifiek punt met x, y en direction
+- Maximaal 3 markers
+- Bij geen foto of onduidelijke foto: leeg array []
 
 BELANGRIJKE REGELS
 - Geen uitleg buiten JSON
@@ -123,8 +141,16 @@ Geef nu uitsluitend het JSON-object terug.`;
 interface AIRequest {
   userType: "seeker" | "handy";
   message: string;
-  photoProvided: boolean;
+  photo?: string;
   categoryHint: string | null;
+}
+
+interface VisualMarker {
+  type: "circle" | "arrow";
+  x: number;
+  y: number;
+  radius: number | null;
+  direction: "up" | "down" | "left" | "right" | null;
 }
 
 interface AIResponse {
@@ -138,6 +164,7 @@ interface AIResponse {
   main_issue: string | null;
   issue_location_description: string | null;
   what_is_visible: string[];
+  visual_markers: VisualMarker[];
   suggested_steps: string[];
   stop_conditions: string[];
   next_action: "continue_self_fix" | "request_more_info" | "lesson" | "book_handy";
@@ -158,6 +185,7 @@ const FALLBACK_RESPONSE: AIResponse = {
   main_issue: null,
   issue_location_description: null,
   what_is_visible: [],
+  visual_markers: [],
   suggested_steps: [],
   stop_conditions: ["Bij twijfel, schakel een professional in"],
   next_action: "request_more_info",
@@ -166,6 +194,24 @@ const FALLBACK_RESPONSE: AIResponse = {
   explanation_if_uncertain: "Ik kon je vraag niet volledig analyseren. Geef meer details of stuur een foto.",
   disclaimer: "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
 };
+
+function validateVisualMarkers(markers: unknown): VisualMarker[] {
+  if (!Array.isArray(markers)) return [];
+  return markers
+    .filter((m: any) => 
+      m && typeof m.x === "number" && typeof m.y === "number" &&
+      (m.type === "circle" || m.type === "arrow") &&
+      m.x >= 0 && m.x <= 1 && m.y >= 0 && m.y <= 1
+    )
+    .slice(0, 3)
+    .map((m: any) => ({
+      type: m.type,
+      x: m.x,
+      y: m.y,
+      radius: typeof m.radius === "number" ? Math.min(Math.max(m.radius, 0.01), 0.15) : null,
+      direction: ["up", "down", "left", "right"].includes(m.direction) ? m.direction : null,
+    }));
+}
 
 function validateAndFixResponse(data: unknown, userType: string, photoProvided: boolean): AIResponse {
   const response = data as Partial<AIResponse>;
@@ -192,6 +238,7 @@ function validateAndFixResponse(data: unknown, userType: string, photoProvided: 
     main_issue: response.main_issue || null,
     issue_location_description: response.issue_location_description || null,
     what_is_visible: Array.isArray(response.what_is_visible) ? response.what_is_visible : [],
+    visual_markers: photoProvided ? validateVisualMarkers(response.visual_markers) : [],
     suggested_steps: Array.isArray(response.suggested_steps) ? response.suggested_steps : [],
     stop_conditions: Array.isArray(response.stop_conditions) ? response.stop_conditions : [],
     next_action: nextAction,
@@ -202,7 +249,7 @@ function validateAndFixResponse(data: unknown, userType: string, photoProvided: 
   };
 }
 
-async function callAI(messages: Array<{ role: string; content: string }>): Promise<{ success: boolean; data?: AIResponse; error?: string }> {
+async function callAI(messages: Array<{ role: string; content: string | Array<any> }>): Promise<{ success: boolean; data?: AIResponse; error?: string }> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   
   if (!LOVABLE_API_KEY) {
@@ -211,7 +258,7 @@ async function callAI(messages: Array<{ role: string; content: string }>): Promi
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 14000);
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
 
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -253,15 +300,12 @@ async function callAI(messages: Array<{ role: string; content: string }>): Promi
       return { success: false, error: "Geen antwoord ontvangen van AI" };
     }
 
-    // Try to parse JSON - handle markdown code blocks
     let jsonStr = content.trim();
     
-    // Remove markdown code blocks if present
     const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) {
       jsonStr = jsonMatch[1].trim();
     } else {
-      // Try to find JSON object directly
       const objectMatch = jsonStr.match(/\{[\s\S]*\}/);
       if (objectMatch) {
         jsonStr = objectMatch[0];
@@ -291,7 +335,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userType, message, photoProvided, categoryHint }: AIRequest = await req.json();
+    const { userType, message, photo, categoryHint }: AIRequest = await req.json();
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return new Response(
@@ -300,7 +344,9 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Processing AI request: userType=${userType}, message length=${message.length}, photo=${photoProvided}`);
+    const photoProvided = !!photo && typeof photo === "string" && photo.length > 0;
+
+    console.log(`Processing AI request: userType=${userType}, message length=${message.length}, photo=${photoProvided}, photo size=${photo ? photo.length : 0}`);
 
     // Build context
     let userContext = "";
@@ -315,12 +361,30 @@ serve(async (req) => {
     }
     
     if (photoProvided) {
-      userContext += "[De gebruiker heeft een foto toegevoegd]\n\n";
+      userContext += "[De gebruiker heeft een foto toegevoegd van het probleem]\n\n";
+    }
+
+    // Build user message - multimodal if photo present
+    let userContent: string | Array<any>;
+    if (photoProvided) {
+      // Determine mime type from base64 header or default to jpeg
+      let mimeType = "image/jpeg";
+      if (photo!.startsWith("/9j/")) mimeType = "image/jpeg";
+      else if (photo!.startsWith("iVBOR")) mimeType = "image/png";
+      else if (photo!.startsWith("R0lGOD")) mimeType = "image/gif";
+      else if (photo!.startsWith("UklGR")) mimeType = "image/webp";
+
+      userContent = [
+        { type: "text", text: userContext + message },
+        { type: "image_url", image_url: { url: `data:${mimeType};base64,${photo}` } }
+      ];
+    } else {
+      userContent = userContext + message;
     }
 
     const messages = [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userContext + message }
+      { role: "user", content: userContent }
     ];
 
     // First attempt
@@ -332,7 +396,7 @@ serve(async (req) => {
       
       const repairMessages = [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userContext + message },
+        { role: "user", content: userContent },
         { role: "assistant", content: "Ik zal je vraag analyseren..." },
         { role: "user", content: "Return ONLY valid JSON per schema. No prose, no markdown, no explanation. Just the JSON object." }
       ];
@@ -342,7 +406,7 @@ serve(async (req) => {
 
     if (result.success && result.data) {
       const validated = validateAndFixResponse(result.data, userType, photoProvided);
-      console.log(`AI response: category=${validated.category}, risk=${validated.risk_level}, next_action=${validated.next_action}`);
+      console.log(`AI response: category=${validated.category}, risk=${validated.risk_level}, next_action=${validated.next_action}, markers=${validated.visual_markers.length}`);
       
       return new Response(
         JSON.stringify({ ok: true, data: validated }),
@@ -350,7 +414,6 @@ serve(async (req) => {
       );
     }
 
-    // Return fallback with error info
     console.log(`Returning fallback due to: ${result.error}`);
     
     return new Response(
