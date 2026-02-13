@@ -460,6 +460,24 @@ const AIHelpPage = () => {
 
         {/* CTA Buttons based on next_action */}
         <div className="pt-2 space-y-2">
+          {/* Dynamic Tutorial CTA - shown for any understood problem with steps */}
+          {aiResponse.understood && aiResponse.suggested_steps && aiResponse.suggested_steps.length > 0 && aiResponse.risk_level !== 'RED' && (
+            <Button
+              className="w-full btn-forest"
+              onClick={() => navigate('/tutorial', {
+                state: {
+                  problem: aiResponse.main_issue || '',
+                  category: aiResponse.category,
+                  riskLevel: aiResponse.risk_level,
+                  userType: isHandy ? 'handy' : 'seeker',
+                }
+              })}
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Bekijk interactieve tutorial
+            </Button>
+          )}
+
           {aiResponse.next_action === 'continue_self_fix' && (
             <Button 
               className="w-full btn-cta"
@@ -472,7 +490,7 @@ const AIHelpPage = () => {
           
           {aiResponse.next_action === 'lesson' && aiResponse.lesson_suggestion.suggested && aiResponse.lesson_suggestion.topic && (
             <Button 
-              className="w-full btn-forest"
+              className="w-full btn-cta"
               onClick={() => handleCTAClick('lesson', aiResponse.lesson_suggestion.topic!)}
             >
               <BookOpen className="w-4 h-4 mr-2" />

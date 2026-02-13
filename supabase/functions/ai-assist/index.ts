@@ -143,6 +143,9 @@ interface AIRequest {
   message: string;
   photo?: string;
   categoryHint: string | null;
+  mode?: "analysis" | "tutorial";
+  category?: string;
+  riskLevel?: string;
 }
 
 interface VisualMarker {
@@ -329,13 +332,115 @@ async function callAI(messages: Array<{ role: string; content: string | Array<an
   }
 }
 
+const TUTORIAL_SYSTEM_PROMPT = `ROL
+Je bent HandyMatch AI Tutorial Generator voor klusproblemen in België.
+Je genereert gedetailleerde, stap-voor-stap tutorials voor kluswerkzaamheden.
+
+De input is een probleembeschrijving en optioneel een categorie en risiconiveau.
+
+GEBRUIKERSPROFIEL-LOGICA
+Als userType = seeker:
+- Eenvoudige taal, geen vakjargon
+- Max 7 stappen
+- Focus op veiligheid
+
+Als userType = handy:
+- Technische termen toegestaan
+- Meer detail en precisie
+- Diagnose-gerichte stappen
+
+VERPLICHT JSON-FORMAT
+Geef uitsluitend dit JSON-object terug:
+
+{
+  "tutorial_title": string,
+  "tutorial_category": string,
+  "risk_level": "GREEN" | "YELLOW" | "RED",
+  "estimated_duration": string,
+  "tools_needed": string[],
+  "materials_needed": string[],
+  "steps": [
+    {
+      "title": string,
+      "description": string,
+      "tip": string | null,
+      "risk_level": "GREEN" | "YELLOW",
+      "detailed_explanation": string
+    }
+  ],
+  "when_to_stop": string,
+  "disclaimer": "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
+}
+
+REGELS
+- Maximaal 7 stappen
+- Elke stap heeft een duidelijke titel, beschrijving, tip en gedetailleerde uitleg
+- Tools en materialen moeten specifiek en concreet zijn
+- Bij RED risico: geef waarschuwing maar genereer alsnog beperkte veiligheidsstappen
+- when_to_stop moet een duidelijke stopconditie bevatten
+- Geen uitleg buiten JSON
+- Geen emoji's
+- estimated_duration in minuten formaat (bijv. "30 minuten")
+
+Je antwoord moet uitsluitend het JSON-object zijn.`;
+
+interface TutorialStep {
+  title: string;
+  description: string;
+  tip: string | null;
+  risk_level: "GREEN" | "YELLOW";
+  detailed_explanation: string;
+}
+
+interface TutorialData {
+  tutorial_title: string;
+  tutorial_category: string;
+  risk_level: "GREEN" | "YELLOW" | "RED";
+  estimated_duration: string;
+  tools_needed: string[];
+  materials_needed: string[];
+  steps: TutorialStep[];
+  when_to_stop: string;
+  disclaimer: string;
+}
+
+function validateTutorialResponse(data: unknown, userType: string): TutorialData {
+  const response = data as Partial<TutorialData>;
+  
+  const riskLevel = (["GREEN", "YELLOW", "RED"].includes(response.risk_level || ""))
+    ? response.risk_level as "GREEN" | "YELLOW" | "RED"
+    : "YELLOW";
+
+  const steps = Array.isArray(response.steps) 
+    ? response.steps.slice(0, 7).map((s: any) => ({
+        title: s.title || "Stap",
+        description: s.description || "",
+        tip: s.tip || null,
+        risk_level: (["GREEN", "YELLOW"].includes(s.risk_level)) ? s.risk_level : "GREEN",
+        detailed_explanation: s.detailed_explanation || s.description || "",
+      }))
+    : [];
+
+  return {
+    tutorial_title: response.tutorial_title || "Tutorial",
+    tutorial_category: response.tutorial_category || "Algemeen",
+    risk_level: riskLevel,
+    estimated_duration: response.estimated_duration || "30 minuten",
+    tools_needed: Array.isArray(response.tools_needed) ? response.tools_needed : [],
+    materials_needed: Array.isArray(response.materials_needed) ? response.materials_needed : [],
+    steps,
+    when_to_stop: response.when_to_stop || "Bij twijfel, schakel een professional in.",
+    disclaimer: response.disclaimer || "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in.",
+  };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { userType, message, photo, categoryHint }: AIRequest = await req.json();
+    const { userType, message, photo, categoryHint, mode, category, riskLevel }: AIRequest = await req.json();
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return new Response(
@@ -344,6 +449,49 @@ serve(async (req) => {
       );
     }
 
+    // TUTORIAL MODE
+    if (mode === "tutorial") {
+      console.log(`Processing tutorial request: userType=${userType}, message=${message}, category=${category}`);
+      
+      let tutorialContext = userType === "handy" 
+        ? "[Context: De gebruiker is een Handy (vakman/klusser)]\n\n"
+        : "[Context: De gebruiker is een particulier zonder technische kennis]\n\n";
+      
+      if (category) tutorialContext += `[Categorie: ${category}]\n\n`;
+      if (riskLevel) tutorialContext += `[Risiconiveau van eerste analyse: ${riskLevel}]\n\n`;
+
+      const tutorialMessages = [
+        { role: "system", content: TUTORIAL_SYSTEM_PROMPT },
+        { role: "user", content: tutorialContext + `Genereer een gedetailleerde tutorial voor het volgende probleem: ${message}` }
+      ];
+
+      let result = await callAI(tutorialMessages);
+
+      if (!result.success && result.error === "Ongeldig antwoordformaat") {
+        const repairMessages = [
+          ...tutorialMessages,
+          { role: "assistant", content: "Ik genereer de tutorial..." },
+          { role: "user", content: "Return ONLY valid JSON per schema. No prose, no markdown. Just the JSON object." }
+        ];
+        result = await callAI(repairMessages);
+      }
+
+      if (result.success && result.data) {
+        const validated = validateTutorialResponse(result.data, userType);
+        console.log(`Tutorial response: title=${validated.tutorial_title}, steps=${validated.steps.length}`);
+        return new Response(
+          JSON.stringify({ ok: true, tutorial: validated }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ ok: false, error: result.error || "Tutorial generatie mislukt" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ANALYSIS MODE (default)
     const photoProvided = !!photo && typeof photo === "string" && photo.length > 0;
 
     console.log(`Processing AI request: userType=${userType}, message length=${message.length}, photo=${photoProvided}, photo size=${photo ? photo.length : 0}`);
