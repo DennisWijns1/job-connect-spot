@@ -1,10 +1,41 @@
 
 
-# Plan: Camera + AI Vision Analyse Implementatie
+# Plan: Dynamische Interactieve Tutorial voor Elk Probleem
 
 ## Overzicht
 
-De camera-knop in de AI Klushulp werkt momenteel niet (toont alleen een toast). Dit plan implementeert volledige foto-upload, AI Vision analyse met visual markers, en SVG overlay rendering.
+In plaats van een hardcoded tutorial voor "lekkende kraan", wordt er een dynamisch tutorialsysteem gebouwd dat werkt voor **elk probleem** dat de AI analyseert. De AI genereert de tutorial-data (gedetailleerde stappen met tips, gereedschap en uitleg), en een herbruikbare tutorial-pagina rendert dit interactief.
+
+---
+
+## Hoe het werkt
+
+```text
+Gebruiker stelt vraag in AI Klushulp
+            |
+            v
+AI geeft analyse terug (bestaand)
+            |
+            v
+CTA: "Bekijk stap-voor-stap tutorial"
+            |
+            v
+Klik -> Nieuwe request naar edge function
+        met: "Genereer tutorial voor [probleem]"
+            |
+            v
+AI retourneert tutorial_steps[] met:
+  - titel, beschrijving, tip, gereedschap, risico
+            |
+            v
+Dynamische TutorialPage rendert:
+  - Voortgangsbalk
+  - Stappen met iconen
+  - Uitklapbare "Meer weten?" secties
+  - Afvinkbare checkboxes
+  - Gereedschap overzicht
+  - Escalatie CTA onderaan
+```
 
 ---
 
@@ -12,165 +43,153 @@ De camera-knop in de AI Klushulp werkt momenteel niet (toont alleen een toast). 
 
 ### 1. Edge Function: `supabase/functions/ai-assist/index.ts`
 
-**Wat verandert:**
-- Accept `photo` (base64 string) in request body naast `message`
-- Stuur foto als multimodal content naar Gemini (image_url met base64 data URI)
-- Voeg `visual_markers` toe aan het verplichte JSON-schema in de system prompt
-- Update `AIResponse` interface en `validateAndFixResponse` met `visual_markers`
-- Update `FALLBACK_RESPONSE` met leeg `visual_markers` array
+**Nieuw request type**: `mode: "tutorial"`
 
-**Nieuw request formaat:**
+Wanneer de frontend een tutorial opvraagt, stuurt het:
 ```json
 {
   "userType": "seeker",
-  "message": "Mijn kraan lekt",
-  "photo": "base64_encoded_image_data",
-  "categoryHint": null
+  "message": "Kraan lekt water",
+  "mode": "tutorial",
+  "category": "Sanitair",
+  "riskLevel": "GREEN"
 }
 ```
 
-**Multimodal message opbouw:**
-Wanneer `photo` aanwezig is, wordt de user message een array van content parts:
+De edge function gebruikt een aparte system prompt die de AI instrueert om een array van gedetailleerde tutorial-stappen te retourneren:
+
 ```json
-[
-  { "type": "text", "text": "beschrijving + context" },
-  { "type": "image_url", "image_url": { "url": "data:image/jpeg;base64,..." } }
-]
+{
+  "tutorial_title": "Lekkende kraan repareren",
+  "tutorial_category": "Sanitair",
+  "risk_level": "GREEN",
+  "estimated_duration": "30 minuten",
+  "tools_needed": ["Verstelbare moersleutel", "Nieuw kraanleertje", "Doek"],
+  "materials_needed": ["Kraanleertje (juiste maat)", "Teflontape"],
+  "steps": [
+    {
+      "title": "Sluit de hoofdkraan af",
+      "description": "Draai de hoofdkraan dicht onder de gootsteen of in de meterkast.",
+      "tip": "Laat daarna de kraan even openstaan zodat restwater kan weglopen.",
+      "risk_level": "GREEN",
+      "detailed_explanation": "De hoofdkraan bevindt zich meestal..."
+    }
+  ],
+  "when_to_stop": "Als je twijfelt of water niet stopt na afsluiten.",
+  "disclaimer": "..."
+}
 ```
 
-**Extra JSON-veld in system prompt:**
-```json
-"visual_markers": [
-  {
-    "type": "circle" | "arrow",
-    "x": 0.0-1.0,
-    "y": 0.0-1.0,
-    "radius": number | null,
-    "direction": "up" | "down" | "left" | "right" | null
-  }
-]
+**Implementatie:**
+- Check voor `mode` veld in request body
+- Als `mode === "tutorial"`: gebruik een tutorial-specifieke system prompt
+- Valideer en fix de tutorial response net als bij de standaard response
+- Retourneer als `{ ok: true, tutorial: validatedTutorial }`
+
+### 2. Nieuwe pagina: `src/pages/TutorialPage.tsx`
+
+Een **generieke, herbruikbare** tutorial pagina die werkt voor elk probleem.
+
+**Hoe data wordt doorgegeven:**
+- Via React Router state: `navigate('/tutorial', { state: { problem, category, riskLevel } })`
+- De pagina doet zelf een fetch naar de edge function met `mode: "tutorial"`
+
+**Componenten op de pagina:**
+- Header met tutorial titel
+- Voortgangsbalk (X van Y stappen voltooid)
+- Gereedschap en materialen sectie (collapsible)
+- Per stap:
+  - Nummer + titel + risico-badge
+  - Beschrijving
+  - Accordion "Meer weten?" met gedetailleerde uitleg
+  - Optionele tip-blok
+  - Checkbox om stap als voltooid te markeren
+- Navigatieknoppen (Vorige / Volgende)
+- Escalatie CTA onderaan: "Lukt het niet? Schakel een Handy in"
+
+**State management:**
+- `completedSteps: Set<number>` - lokaal bijgehouden met useState
+- `activeStep: number` - huidige stap in focus
+- `tutorialData: TutorialData | null` - opgehaalde data van AI
+- `isLoading: boolean` - laadstatus
+
+### 3. Aanpassing: `src/pages/AIHelpPage.tsx`
+
+**Nieuwe CTA knop** in `renderAIResponse`:
+
+Bij elke AI response waar `understood === true` en `risk_level !== 'RED'` en er `suggested_steps` zijn, toon een extra knop:
+
+```
+"Bekijk interactieve tutorial"
 ```
 
----
+Deze knop navigeert naar `/tutorial` met het probleem, de categorie en het risiconiveau als route state.
 
-### 2. Frontend: `src/pages/AIHelpPage.tsx`
+Dit werkt voor **elk probleem** - niet alleen sanitair of lekkende kraan.
 
-**Wat verandert:**
+### 4. Route: `src/App.tsx`
 
-**a) Camera/foto functionaliteit:**
-- Hidden `<input type="file" accept="image/*" capture="environment">` element
-- Camera knop onClick triggert dit input element
-- Op mobiel opent dit de native camera, op desktop de file picker
-- Na selectie: lees bestand als base64 via `FileReader`
-- Sla base64 + preview URL op in state (`photoBase64`, `photoPreview`)
-- Toon kleine preview thumbnail naast de input wanneer foto geselecteerd is
-- Verwijder-knop (X) om foto te annuleren
-
-**b) Versturen met foto:**
-- `handleSend` stuurt `photo: photoBase64` mee in request body wanneer aanwezig
-- User message toont de foto-preview in de chat bubble
-- Na verzenden: reset `photoBase64` en `photoPreview`
-
-**c) Message interface uitbreiden:**
-- Voeg `photoUrl?: string` toe aan `Message` interface
-- Voeg `visual_markers` toe aan `AIResponse` interface
-
-**d) SVG Overlay rendering:**
-- Nieuw `renderPhotoWithOverlay` functie
-- Toont de afbeelding in een `<div style="position: relative">`
-- Rendert `<svg>` overlay met viewBox="0 0 1 1" (genormaliseerde coordinaten)
-- Voor `circle` markers: `<circle>` op (x, y) met radius, rode stroke
-- Voor `arrow` markers: `<line>` met pijlpunt in opgegeven richting
-- SVG schaalt mee met de afbeelding via `preserveAspectRatio`
-
-**e) Rendering in `renderAIResponse`:**
-- Controleer of het bericht een foto bevat en AI `visual_markers` heeft teruggegeven
-- Render `renderPhotoWithOverlay` boven het stappenplan
-- Bij `vision_confidence === 'low'`: toon melding om nieuwe foto te sturen, geen stappen
+Nieuwe route toevoegen:
+```
+<Route path="/tutorial" element={<TutorialPage />} />
+```
 
 ---
 
 ## Technische Details
 
-### Bestanden te wijzigen
+### Bestanden
 
-| Bestand | Wijziging |
-|---------|-----------|
-| `supabase/functions/ai-assist/index.ts` | Multimodal support, visual_markers in schema |
-| `src/pages/AIHelpPage.tsx` | Camera input, foto state, overlay rendering |
+| Bestand | Actie |
+|---------|-------|
+| `supabase/functions/ai-assist/index.ts` | Tutorial mode toevoegen |
+| `src/pages/TutorialPage.tsx` | Nieuw - dynamische tutorial pagina |
+| `src/pages/AIHelpPage.tsx` | CTA knop toevoegen |
+| `src/App.tsx` | Route toevoegen |
 
-### AIResponse interface update
+### Tutorial data interface
 
 ```typescript
-interface VisualMarker {
-  type: 'circle' | 'arrow';
-  x: number;
-  y: number;
-  radius: number | null;
-  direction: 'up' | 'down' | 'left' | 'right' | null;
+interface TutorialStep {
+  title: string;
+  description: string;
+  tip: string | null;
+  risk_level: 'GREEN' | 'YELLOW';
+  detailed_explanation: string;
 }
 
-interface AIResponse {
-  // ... bestaande velden ...
-  visual_markers: VisualMarker[];
+interface TutorialData {
+  tutorial_title: string;
+  tutorial_category: string;
+  risk_level: 'GREEN' | 'YELLOW' | 'RED';
+  estimated_duration: string;
+  tools_needed: string[];
+  materials_needed: string[];
+  steps: TutorialStep[];
+  when_to_stop: string;
+  disclaimer: string;
 }
 ```
 
-### Camera flow
+### Tutorial system prompt (samenvatting)
 
-```text
-[Camera icoon] --> <input type="file" accept="image/*" capture="environment">
-      |
-      v
-FileReader.readAsDataURL(file)
-      |
-      v
-State: photoBase64, photoPreview
-      |
-      v
-[Preview thumbnail naast input] [X knop]
-      |
-      v
-handleSend() --> POST { message, photo: base64, userType }
-      |
-      v
-Edge Function --> Gemini multimodal --> JSON + visual_markers
-      |
-      v
-renderPhotoWithOverlay() --> SVG circles/arrows op foto
-```
-
-### SVG Overlay structuur
-
-```text
-┌──────────────────────────────┐
-│  <div position: relative>    │
-│  ┌──────────────────────────┐│
-│  │ <img src={photo} />      ││
-│  │                          ││
-│  │   ○ (circle marker)      ││
-│  │        ↓ (arrow marker)  ││
-│  │                          ││
-│  └──────────────────────────┘│
-│  <svg position: absolute     │
-│   top:0 left:0 100% x 100%> │
-│   viewBox="0 0 1 1"         │
-│  </svg>                     │
-│  </div>                     │
-└──────────────────────────────┘
-```
+De AI krijgt instructie om:
+- Maximaal 7 stappen te genereren (seeker: eenvoudig, handy: technisch)
+- Per stap een tip en gedetailleerde uitleg te geven
+- Benodigde gereedschap en materialen op te sommen
+- Risico per stap te beoordelen
+- Een duidelijke stopconditie te geven
 
 ---
 
 ## Resultaat
 
-1. Gebruiker klikt camera-icoon -> native camera (mobiel) of file picker (desktop) opent
-2. Foto wordt geconverteerd naar base64 en als preview getoond
-3. Bij verzenden gaat foto + tekst naar de edge function
-4. Gemini analyseert de foto multimodaal
-5. AI response bevat visual_markers met genormaliseerde coordinaten
-6. Foto wordt getoond met SVG overlay (rode cirkels/pijlen)
-7. Stappenplan verschijnt onder de foto, aangepast aan seeker/handy profiel
-8. Bij RED risico: geen stappen, alleen escalatie
-9. Bij confidence = low: vraag om betere foto
+1. Gebruiker stelt **elk willekeurig** klusprobleem in de AI Klushulp
+2. AI analyseert en toont het stappenplan (bestaand)
+3. Nieuwe CTA: "Bekijk interactieve tutorial"
+4. Klik -> Tutorial pagina laadt met AI-gegenereerde stappen
+5. Gebruiker ziet: gereedschap, materialen, gedetailleerde stappen
+6. Per stap: uitklapbare extra uitleg, tips, afvinkbaar
+7. Voortgangsbalk toont hoever de gebruiker is
+8. Bij twijfel: CTA om een Handy in te schakelen
 
