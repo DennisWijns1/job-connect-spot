@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight, X } from 'lucide-react';
+import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight, X, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useSpeechRecognition, speakText, stopSpeaking } from '@/hooks/use-speech';
 
 interface VisualMarker {
   type: 'circle' | 'arrow';
@@ -94,6 +95,45 @@ const AIHelpPage = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const { isListening, transcript, startListening, stopListening, isSupported: speechSupported } = useSpeechRecognition();
+
+  // Sync speech transcript to input
+  useEffect(() => {
+    if (transcript) {
+      setInput(transcript);
+    }
+  }, [transcript]);
+
+  // Auto-send when speech recognition stops and there's a transcript
+  useEffect(() => {
+    if (!isListening && transcript.trim()) {
+      // Small delay to ensure final transcript is set
+      const timer = setTimeout(() => {
+        handleSend();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isListening, transcript]);
+
+  const handleSpeak = (text: string) => {
+    if (isSpeaking) {
+      stopSpeaking();
+      setIsSpeaking(false);
+    } else {
+      setIsSpeaking(true);
+      speakText(text);
+      // Listen for end of speech
+      if ('speechSynthesis' in window) {
+        const checkSpeaking = setInterval(() => {
+          if (!window.speechSynthesis.speaking) {
+            setIsSpeaking(false);
+            clearInterval(checkSpeaking);
+          }
+        }, 200);
+      }
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -516,10 +556,27 @@ const AIHelpPage = () => {
           )}
         </div>
 
-        {/* Disclaimer */}
-        <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-          {aiResponse.disclaimer}
-        </p>
+        {/* TTS Button */}
+        <div className="flex items-center justify-between pt-2 border-t border-border">
+          <p className="text-xs text-muted-foreground flex-1">
+            {aiResponse.disclaimer}
+          </p>
+          {'speechSynthesis' in window && (
+            <button
+              onClick={() => {
+                const speakContent = [
+                  aiResponse.main_issue,
+                  ...(aiResponse.suggested_steps || []),
+                ].filter(Boolean).join('. ');
+                handleSpeak(speakContent);
+              }}
+              className="ml-2 w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+              title={isSpeaking ? 'Stop voorlezen' : 'Lees voor'}
+            >
+              {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
+          )}
+        </div>
       </div>
     );
   };
@@ -647,12 +704,26 @@ const AIHelpPage = () => {
               <Camera className="w-6 h-6" />
             </button>
           )}
+          {speechSupported && (
+            <button
+              onClick={isListening ? stopListening : startListening}
+              disabled={isTyping}
+              className={`w-12 h-12 rounded-xl shadow-soft flex items-center justify-center transition-colors border ${
+                isListening
+                  ? 'bg-destructive text-destructive-foreground border-destructive animate-pulse'
+                  : 'bg-card text-muted-foreground hover:text-foreground border-border'
+              }`}
+              title={isListening ? 'Stop opname' : 'Spreek in'}
+            >
+              {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+            </button>
+          )}
           <div className="flex-1 relative">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !isTyping && handleSend()}
-              placeholder={isHandy ? 'Stel je vraag...' : 'Beschrijf je probleem...'}
+              placeholder={isListening ? 'Luisteren...' : isHandy ? 'Stel je vraag...' : 'Beschrijf je probleem...'}
               className="h-12 rounded-xl pr-12 bg-card border-border"
               disabled={isTyping}
             />
