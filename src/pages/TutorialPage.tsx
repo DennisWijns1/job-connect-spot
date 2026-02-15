@@ -24,6 +24,7 @@ import {
   Lightbulb,
   Loader2,
   OctagonAlert,
+  Camera,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -370,6 +371,24 @@ const TutorialPage = () => {
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
+
+        {/* AR Mode CTA */}
+        <Button
+          variant="outline"
+          className="w-full border-primary/30 text-primary"
+          onClick={() => navigate('/ar-tutorial', {
+            state: {
+              problem: state?.problem,
+              category: state?.category,
+              riskLevel: state?.riskLevel,
+              userType: state?.userType,
+              tutorialData,
+            }
+          })}
+        >
+          <Camera className="w-4 h-4 mr-2" />
+          Open AR-weergave met camera
+        </Button>
 
         {/* Completion / Escalation */}
         {allDone ? (
