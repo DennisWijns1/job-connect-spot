@@ -25,6 +25,7 @@ import {
   Loader2,
   OctagonAlert,
   Camera,
+  Brain,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -372,23 +373,40 @@ const TutorialPage = () => {
           </Button>
         </div>
 
-        {/* AR Mode CTA */}
-        <Button
-          variant="outline"
-          className="w-full border-primary/30 text-primary"
-          onClick={() => navigate('/ar-tutorial', {
-            state: {
-              problem: state?.problem,
-              category: state?.category,
-              riskLevel: state?.riskLevel,
-              userType: state?.userType,
-              tutorialData,
-            }
-          })}
-        >
-          <Camera className="w-4 h-4 mr-2" />
-          Open AR-weergave met camera
-        </Button>
+        {/* Interactive & AR CTAs */}
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            className="flex-1 border-primary/30 text-primary"
+            onClick={() => navigate('/interactive-tutorial', {
+              state: {
+                problem: state?.problem,
+                category: state?.category,
+                riskLevel: state?.riskLevel,
+                userType: state?.userType,
+              }
+            })}
+          >
+            <Brain className="w-4 h-4 mr-2" />
+            Interactief oefenen
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 border-primary/30 text-primary"
+            onClick={() => navigate('/ar-tutorial', {
+              state: {
+                problem: state?.problem,
+                category: state?.category,
+                riskLevel: state?.riskLevel,
+                userType: state?.userType,
+                tutorialData,
+              }
+            })}
+          >
+            <Camera className="w-4 h-4 mr-2" />
+            AR-weergave
+          </Button>
+        </div>
 
         {/* Completion / Escalation */}
         {allDone ? (

@@ -143,7 +143,7 @@ interface AIRequest {
   message: string;
   photo?: string;
   categoryHint: string | null;
-  mode?: "analysis" | "tutorial";
+  mode?: "analysis" | "tutorial" | "interactive";
   category?: string;
   riskLevel?: string;
 }
@@ -487,6 +487,101 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ ok: false, error: result.error || "Tutorial generatie mislukt" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // INTERACTIVE MODE
+    if (mode === "interactive") {
+      console.log(`Processing interactive request: userType=${userType}, message=${message}, category=${category}`);
+
+      const INTERACTIVE_SYSTEM_PROMPT = `ROL
+Je bent HandyMatch AI Interactive Content Generator voor klusproblemen in België.
+Je genereert interactieve leerinhoud (quiz, drag-and-drop, simulatie) gerelateerd aan een klusprobleem.
+
+VERPLICHT JSON-FORMAT
+Geef uitsluitend dit JSON-object terug:
+
+{
+  "quiz": [
+    {
+      "question": string,
+      "options": string[] (4 opties),
+      "correct_index": number (0-3),
+      "explanation": string
+    }
+  ],
+  "drag_drop": [
+    {
+      "instruction": string,
+      "items": string[] (4-6 items),
+      "targets": string[] (2-3 categorieën),
+      "correct_mapping": { "item": "target" }
+    }
+  ],
+  "simulation": {
+    "title": string,
+    "steps": [
+      {
+        "scenario": string,
+        "options": string[] (3 opties),
+        "correct_index": number (0-2),
+        "feedback_correct": string,
+        "feedback_wrong": string
+      }
+    ]
+  }
+}
+
+REGELS
+- Quiz: 3-5 vragen over het probleem, gereedschap, veiligheid, en juiste aanpak
+- Drag-and-drop: 1-2 oefeningen (bijv. gereedschap naar juiste categorie, stappen in juiste volgorde)
+- Simulatie: 3-5 stappen die een realistische situatie simuleren
+- Taal: ${userType === "handy" ? "technisch" : "eenvoudig, geen vakjargon"}
+- Focus op veiligheid en correcte werkwijze
+- Geen emoji's
+- Alleen het JSON-object, geen uitleg`;
+
+      let interactiveContext = "";
+      if (category) interactiveContext += `[Categorie: ${category}]\n`;
+      if (riskLevel) interactiveContext += `[Risiconiveau: ${riskLevel}]\n`;
+
+      const interactiveMessages = [
+        { role: "system", content: INTERACTIVE_SYSTEM_PROMPT },
+        { role: "user", content: interactiveContext + `Genereer interactieve leerinhoud voor het volgende klusprobleem: ${message}` }
+      ];
+
+      let result = await callAI(interactiveMessages);
+
+      if (!result.success && result.error === "Ongeldig antwoordformaat") {
+        const repairMessages = [
+          ...interactiveMessages,
+          { role: "assistant", content: "Ik genereer de interactieve content..." },
+          { role: "user", content: "Return ONLY valid JSON per schema. No prose, no markdown. Just the JSON object." }
+        ];
+        result = await callAI(repairMessages);
+      }
+
+      if (result.success && result.data) {
+        const interactive = result.data as any;
+        // Basic validation
+        const validated = {
+          quiz: Array.isArray(interactive.quiz) ? interactive.quiz.slice(0, 5) : [],
+          drag_drop: Array.isArray(interactive.drag_drop) ? interactive.drag_drop.slice(0, 2) : [],
+          simulation: {
+            title: interactive.simulation?.title || "Stap-voor-stap simulatie",
+            steps: Array.isArray(interactive.simulation?.steps) ? interactive.simulation.steps.slice(0, 5) : [],
+          },
+        };
+        console.log(`Interactive response: quiz=${validated.quiz.length}, drag_drop=${validated.drag_drop.length}, sim_steps=${validated.simulation.steps.length}`);
+        return new Response(
+          JSON.stringify({ ok: true, interactive: validated }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ ok: false, error: result.error || "Interactieve content generatie mislukt" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

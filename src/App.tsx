@@ -22,6 +22,7 @@ import SettingsPage from "./pages/SettingsPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import TutorialPage from "./pages/TutorialPage";
 import ARTutorialPage from "./pages/ARTutorialPage";
+import InteractiveTutorialPage from "./pages/InteractiveTutorialPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/help" element={<HelpSupportPage />} />
           <Route path="/tutorial" element={<TutorialPage />} />
           <Route path="/ar-tutorial" element={<ARTutorialPage />} />
+          <Route path="/interactive-tutorial" element={<InteractiveTutorialPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
