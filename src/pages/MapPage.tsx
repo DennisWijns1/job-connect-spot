@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { EmergencyButton } from '@/components/EmergencyButton';
 import { ProblemInputDialog } from '@/components/ProblemInputDialog';
+import { ProjectSearchModal, ProjectFilters } from '@/components/ProjectSearchModal';
 import { mockHandyProfiles, mockProjects } from '@/data/mockData';
 import { MessageCircle, Hammer, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +47,7 @@ const MapPage = () => {
   const isSeeker = userType === 'seeker';
   const isHandy = userType === 'handy';
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showProjectSearchModal, setShowProjectSearchModal] = useState(false);
   const [filteredHandys, setFilteredHandys] = useState(allOnlineHandys);
 
   // Create handy locations from filtered data
@@ -110,7 +112,7 @@ const MapPage = () => {
         title="Kaart" 
         showFavorites 
         showSearch 
-        onOpenSearch={() => setShowFilterModal(true)} 
+        onOpenSearch={() => isHandy ? setShowProjectSearchModal(true) : setShowFilterModal(true)} 
       />
 
       <div className="relative h-[calc(100vh-180px)] mx-4 mt-4 rounded-3xl overflow-hidden shadow-card">
@@ -324,11 +326,21 @@ const MapPage = () => {
       {isSeeker && <EmergencyButton />}
       <BottomNav />
 
-      {/* Filter Modal */}
+      {/* Filter Modal - for seekers */}
       <ProblemInputDialog
         isOpen={showFilterModal}
         onClose={() => setShowFilterModal(false)}
         onSubmit={handleFilterApply}
+      />
+
+      {/* Project Search Modal - for handy users */}
+      <ProjectSearchModal
+        isOpen={showProjectSearchModal}
+        onClose={() => setShowProjectSearchModal(false)}
+        onSearch={(filters: ProjectFilters) => {
+          setShowProjectSearchModal(false);
+          toast.success('Projecten gefilterd');
+        }}
       />
     </div>
   );
