@@ -570,7 +570,7 @@ const AIHelpPage = () => {
             </Button>
           )}
           
-          {(aiResponse.next_action === 'book_handy' || aiResponse.handy_suggestion.suggested) && (
+          {!isHandy && (aiResponse.next_action === 'book_handy' || aiResponse.handy_suggestion.suggested) && (
             <Button 
               className={`w-full ${aiResponse.risk_level === 'RED' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'btn-cta'}`}
               onClick={() => handleCTAClick('book_handy')}
