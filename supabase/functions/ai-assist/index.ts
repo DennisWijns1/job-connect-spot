@@ -34,12 +34,17 @@ Als userType = seeker:
 - Max. 5 stappen
 - Focus op: "kan ik dit veilig zelf doen?"
 - Leg niet uit hoe iets werkt, alleen wat te doen
+- Bij RED of twijfel: stel voor om een Handy in te schakelen
 
 Als userType = handy:
 - Gebruik technische termen
 - Ga dieper waar nuttig (diagnose, oorzaken)
 - Minder uitleg, meer precisie
 - Focus op: oorzaak → oplossing → risico's
+- NOOIT voorstellen om "een andere handy in te schakelen" — de gebruiker IS een professional
+- Bij RED: geef een duidelijke waarschuwing over risico's, maar help de professional verder
+- next_action mag NOOIT "book_handy" zijn voor handy-gebruikers
+- handy_suggestion.suggested moet ALTIJD false zijn voor handy-gebruikers
 
 FOTO-ANALYSE (ALLEEN ALS FOTO AANWEZIG IS)
 Als er een foto is:
@@ -133,7 +138,12 @@ BESLISSINGSLOGICA next_action
 - "continue_self_fix" → GREEN + understood = true
 - "lesson" → YELLOW of herhaalbare taak
 - "request_more_info" → vision_confidence = low of onduidelijke vraag
-- "book_handy" → RED of twijfel/gevaar
+- "book_handy" → ALLEEN voor seekers bij RED of twijfel/gevaar. NOOIT voor handy-gebruikers.
+
+HANDY-SPECIFIEKE REGELS
+- Als userType = handy: next_action mag NOOIT "book_handy" zijn
+- Als userType = handy: handy_suggestion.suggested moet ALTIJD false zijn
+- Als userType = handy en risk_level = RED: gebruik next_action = "continue_self_fix" met duidelijke waarschuwingen in stop_conditions
 
 Je antwoord moet kort, correct en beslissend zijn.
 Geef nu uitsluitend het JSON-object terug.`;
@@ -227,7 +237,13 @@ function validateAndFixResponse(data: unknown, userType: string, photoProvided: 
   
   let nextAction: AIResponse["next_action"] = response.next_action || "continue_self_fix";
   if (!["continue_self_fix", "request_more_info", "lesson", "book_handy"].includes(nextAction)) {
-    nextAction = riskLevel === "RED" ? "book_handy" : understood ? "continue_self_fix" : "request_more_info";
+    nextAction = riskLevel === "RED" ? (userType === "handy" ? "continue_self_fix" : "book_handy") : understood ? "continue_self_fix" : "request_more_info";
+  }
+  
+  // CRITICAL: Handy users should NEVER get "book_handy" suggestion
+  const isHandy = userType === "handy";
+  if (isHandy && nextAction === "book_handy") {
+    nextAction = "continue_self_fix";
   }
   
   return {
@@ -246,9 +262,13 @@ function validateAndFixResponse(data: unknown, userType: string, photoProvided: 
     stop_conditions: Array.isArray(response.stop_conditions) ? response.stop_conditions : [],
     next_action: nextAction,
     lesson_suggestion: response.lesson_suggestion || { suggested: false, topic: null },
-    handy_suggestion: response.handy_suggestion || { suggested: riskLevel === "RED", reason: riskLevel === "RED" ? "Schakel een professional in." : null },
+    handy_suggestion: isHandy 
+      ? { suggested: false, reason: null }
+      : (response.handy_suggestion || { suggested: riskLevel === "RED", reason: riskLevel === "RED" ? "Schakel een professional in." : null }),
     explanation_if_uncertain: response.explanation_if_uncertain || null,
-    disclaimer: response.disclaimer || "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in."
+    disclaimer: isHandy 
+      ? "Indicatief advies. Beoordeel zelf of verdere actie nodig is."
+      : (response.disclaimer || "Indicatief advies. Stop bij twijfel of gevaar en schakel een professional in.")
   };
 }
 
