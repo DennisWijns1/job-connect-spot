@@ -844,14 +844,12 @@ const AIHelpPage = () => {
       {/* Input */}
       <div className="sticky bottom-24 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-background via-background to-transparent pt-4">
         <div className="flex items-center gap-3">
-          {!isHandy && (
-            <button 
-              className="w-12 h-12 rounded-xl bg-card shadow-soft flex items-center justify-center text-muted-foreground hover:text-accent transition-colors border border-border"
-              onClick={() => setShowCameraMenu(!showCameraMenu)}
-            >
-              <Camera className="w-6 h-6" />
-            </button>
-          )}
+          <button 
+            className="w-12 h-12 rounded-xl bg-card shadow-soft flex items-center justify-center text-muted-foreground hover:text-accent transition-colors border border-border"
+            onClick={() => setShowCameraMenu(!showCameraMenu)}
+          >
+            <Camera className="w-6 h-6" />
+          </button>
           {speechSupported && (
             <button
               onClick={isListening ? stopListening : startListening}
