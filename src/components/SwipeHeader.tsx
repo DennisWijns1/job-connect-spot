@@ -100,10 +100,12 @@ export const SwipeHeader = ({
 
   return (
     <>
-      <header className="h-16 flex-shrink-0 z-40 bg-gradient-to-r from-primary via-primary/90 to-accent/80 text-primary-foreground">
-        <div className="h-full flex items-center justify-between px-4">
+      <header className="h-16 flex-shrink-0 z-40 text-white relative overflow-hidden" style={{ backgroundColor: 'hsl(222, 47%, 11%)' }}>
+        {/* Radial blue glow */}
+        <div className="absolute top-0 right-0 w-48 h-48 -translate-y-1/3 translate-x-1/4 rounded-full opacity-30 blur-3xl pointer-events-none" style={{ backgroundColor: 'hsl(217, 91%, 60%)' }} />
+        <div className="h-full flex items-center justify-between px-4 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-sm">HM</span>
             </div>
             <h1 className="font-display font-bold text-lg truncate max-w-[160px]">{title}</h1>
@@ -111,12 +113,12 @@ export const SwipeHeader = ({
 
           <div className="flex items-center gap-2">
             {/* Icon 1: Search */}
-            <button onClick={onOpenSearch} className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors" aria-label="Zoeken en filteren">
+            <button onClick={onOpenSearch} className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" aria-label="Zoeken en filteren">
               <Search className="w-5 h-5" />
             </button>
 
             {/* Icon 2: Star - Reviews (handy) / Favorites (seeker) */}
-            <button onClick={handleStarClick} className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors relative" aria-label={isHandy ? 'Reviews' : 'Favorieten'}>
+            <button onClick={handleStarClick} className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors relative" aria-label={isHandy ? 'Reviews' : 'Favorieten'}>
               <Star className="w-5 h-5 text-white fill-accent/50" />
               {isHandy ? (
                 mockReviews.length > 0 && (
@@ -134,7 +136,7 @@ export const SwipeHeader = ({
             </button>
 
             {/* Icon 3: Projects (wrench for handy, key for seeker) */}
-            <button onClick={handleProjectsClick} className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors relative" aria-label="Projecten">
+            <button onClick={handleProjectsClick} className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors relative" aria-label="Projecten">
               {isHandy ? <Wrench className="w-5 h-5" /> : <KeyRound className="w-5 h-5" />}
               {projectCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
@@ -145,6 +147,7 @@ export const SwipeHeader = ({
           </div>
         </div>
       </header>
+
 
       {/* Star Dropdown: Reviews for Handy */}
       <AnimatePresence>
