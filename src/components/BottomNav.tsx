@@ -25,7 +25,7 @@ export const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-secondary border-t border-border/30 safe-area-bottom z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border safe-area-bottom z-50">
       <div className="flex items-center justify-around py-2">
         {navItems.map(({ icon: Icon, label, path, highlight }) => {
           const isActive = location.pathname === path;
@@ -34,11 +34,12 @@ export const BottomNav = () => {
               key={path}
               onClick={() => navigate(path)}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-2 py-2 rounded-[16px] transition-all duration-300 relative',
-                highlight && !isActive && 'text-accent',
+                'flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-300 relative',
                 isActive
-                  ? 'text-primary bg-primary/15'
-                  : !highlight && 'text-foreground/60 hover:text-foreground hover:bg-primary/10'
+                  ? 'text-primary bg-primary/10'
+                  : highlight
+                    ? 'text-accent'
+                    : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {highlight && !isActive && (
@@ -49,12 +50,9 @@ export const BottomNav = () => {
                   'w-5 h-5 transition-all duration-300',
                   isActive && 'scale-110'
                 )}
-                strokeWidth={isActive ? 2.5 : 2}
+                strokeWidth={isActive ? 2.5 : 1.5}
               />
-              <span className="text-[10px] font-medium">{label}</span>
-              {isActive && (
-                <div className="absolute -bottom-0.5 w-4 h-1 rounded-full bg-primary" />
-              )}
+              <span className={cn("text-[10px]", isActive ? "font-semibold" : "font-medium")}>{label}</span>
             </button>
           );
         })}

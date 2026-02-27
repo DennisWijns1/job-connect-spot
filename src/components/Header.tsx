@@ -49,13 +49,14 @@ export const Header = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 safe-area-top bg-gradient-to-r from-primary via-primary/90 to-accent/80 text-primary-foreground">
-        <div className="flex items-center justify-between px-4 py-3">
+      <header className="sticky top-0 z-40 safe-area-top text-white relative overflow-hidden" style={{ backgroundColor: 'hsl(222, 47%, 11%)' }}>
+        <div className="absolute top-0 right-0 w-48 h-48 -translate-y-1/3 translate-x-1/4 rounded-full opacity-30 blur-3xl pointer-events-none" style={{ backgroundColor: 'hsl(217, 91%, 60%)' }} />
+        <div className="flex items-center justify-between px-4 py-3 relative z-10">
           <div className="flex items-center gap-3">
             {showBack && (
               <button
                 onClick={() => navigate(-1)}
-                className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
+                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -71,9 +72,9 @@ export const Header = ({
               </button>
             )}
             
-            {/* Logo met oranje accent */}
+            {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-md">
                 <span className="text-white font-bold text-sm">HM</span>
               </div>
               <h1 className="font-display font-bold text-lg">
@@ -104,7 +105,7 @@ export const Header = ({
             {showSearch && (
               <button
                 onClick={onOpenSearch}
-                className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
+                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -114,7 +115,7 @@ export const Header = ({
             {showFavorites && (
               <button
                 onClick={() => setShowFavoritesMenu(!showFavoritesMenu)}
-                className="w-10 h-10 rounded-xl bg-accent/30 border border-accent/40 flex items-center justify-center hover:bg-accent/40 transition-colors relative"
+                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors relative"
               >
                 <Star className="w-5 h-5 text-white fill-accent" />
                 {favorites.length > 0 && (
@@ -129,7 +130,7 @@ export const Header = ({
             {showProjectsButton && (
               <button
                 onClick={onOpenProjects}
-                className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors relative"
+                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors relative"
               >
                 <Wrench className="w-5 h-5" />
                 <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
