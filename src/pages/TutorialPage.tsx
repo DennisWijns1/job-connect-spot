@@ -422,6 +422,14 @@ const TutorialPage = () => {
               Terug naar AI Klushulp
             </Button>
           </motion.div>
+        ) : state?.userType === 'handy' ? (
+          <div className="bg-accent/10 border border-accent/30 rounded-xl p-4 text-center space-y-2">
+            <AlertTriangle className="w-6 h-6 text-accent mx-auto" />
+            <p className="text-sm text-muted-foreground">Lukt het niet? Bekijk de stappen opnieuw of stel een vraag aan de AI.</p>
+            <Button className="w-full btn-cta" onClick={() => navigate('/ai')}>
+              Vraag de AI om hulp
+            </Button>
+          </div>
         ) : (
           <div className="bg-card border border-border rounded-xl p-4 text-center space-y-3">
             <p className="text-sm text-muted-foreground">Lukt het niet? Geen probleem.</p>

@@ -728,7 +728,7 @@ const AIHelpPage = () => {
               className="fixed bottom-36 left-4 bg-card rounded-xl shadow-card-hover border border-border z-50 overflow-hidden"
             >
               <button
-                onClick={() => { cameraInputRef.current?.click(); }}
+                onClick={() => { setShowCameraMenu(false); cameraInputRef.current?.click(); }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors text-left"
               >
                 <Camera className="w-5 h-5 text-accent" />

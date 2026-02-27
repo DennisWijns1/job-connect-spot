@@ -299,7 +299,6 @@ export const ProblemInputDialog = ({ isOpen, onClose, onSubmit }: ProblemInputDi
               {/* Submit button */}
               <Button
                 onClick={handleSubmit}
-                disabled={!problem.trim()}
                 className="w-full h-12 rounded-xl text-sm font-semibold bg-gradient-to-r from-primary to-primary/90 hover:brightness-110"
               >
                 <Search className="w-4 h-4 mr-2" />

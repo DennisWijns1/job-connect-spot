@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
@@ -35,12 +35,34 @@ const ProfilePage = () => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showLocationEdit, setShowLocationEdit] = useState(false);
   const [userAddress, setUserAddress] = useState<UserAddress>(getStoredAddress());
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const user = JSON.parse(localStorage.getItem('handymatch_user') || '{}');
 
   useEffect(() => {
     setUserAddress(getStoredAddress());
+    // Load saved avatar
+    const savedAvatar = localStorage.getItem('handymatch_avatar');
+    if (savedAvatar) setAvatarPreview(savedAvatar);
   }, []);
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Foto mag maximaal 5MB zijn');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setAvatarPreview(dataUrl);
+      localStorage.setItem('handymatch_avatar', dataUrl);
+      toast.success('Profielfoto bijgewerkt!');
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('handymatch_userType');
@@ -77,10 +99,25 @@ const ProfilePage = () => {
         >
           <div className="flex items-center gap-4 mb-6">
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <User className="w-10 h-10 text-primary" />
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center overflow-hidden">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Profiel" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-primary" />
+                )}
               </div>
-              <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-button">
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                capture="user"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-button"
+              >
                 <Camera className="w-4 h-4" />
               </button>
             </div>

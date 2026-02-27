@@ -170,11 +170,15 @@ const SwipePage = () => {
 
   const handleContactFromDetail = useCallback(() => {
     if (selectedHandy) {
-      toast.success(`Bericht verzonden naar ${selectedHandy.name}!`, {
-        description: 'Start een gesprek in je Chats',
-      });
       setShowDetailModal(false);
-      navigate('/chats');
+      navigate(`/chat/new-${selectedHandy.id}`, {
+        state: {
+          isNewChat: true,
+          handyId: selectedHandy.id,
+          handyName: selectedHandy.name,
+          handyAvatar: selectedHandy.avatar,
+        }
+      });
     }
   }, [selectedHandy, navigate]);
 
