@@ -56,7 +56,8 @@ export const HandyCard = ({ handy, onClick, className }: HandyCardProps) => {
           <img
             src={handy.avatar}
             alt={handy.name}
-            className="w-14 h-14 rounded-full object-cover border-2 border-white/80 shadow-lg flex-shrink-0"
+            className="w-14 h-14 rounded-full object-cover border-2 shadow-lg flex-shrink-0"
+            style={{ borderColor: 'hsl(38, 92%, 50%)' }}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">

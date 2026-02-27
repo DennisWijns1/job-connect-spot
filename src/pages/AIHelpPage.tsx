@@ -498,7 +498,7 @@ const AIHelpPage = () => {
             <ul className="space-y-1">
               {aiResponse.what_is_visible.map((item, i) => (
                 <li key={i} className="text-sm flex items-start gap-2">
-                  <span className="text-accent mt-0.5">•</span>
+                  <span className="text-accent mt-0.5">●</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -610,15 +610,15 @@ const AIHelpPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
       {/* Custom header with history icon */}
-      <header className="sticky top-0 z-40 safe-area-top bg-primary text-primary-foreground">
+      <header className="sticky top-0 z-40 safe-area-top gradient-teal text-white">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors">
               <ArrowRight className="w-5 h-5 rotate-180" />
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                <Bot className="w-4 h-4 text-accent-foreground" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'hsl(38, 92%, 50%)' }}>
+                <Bot className="w-4 h-4 text-white" />
               </div>
               <h1 className="font-display font-bold text-lg">{isHandy ? 'AI Assistent' : 'AI Klushulp'}</h1>
             </div>
@@ -766,11 +766,12 @@ const AIHelpPage = () => {
               <div
                 className={`max-w-[85%] p-4 rounded-2xl ${
                   message.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-sm'
+                    ? 'rounded-br-sm text-white'
                     : message.isError
                     ? 'bg-destructive/10 border border-destructive/20 rounded-bl-sm'
-                    : 'bg-card shadow-soft rounded-bl-sm border border-border'
+                    : 'bg-primary/5 shadow-soft rounded-bl-sm border border-primary/10'
                 }`}
+                style={message.role === 'user' ? { backgroundColor: 'hsl(330, 65%, 55%)' } : {}}
               >
                 {message.role === 'user' && message.photoUrl && (
                   <img src={message.photoUrl} alt="Bijgevoegde foto" className="w-full rounded-lg mb-2" />

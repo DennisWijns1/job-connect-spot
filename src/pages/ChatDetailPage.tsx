@@ -146,22 +146,22 @@ const ChatDetailPage = () => {
                 <div
                   className={`max-w-[75%] p-4 rounded-2xl ${
                     message.senderId === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-br-sm'
-                      : 'bg-card shadow-soft rounded-bl-sm'
+                      ? 'rounded-br-sm text-white' : 'bg-card shadow-soft rounded-bl-sm border border-border'
                   }`}
+                  style={message.senderId === 'user' ? { backgroundColor: 'hsl(330, 65%, 55%)' } : {}}
                 >
                   <p className="text-sm">{message.text}</p>
                   <p className={`text-xs mt-1 ${
-                    message.senderId === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    message.senderId === 'user' ? 'text-white/70' : 'text-muted-foreground'
                   }`}>
                     {formatDistanceToNow(message.timestamp, { addSuffix: true, locale: nl })}
                   </p>
 
                   {message.isAppointmentRequest && (
-                    <div className="mt-3 pt-3 border-t border-current/20">
+                    <div className="mt-3 pt-3 border-t border-white/20">
                       <button
                         onClick={handleAppointment}
-                        className="w-full py-2 px-4 rounded-xl bg-success/20 text-success font-medium text-sm flex items-center justify-center gap-2"
+                        className="w-full py-2 px-4 rounded-xl bg-primary/20 text-primary font-medium text-sm flex items-center justify-center gap-2 border border-primary/30"
                       >
                         <Calendar className="w-4 h-4" />
                         Afspraak bevestigen

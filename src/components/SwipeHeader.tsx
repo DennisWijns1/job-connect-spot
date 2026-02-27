@@ -100,12 +100,10 @@ export const SwipeHeader = ({
 
   return (
     <>
-      <header className="h-16 flex-shrink-0 z-40 text-white relative overflow-hidden" style={{ backgroundColor: 'hsl(222, 47%, 11%)' }}>
-        {/* Radial blue glow */}
-        <div className="absolute top-0 right-0 w-48 h-48 -translate-y-1/3 translate-x-1/4 rounded-full opacity-30 blur-3xl pointer-events-none" style={{ backgroundColor: 'hsl(217, 91%, 60%)' }} />
+      <header className="h-16 flex-shrink-0 z-40 text-white relative overflow-hidden gradient-teal">
         <div className="h-full flex items-center justify-between px-4 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md" style={{ backgroundColor: 'hsl(38, 92%, 50%)' }}>
               <span className="text-white font-bold text-sm">HM</span>
             </div>
             <h1 className="font-display font-bold text-lg truncate max-w-[160px]">{title}</h1>

@@ -51,6 +51,10 @@ export default {
           DEFAULT: "hsl(var(--navy))",
           foreground: "hsl(var(--navy-foreground))",
         },
+        fuchsia: {
+          DEFAULT: "hsl(var(--fuchsia))",
+          foreground: "hsl(var(--fuchsia-foreground))",
+        },
         ochre: {
           DEFAULT: "hsl(var(--ochre))",
           foreground: "hsl(var(--ochre-foreground))",
