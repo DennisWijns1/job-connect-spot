@@ -47,9 +47,9 @@ const ProfilePage = () => {
     if (savedAvatar) setAvatarPreview(savedAvatar);
   }, []);
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+
+  const processFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Foto mag maximaal 5MB zijn');
       return;
@@ -62,6 +62,61 @@ const ProfilePage = () => {
       toast.success('Profielfoto bijgewerkt!');
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleOpenCamera = async () => {
+    setShowAvatarMenu(false);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.autoplay = true;
+      video.playsInline = true;
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+      
+      const canvas = document.createElement('canvas');
+      
+      const btnRow = document.createElement('div');
+      btnRow.style.cssText = 'position:absolute;bottom:40px;display:flex;gap:16px;z-index:10;';
+      
+      const snapBtn = document.createElement('button');
+      snapBtn.textContent = '📸 Maak foto';
+      snapBtn.style.cssText = 'padding:12px 24px;border-radius:999px;background:#F97316;color:#fff;font-weight:600;border:none;font-size:16px;';
+      
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Annuleer';
+      cancelBtn.style.cssText = 'padding:12px 24px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-weight:600;border:none;font-size:16px;';
+
+      const cleanup = () => {
+        stream.getTracks().forEach(t => t.stop());
+        overlay.remove();
+      };
+
+      cancelBtn.onclick = cleanup;
+      snapBtn.onclick = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d')?.drawImage(video, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) processFile(new File([blob], 'camera.jpg', { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.85);
+        cleanup();
+      };
+
+      video.style.cssText = 'max-width:100%;max-height:80vh;border-radius:16px;';
+      btnRow.append(snapBtn, cancelBtn);
+      overlay.append(video, btnRow);
+      document.body.appendChild(overlay);
+    } catch {
+      toast.error('Camera niet beschikbaar. Controleer je rechten.');
+    }
   };
 
   const handleLogout = () => {
@@ -110,16 +165,25 @@ const ProfilePage = () => {
                 ref={avatarInputRef}
                 type="file"
                 accept="image/*"
-                capture="user"
                 className="hidden"
                 onChange={handleAvatarUpload}
               />
               <button
-                onClick={() => avatarInputRef.current?.click()}
+                onClick={() => setShowAvatarMenu(!showAvatarMenu)}
                 className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-button"
               >
                 <Camera className="w-4 h-4" />
               </button>
+              {showAvatarMenu && (
+                <div className="absolute -bottom-20 -right-2 bg-card rounded-xl shadow-lg border border-border z-50 overflow-hidden">
+                  <button onClick={handleOpenCamera} className="flex items-center gap-2 px-4 py-2 hover:bg-muted text-sm text-foreground w-full">
+                    <Camera className="w-4 h-4" /> Camera
+                  </button>
+                  <button onClick={() => { setShowAvatarMenu(false); avatarInputRef.current?.click(); }} className="flex items-center gap-2 px-4 py-2 hover:bg-muted text-sm text-foreground w-full">
+                    <User className="w-4 h-4" /> Bestand
+                  </button>
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <h2 className="font-display font-bold text-xl text-foreground">
