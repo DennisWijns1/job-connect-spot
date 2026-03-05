@@ -22,7 +22,10 @@ const ChatDetailPage = () => {
   } | null;
   
   const isNewChat = navState?.isNewChat && id?.startsWith('new-');
-  const existingChat = mockChats.find(c => c.id === id);
+  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
+  const isHandy = userType === 'handy';
+  const allChats = isHandy ? mockHandyChats : mockChats;
+  const existingChat = allChats.find(c => c.id === id);
   
   // Participant bepalen
   const participant = isNewChat 
