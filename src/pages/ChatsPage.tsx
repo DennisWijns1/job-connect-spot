@@ -46,7 +46,7 @@ const ChatsPage = () => {
           </motion.div>
         ) : (
           <div className="space-y-3">
-            {mockChats.map((chat, index) => (
+            {chats.map((chat, index) => (
               <motion.button
                 key={chat.id}
                 initial={{ opacity: 0, y: 20 }}

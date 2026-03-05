@@ -242,6 +242,8 @@ const ProfilePage = () => {
                   } else if (item.action === 'location') {
                     setShowLocationEdit(true);
                   }
+                } else if ('path' in item && 'navigate' in item) {
+                  navigate(item.path);
                 } else if ('path' in item) {
                   toast.info('Deze functie komt binnenkort!');
                 }
