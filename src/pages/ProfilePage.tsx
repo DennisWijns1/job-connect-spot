@@ -128,9 +128,9 @@ const ProfilePage = () => {
 
   const menuItems = isHandy
     ? [
-        { icon: Camera, label: 'Foto\'s beheren', description: 'Upload werken', path: '/profile/photos' },
-        { icon: CheckCircle, label: 'Afgewerkte projecten', description: 'Bekijk voltooide klussen', path: '/profile/completed' },
-        { icon: Briefcase, label: 'Specialisaties', description: 'Bewerk vaardigheden', path: '/profile/skills' },
+        { icon: Camera, label: 'Foto\'s beheren', description: 'Upload werken', path: '/profile/photos', navigate: true },
+        { icon: CheckCircle, label: 'Afgewerkte projecten', description: 'Bekijk voltooide klussen', path: '/profile/completed', navigate: true },
+        { icon: Briefcase, label: 'Specialisaties', description: 'Bewerk vaardigheden', path: '/profile/skills', navigate: true },
         { icon: BookOpen, label: 'Lessen & Trainingen', description: 'Leer nieuwe vaardigheden', path: '/learn' },
         { icon: MapPin, label: 'Werkgebied', description: 'Stel je bereik in', path: '/profile/area' },
         { icon: Shield, label: 'Verificatie', description: 'Word geverifieerd', path: '/profile/verify' },
