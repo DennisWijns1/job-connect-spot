@@ -134,6 +134,32 @@ const lessonSeries: LessonSeries[] = [
 const specialties = ['Elektriciteit', 'Loodgieter', 'Tuinwerk', 'Schilderen', 'Tegels', 'Timmerwerk'];
 const locations = ['Leuven', 'Brussel', 'Antwerpen', 'Gent', 'Mechelen'];
 
+// Fictive completed lessons for handy users
+const completedLessons = [
+  {
+    id: 'c1',
+    seriesId: '1',
+    title: 'Elektriciteit Basis tot Expert',
+    instructor: 'Jan Vermeeren',
+    completedAt: '10 jan 2026',
+    diplomaEarned: true,
+    rating: 4.9,
+    specialty: 'Elektriciteit',
+    image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=400&fit=crop',
+  },
+  {
+    id: 'c2',
+    seriesId: '4',
+    title: 'Domotica & Smart Home',
+    instructor: 'Pieter Claes',
+    completedAt: '20 feb 2026',
+    diplomaEarned: true,
+    rating: 4.6,
+    specialty: 'Domotica',
+    image: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=600&h=400&fit=crop',
+  },
+];
+
 const LearningPage = () => {
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
