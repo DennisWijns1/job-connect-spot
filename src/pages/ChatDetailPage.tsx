@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockChats } from '@/data/mockData';
+import { mockHandyChats } from '@/data/handyMockData';
 import { Send, Calendar, Phone, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
@@ -21,7 +22,10 @@ const ChatDetailPage = () => {
   } | null;
   
   const isNewChat = navState?.isNewChat && id?.startsWith('new-');
-  const existingChat = mockChats.find(c => c.id === id);
+  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
+  const isHandy = userType === 'handy';
+  const allChats = isHandy ? mockHandyChats : mockChats;
+  const existingChat = allChats.find(c => c.id === id);
   
   // Participant bepalen
   const participant = isNewChat 

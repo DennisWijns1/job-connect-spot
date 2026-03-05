@@ -24,6 +24,9 @@ import TutorialPage from "./pages/TutorialPage";
 import ARTutorialPage from "./pages/ARTutorialPage";
 import InteractiveTutorialPage from "./pages/InteractiveTutorialPage";
 import NotFound from "./pages/NotFound";
+import HandyPhotosPage from "./pages/HandyPhotosPage";
+import CompletedProjectsPage from "./pages/CompletedProjectsPage";
+import HandySkillsPage from "./pages/HandySkillsPage";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +46,9 @@ const App = () => (
           <Route path="/chats" element={<ChatsPage />} />
           <Route path="/chat/:id" element={<ChatDetailPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/photos" element={<HandyPhotosPage />} />
+          <Route path="/profile/completed" element={<CompletedProjectsPage />} />
+          <Route path="/profile/skills" element={<HandySkillsPage />} />
           <Route path="/learning" element={<LearningPage />} />
           <Route path="/quick-chat" element={<QuickChatPage />} />
           <Route path="/instructor" element={<InstructorHomePage />} />
