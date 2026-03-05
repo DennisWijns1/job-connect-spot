@@ -19,6 +19,8 @@ const ChatsPage = () => {
 
   const headerSubtitle = isHandy ? 'Gesprekken met klanten' : 'Gesprekken met Handy\'s';
 
+  const chats = isHandy ? mockHandyChats : mockChats;
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <Header title="Chats" showNotifications />
@@ -26,7 +28,7 @@ const ChatsPage = () => {
       <div className="px-4 py-4">
         <p className="text-sm text-muted-foreground mb-4">{headerSubtitle}</p>
         
-        {mockChats.length === 0 ? (
+        {chats.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
