@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { mockChats } from '@/data/mockData';
+import { mockHandyChats } from '@/data/handyMockData';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { MessageCircle } from 'lucide-react';
