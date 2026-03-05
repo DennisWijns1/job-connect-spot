@@ -334,7 +334,57 @@ const LearningPage = () => {
           ))}
         </div>
 
-        {/* Lesson Series */}
+        {/* Completed Lessons for Handy */}
+        {isHandy && completedLessons.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-success" />
+              Voltooide lessen ({completedLessons.length})
+            </h3>
+            <div className="space-y-3">
+              {completedLessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className="bg-card rounded-2xl p-4 border border-success/20 shadow-soft flex items-center gap-4"
+                >
+                  <img
+                    src={lesson.image}
+                    alt={lesson.title}
+                    className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-foreground text-sm truncate">{lesson.title}</h4>
+                      {lesson.diplomaEarned && (
+                        <Award className="w-4 h-4 text-accent flex-shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {lesson.instructor} • Voltooid {lesson.completedAt}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-accent" fill="currentColor" />
+                        <span className="text-xs text-muted-foreground">{lesson.rating}</span>
+                      </div>
+                      {lesson.diplomaEarned && (
+                        <Badge variant="outline" className="text-xs border-accent/30 text-accent">
+                          Diploma behaald
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <CheckCircle className="w-6 h-6 text-success flex-shrink-0" />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Online Lesson Portal */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -357,7 +407,7 @@ const LearningPage = () => {
             >
               <BookOpen className="w-5 h-5 mb-2" />
               <span className="font-medium text-sm">Mijn Lessen</span>
-              <p className="text-xs text-primary/70 mt-1">0 actieve cursussen</p>
+              <p className="text-xs text-primary/70 mt-1">{isHandy ? `${completedLessons.length} voltooide cursussen` : '0 actieve cursussen'}</p>
             </button>
             <button 
               onClick={() => toast.info('Live sessies portaal komt binnenkort!')}
