@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockChats } from '@/data/mockData';
+import { mockHandyChats } from '@/data/handyMockData';
 import { Send, Calendar, Phone, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
