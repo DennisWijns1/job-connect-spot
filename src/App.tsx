@@ -27,6 +27,8 @@ import NotFound from "./pages/NotFound";
 import HandyPhotosPage from "./pages/HandyPhotosPage";
 import CompletedProjectsPage from "./pages/CompletedProjectsPage";
 import HandySkillsPage from "./pages/HandySkillsPage";
+import WorkAreaPage from "./pages/WorkAreaPage";
+import VerificationPage from "./pages/VerificationPage";
 
 const queryClient = new QueryClient();
 
