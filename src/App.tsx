@@ -27,6 +27,8 @@ import NotFound from "./pages/NotFound";
 import HandyPhotosPage from "./pages/HandyPhotosPage";
 import CompletedProjectsPage from "./pages/CompletedProjectsPage";
 import HandySkillsPage from "./pages/HandySkillsPage";
+import WorkAreaPage from "./pages/WorkAreaPage";
+import VerificationPage from "./pages/VerificationPage";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,8 @@ const App = () => (
           <Route path="/profile/photos" element={<HandyPhotosPage />} />
           <Route path="/profile/completed" element={<CompletedProjectsPage />} />
           <Route path="/profile/skills" element={<HandySkillsPage />} />
+          <Route path="/profile/area" element={<WorkAreaPage />} />
+          <Route path="/profile/verify" element={<VerificationPage />} />
           <Route path="/learning" element={<LearningPage />} />
           <Route path="/quick-chat" element={<QuickChatPage />} />
           <Route path="/instructor" element={<InstructorHomePage />} />
