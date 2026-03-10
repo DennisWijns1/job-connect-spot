@@ -158,10 +158,25 @@ const ARTutorialPage = () => {
       animFrameRef.current = rafId;
     };
 
-    if (videoRef.current && videoRef.current.readyState >= 2) {
+    let started = false;
+    const safeStart = () => {
+      if (started) return;
+      started = true;
       startLoop();
+    };
+
+    if (videoRef.current && videoRef.current.readyState >= 2) {
+      safeStart();
     } else {
-      videoRef.current?.addEventListener('loadeddata', startLoop, { once: true });
+      videoRef.current?.addEventListener('loadeddata', safeStart, { once: true });
+      videoRef.current?.addEventListener('canplay', safeStart, { once: true });
+      // Fallback: start na 800ms ook als events niet vuren (iOS Safari quirk)
+      const fallback = setTimeout(safeStart, 800);
+      return () => {
+        clearTimeout(fallback);
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('resize', resizeCanvas);
+      };
     }
 
     return () => {
@@ -179,6 +194,11 @@ const ARTutorialPage = () => {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        try {
+          await videoRef.current.play();
+        } catch {
+          // autoPlay policy — play() wordt genegeerd, autoPlay attribuut neemt over
+        }
       }
       setCameraActive(true);
       setCameraError(null);
