@@ -34,7 +34,7 @@ export const BottomNav = () => {
               key={path}
               onClick={() => navigate(path)}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-300 relative',
+                'flex flex-col items-center gap-0.5 px-3 py-2 min-w-[44px] min-h-[44px] rounded-2xl transition-all duration-300 relative',
                 isActive
                   ? 'text-primary bg-primary/10'
                   : highlight
@@ -52,7 +52,7 @@ export const BottomNav = () => {
                 )}
                 strokeWidth={isActive ? 2.5 : 1.5}
               />
-              <span className={cn("text-[10px]", isActive ? "font-semibold" : "font-medium")}>{label}</span>
+              <span className={cn("text-[11px]", isActive ? "font-semibold" : "font-medium")}>{label}</span>
             </button>
           );
         })}

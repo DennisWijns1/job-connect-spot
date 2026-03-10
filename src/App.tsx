@@ -38,6 +38,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <div className="max-w-md mx-auto relative min-h-screen">
         <Routes>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -66,6 +67,7 @@ const App = () => (
           <Route path="/interactive-tutorial" element={<InteractiveTutorialPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

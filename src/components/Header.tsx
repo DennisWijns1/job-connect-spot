@@ -55,7 +55,7 @@ export const Header = ({
             {showBack && (
               <button
                 onClick={() => navigate(-1)}
-                className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/25 transition-colors"
+                className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/25 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -104,7 +104,7 @@ export const Header = ({
             {showSearch && (
               <button
                 onClick={onOpenSearch}
-                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
               >
                 <Search className="w-5 h-5" />
               </button>
