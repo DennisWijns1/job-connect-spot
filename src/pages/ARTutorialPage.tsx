@@ -274,11 +274,16 @@ const ARTutorialPage = () => {
     setTimeout(() => setIsFlashing(false), 200);
 
     const video = videoRef.current;
+    // Schaal foto naar max 800px — iPhone 16 Pro schiet 4K wat ~3MB base64 geeft
+    const MAX = 800;
+    const srcW = video.videoWidth || 1280;
+    const srcH = video.videoHeight || 720;
+    const scale = Math.min(MAX / srcW, MAX / srcH, 1);
     const snap = document.createElement('canvas');
-    snap.width = video.videoWidth || 1280;
-    snap.height = video.videoHeight || 720;
-    snap.getContext('2d')?.drawImage(video, 0, 0);
-    const base64 = snap.toDataURL('image/jpeg', 0.85).split(',')[1];
+    snap.width = Math.round(srcW * scale);
+    snap.height = Math.round(srcH * scale);
+    snap.getContext('2d')?.drawImage(video, 0, 0, snap.width, snap.height);
+    const base64 = snap.toDataURL('image/jpeg', 0.75).split(',')[1];
 
     setIsChecking(true);
     setStepCheckResult(null);
@@ -312,10 +317,23 @@ const ARTutorialPage = () => {
           setCompletedSteps((prev) => new Set([...prev, activeStepRef.current]));
         }
       } else {
-        toast({ title: 'Analyse mislukt', description: 'Probeer opnieuw.', variant: 'destructive' });
+        // Fallback: AI kon niet analyseren — toon neutraal resultaat zodat gebruiker kan doorgaan
+        setStepCheckResult({
+          correct: true,
+          confidence: 'low',
+          feedback: 'We konden de foto niet analyseren. Controleer zelf of de stap klopt en ga verder.',
+          what_is_visible: '',
+          suggestion: null,
+        });
       }
     } catch {
-      toast({ title: 'Verbindingsfout', description: 'Controleer je netwerk.', variant: 'destructive' });
+      setStepCheckResult({
+        correct: true,
+        confidence: 'low',
+        feedback: 'Geen verbinding. Controleer je netwerk of ga handmatig verder.',
+        what_is_visible: '',
+        suggestion: null,
+      });
     } finally {
       setIsChecking(false);
     }
