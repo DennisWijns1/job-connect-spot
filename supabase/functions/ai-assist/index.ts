@@ -286,29 +286,59 @@ function validateAndFixResponse(data: unknown, userType: string, photoProvided: 
   };
 }
 
+// Converteer OpenAI-stijl image_url content naar Anthropic image source formaat
+function toAnthropicContent(content: string | Array<any>): string | Array<any> {
+  if (typeof content === "string") return content;
+  return content.map((item: any) => {
+    if (item.type === "image_url" && item.image_url?.url) {
+      const url: string = item.image_url.url;
+      const match = url.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        return {
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: match[1] as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+            data: match[2],
+          },
+        };
+      }
+    }
+    return item;
+  });
+}
+
 async function callAI(messages: Array<{ role: string; content: string | Array<any> }>): Promise<{ success: boolean; data?: AIResponse; error?: string }> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  
-  if (!LOVABLE_API_KEY) {
-    console.error("LOVABLE_API_KEY is not configured");
+  const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+
+  if (!ANTHROPIC_API_KEY) {
+    console.error("ANTHROPIC_API_KEY is not configured");
     return { success: false, error: "AI service niet geconfigureerd" };
   }
 
+  // Anthropic verwacht system als top-level parameter, niet in de messages array
+  const systemMessage = messages.find((m) => m.role === "system");
+  const conversationMessages = messages
+    .filter((m) => m.role !== "system")
+    .map((m) => ({ role: m.role, content: toAnthropicContent(m.content) }));
+
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
 
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages,
-        temperature: 0.7,
+        model: "claude-sonnet-4-5",
         max_tokens: 2000,
+        temperature: 0.2,
+        ...(systemMessage ? { system: systemMessage.content as string } : {}),
+        messages: conversationMessages,
       }),
       signal: controller.signal,
     });
@@ -317,28 +347,29 @@ async function callAI(messages: Array<{ role: string; content: string | Array<an
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`AI API error: ${response.status} - ${errorText}`);
-      
+      console.error(`Anthropic API error: ${response.status} - ${errorText}`);
+
       if (response.status === 429) {
         return { success: false, error: "Te veel verzoeken, probeer het later opnieuw" };
       }
-      if (response.status === 402) {
-        return { success: false, error: "AI credits opgebruikt" };
+      if (response.status === 401) {
+        return { success: false, error: "AI service niet geconfigureerd" };
       }
-      
+
       return { success: false, error: "AI service tijdelijk niet beschikbaar" };
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    // Anthropic response: data.content[0].text
+    const content = data.content?.[0]?.text;
 
     if (!content) {
-      console.error("No content in AI response:", data);
+      console.error("No content in Anthropic response:", data);
       return { success: false, error: "Geen antwoord ontvangen van AI" };
     }
 
     let jsonStr = content.trim();
-    
+
     const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) {
       jsonStr = jsonMatch[1].trim();
