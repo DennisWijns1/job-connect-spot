@@ -164,9 +164,12 @@ interface AIRequest {
   photo?: string;
   categoryHint: string | null;
   conversationHistory?: ConversationMessage[];
-  mode?: "analysis" | "tutorial" | "interactive";
+  mode?: "analysis" | "tutorial" | "interactive" | "step-check";
   category?: string;
   riskLevel?: string;
+  stepTitle?: string;
+  stepNumber?: number;
+  totalSteps?: number;
 }
 
 interface VisualMarker {
@@ -471,7 +474,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userType, message, photo, categoryHint, conversationHistory, mode, category, riskLevel }: AIRequest = await req.json();
+    const { userType, message, photo, categoryHint, conversationHistory, mode, category, riskLevel, stepTitle, stepNumber, totalSteps }: AIRequest = await req.json();
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return new Response(
@@ -613,6 +616,89 @@ REGELS
 
       return new Response(
         JSON.stringify({ ok: false, error: result.error || "Interactieve content generatie mislukt" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // STEP-CHECK MODE
+    if (mode === "step-check") {
+      console.log(`Processing step-check: step=${stepNumber}/${totalSteps}, title=${stepTitle}`);
+
+      const STEP_CHECK_PROMPT = `ROL
+Je bent HandyMatch AR Step Validator. Je beoordeelt of een foto bevestigt dat een doe-het-zelf stap correct is uitgevoerd.
+
+DOEL
+Kijk naar de foto en de stapbeschrijving. Bepaal of:
+- De gebruiker het juiste onderdeel/gebied in beeld heeft
+- De stap zichtbaar correct is uitgevoerd
+- Of de gebruiker op het juiste spoor zit
+
+VERPLICHT JSON-FORMAT
+Geef uitsluitend dit JSON-object terug:
+{
+  "correct": boolean,
+  "confidence": "high" | "medium" | "low",
+  "feedback": string (max 2 zinnen, altijd bemoedigend en concreet),
+  "what_is_visible": string (kort, feitelijk: wat zie je op de foto),
+  "suggestion": string | null (alleen als correct = false: één concrete aanwijzing wat de gebruiker anders moet doen)
+}
+
+REGELS
+- correct = true: foto toont bewijs dat de stap klaar is of dat het juiste object zichtbaar is
+- correct = false: foto toont iets onrelateerd of de stap is duidelijk nog niet gedaan
+- Bij twijfel of lage confidence: correct = true (voordeel van de twijfel)
+- feedback is altijd positief, nooit negatief of ontmoedigend
+- suggestion is null als correct = true
+- Geen uitleg buiten JSON`;
+
+      const photoProvided = !!photo && typeof photo === "string" && photo.length > 0;
+
+      let mimeType = "image/jpeg";
+      if (photo?.startsWith("iVBOR")) mimeType = "image/png";
+      else if (photo?.startsWith("UklGR")) mimeType = "image/webp";
+
+      const stepContext = `Stap ${stepNumber ?? "?"} van ${totalSteps ?? "?"}: "${stepTitle ?? ""}"\nStapbeschrijving: ${message}`;
+
+      const stepCheckContent = photoProvided
+        ? [
+            { type: "text", text: stepContext },
+            { type: "image_url", image_url: { url: `data:${mimeType};base64,${photo}` } },
+          ]
+        : stepContext;
+
+      const stepCheckMessages = [
+        { role: "system", content: STEP_CHECK_PROMPT },
+        { role: "user", content: stepCheckContent },
+      ];
+
+      let result = await callAI(stepCheckMessages);
+
+      if (!result.success && result.error === "Ongeldig antwoordformaat") {
+        const repair = [
+          ...stepCheckMessages,
+          { role: "assistant", content: "Ik analyseer de foto..." },
+          { role: "user", content: "Return ONLY valid JSON. No prose, no markdown. Just the JSON object." },
+        ];
+        result = await callAI(repair);
+      }
+
+      if (result.success && result.data) {
+        const sc = result.data as any;
+        const validated = {
+          correct: typeof sc.correct === "boolean" ? sc.correct : true,
+          confidence: ["high", "medium", "low"].includes(sc.confidence) ? sc.confidence : "medium",
+          feedback: sc.feedback || "Goed bezig! Ga verder met de volgende stap.",
+          what_is_visible: sc.what_is_visible || "",
+          suggestion: sc.suggestion || null,
+        };
+        return new Response(
+          JSON.stringify({ ok: true, step_check: validated }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ ok: false, error: result.error || "Stapcontrole mislukt" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
