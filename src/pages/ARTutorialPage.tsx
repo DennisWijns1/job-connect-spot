@@ -137,9 +137,10 @@ const ARTutorialPage = () => {
     let rafId: number;
 
     const resizeCanvas = () => {
-      if (canvasRef.current && videoRef.current) {
-        canvasRef.current.width = videoRef.current.clientWidth;
-        canvasRef.current.height = videoRef.current.clientHeight;
+      if (canvasRef.current) {
+        // Gebruik window dimensies — video.clientWidth is 0 op iOS vóór eerste frame
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight;
       }
     };
 
@@ -187,17 +188,19 @@ const ARTutorialPage = () => {
 
   const startCamera = useCallback(async () => {
     try {
+      // iOS (Chrome/Safari) vereist 'ideal' in plaats van een directe string
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: { facingMode: { ideal: 'environment' } },
         audio: false,
       });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute('webkit-playsinline', 'true');
         try {
           await videoRef.current.play();
         } catch {
-          // autoPlay policy — play() wordt genegeerd, autoPlay attribuut neemt over
+          // autoPlay neemt over als play() geweigerd wordt
         }
       }
       setCameraActive(true);
