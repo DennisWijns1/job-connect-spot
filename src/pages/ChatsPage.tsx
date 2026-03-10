@@ -2,24 +2,47 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { mockChats } from '@/data/mockData';
-import { mockHandyChats } from '@/data/handyMockData';
+import { ChatListSkeleton } from '@/components/skeletons/ChatListSkeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { MessageCircle } from 'lucide-react';
+import { useConversations } from '@/hooks/useChat';
+import { useAuth } from '@/context/AuthContext';
 
 const ChatsPage = () => {
   const navigate = useNavigate();
-  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
+  const { user, profile } = useAuth();
+  const { conversations, isLoading } = useConversations();
+
+  // Fallback to localStorage for backwards compatibility
+  const userType = profile?.user_type || localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = userType === 'handy';
 
   const emptyStateText = isHandy
     ? 'Begin met swipen op projecten om contact te leggen met klanten'
-    : 'Begin met swipen om contact te leggen met Handy\'s';
+    : "Begin met swipen om contact te leggen met Handy's";
 
-  const headerSubtitle = isHandy ? 'Gesprekken met klanten' : 'Gesprekken met Handy\'s';
+  const headerSubtitle = isHandy ? 'Gesprekken met klanten' : "Gesprekken met Handy's";
 
-  const chats = isHandy ? mockHandyChats : mockChats;
+  // Map conversations to display format, showing the other participant's name
+  const chats = conversations.map((conv) => {
+    const isParticipant1 = conv.participant_1 === user?.id;
+    const otherProfile = isParticipant1 ? conv.p2 : conv.p1;
+
+    return {
+      id: conv.id,
+      participant: {
+        name: otherProfile?.full_name || 'Onbekend',
+        avatar:
+          otherProfile?.avatar_url ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${isParticipant1 ? conv.participant_2 : conv.participant_1}`,
+        isOnline: false,
+      },
+      lastMessage: conv.last_message || '',
+      lastMessageTime: conv.last_message_at ? new Date(conv.last_message_at) : new Date(conv.created_at),
+      unreadCount: 0,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -27,8 +50,10 @@ const ChatsPage = () => {
 
       <div className="px-4 py-4">
         <p className="text-sm text-muted-foreground mb-4">{headerSubtitle}</p>
-        
-        {chats.length === 0 ? (
+
+        {isLoading ? (
+          <ChatListSkeleton />
+        ) : chats.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

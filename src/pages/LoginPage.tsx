@@ -4,38 +4,61 @@ import { motion } from 'framer-motion';
 import { Hammer, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userType = location.state?.userType || 'seeker';
-  
+  const { signIn, signUp } = useAuth();
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     username: '',
     password: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
     // Simple validation
     if (!formData.email || !formData.password || (!isLogin && !formData.username)) {
       toast.error('Vul alle velden in');
       return;
     }
 
-    // Store user type
-    localStorage.setItem('handymatch_userType', userType);
-    localStorage.setItem('handymatch_user', JSON.stringify({
-      email: formData.email,
-      username: formData.username || formData.email.split('@')[0],
-    }));
+    setIsSubmitting(true);
 
-    toast.success(isLogin ? 'Welkom terug!' : 'Account aangemaakt!');
-    navigate('/swipe');
+    try {
+      if (isLogin) {
+        const { error } = await signIn(formData.email, formData.password);
+        if (error) {
+          toast.error(error);
+          return;
+        }
+        toast.success('Welkom terug!');
+        navigate('/swipe');
+      } else {
+        const { error } = await signUp(formData.email, formData.password, userType, formData.username);
+        if (error) {
+          toast.error(error);
+          return;
+        }
+        // Keep localStorage as fallback for backwards compatibility
+        localStorage.setItem('handymatch_userType', userType);
+        localStorage.setItem('handymatch_user', JSON.stringify({
+          email: formData.email,
+          username: formData.username,
+        }));
+        toast.success('Account aangemaakt!');
+        navigate('/onboarding');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -67,8 +90,8 @@ const LoginPage = () => {
             {isLogin ? 'Welkom terug' : 'Account aanmaken'}
           </h1>
           <p className="text-muted-foreground">
-            {isLogin 
-              ? 'Log in om verder te gaan' 
+            {isLogin
+              ? 'Log in om verder te gaan'
               : 'Maak een account om te starten'}
           </p>
         </motion.div>
@@ -86,7 +109,7 @@ const LoginPage = () => {
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Gebruikersnaam"
+                placeholder="Volledige naam"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 className="pl-12 h-14 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground"
@@ -139,11 +162,18 @@ const LoginPage = () => {
         className="p-6 safe-area-bottom space-y-4"
       >
         <button
-          onClick={handleSubmit}
-          className="w-full py-4 px-6 rounded-2xl btn-cta font-semibold text-lg flex items-center justify-center gap-3"
+          onClick={() => handleSubmit()}
+          disabled={isSubmitting}
+          className="w-full py-4 px-6 rounded-2xl btn-cta font-semibold text-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isLogin ? 'Inloggen' : 'Account aanmaken'}
-          <ArrowRight className="w-5 h-5" />
+          {isSubmitting ? (
+            <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+          ) : (
+            <>
+              {isLogin ? 'Inloggen' : 'Account aanmaken'}
+              <ArrowRight className="w-5 h-5" />
+            </>
+          )}
         </button>
 
         <p className="text-center text-muted-foreground">

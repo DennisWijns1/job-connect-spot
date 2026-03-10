@@ -25,37 +25,57 @@ import {
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
+  const { profile, signOut, refreshProfile } = useAuth();
+
+  // Fallback to localStorage for backwards compatibility
+  const userType = profile?.user_type || localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = userType === 'handy';
-  const [isOnline, setIsOnline] = useState(true);
+
+  const [isOnline, setIsOnline] = useState(profile?.is_online ?? true);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showLocationEdit, setShowLocationEdit] = useState(false);
   const [userAddress, setUserAddress] = useState<UserAddress>(getStoredAddress());
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url || null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
-  const user = JSON.parse(localStorage.getItem('handymatch_user') || '{}');
+  // Fallback user info from localStorage
+  const localUser = JSON.parse(localStorage.getItem('handymatch_user') || '{}');
+
+  const displayName = profile?.full_name || localUser.username || 'Gebruiker';
+  const displayEmail = localUser.email || '';
+  const displayRating = (profile as any)?.average_rating || 0;
+  const reviewCount = (profile as any)?.review_count || 0;
 
   useEffect(() => {
     setUserAddress(getStoredAddress());
-    // Load saved avatar
-    const savedAvatar = localStorage.getItem('handymatch_avatar');
-    if (savedAvatar) setAvatarPreview(savedAvatar);
-  }, []);
+    // Load saved avatar from localStorage as fallback
+    if (!profile?.avatar_url) {
+      const savedAvatar = localStorage.getItem('handymatch_avatar');
+      if (savedAvatar) setAvatarPreview(savedAvatar);
+    } else {
+      setAvatarPreview(profile.avatar_url);
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (profile) setIsOnline(profile.is_online ?? true);
+  }, [profile]);
 
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
 
-  const processFile = (file: File) => {
+  const processFile = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Foto mag maximaal 5MB zijn');
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const dataUrl = reader.result as string;
       setAvatarPreview(dataUrl);
       localStorage.setItem('handymatch_avatar', dataUrl);
@@ -80,22 +100,22 @@ const ProfilePage = () => {
 
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
-      
+
       const canvas = document.createElement('canvas');
-      
+
       const btnRow = document.createElement('div');
       btnRow.style.cssText = 'position:absolute;bottom:40px;display:flex;gap:16px;z-index:10;';
-      
+
       const snapBtn = document.createElement('button');
-      snapBtn.textContent = '📸 Maak foto';
+      snapBtn.textContent = 'Maak foto';
       snapBtn.style.cssText = 'padding:12px 24px;border-radius:999px;background:#F97316;color:#fff;font-weight:600;border:none;font-size:16px;';
-      
+
       const cancelBtn = document.createElement('button');
       cancelBtn.textContent = 'Annuleer';
       cancelBtn.style.cssText = 'padding:12px 24px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-weight:600;border:none;font-size:16px;';
 
       const cleanup = () => {
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach((t) => t.stop());
         overlay.remove();
       };
 
@@ -104,9 +124,13 @@ const ProfilePage = () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d')?.drawImage(video, 0, 0);
-        canvas.toBlob((blob) => {
-          if (blob) processFile(new File([blob], 'camera.jpg', { type: 'image/jpeg' }));
-        }, 'image/jpeg', 0.85);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) processFile(new File([blob], 'camera.jpg', { type: 'image/jpeg' }));
+          },
+          'image/jpeg',
+          0.85
+        );
         cleanup();
       };
 
@@ -119,16 +143,38 @@ const ProfilePage = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('handymatch_userType');
-    localStorage.removeItem('handymatch_user');
-    toast.success('Tot ziens!');
-    navigate('/');
+  const handleOnlineToggle = async (value: boolean) => {
+    setIsOnline(value);
+    try {
+      if (profile) {
+        await supabase
+          .from('profiles')
+          .update({ is_online: value })
+          .eq('user_id', profile.user_id);
+        await refreshProfile();
+      }
+    } catch (err) {
+      console.error('Error updating online status:', err);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Tot ziens!');
+      navigate('/');
+    } catch (err) {
+      console.error('Logout error:', err);
+      // Fallback
+      localStorage.removeItem('handymatch_userType');
+      localStorage.removeItem('handymatch_user');
+      navigate('/');
+    }
   };
 
   const menuItems = isHandy
     ? [
-        { icon: Camera, label: 'Foto\'s beheren', description: 'Upload werken', path: '/profile/photos', navigate: true },
+        { icon: Camera, label: "Foto's beheren", description: 'Upload werken', path: '/profile/photos', navigate: true },
         { icon: CheckCircle, label: 'Afgewerkte projecten', description: 'Bekijk voltooide klussen', path: '/profile/completed', navigate: true },
         { icon: Briefcase, label: 'Specialisaties', description: 'Bewerk vaardigheden', path: '/profile/skills', navigate: true },
         { icon: BookOpen, label: 'Lessen & Trainingen', description: 'Leer nieuwe vaardigheden', path: '/learning', navigate: true },
@@ -137,7 +183,7 @@ const ProfilePage = () => {
       ]
     : [
         { icon: Plus, label: 'Project plaatsen', description: 'Beschrijf je klus', action: 'createProject' },
-        { icon: Star, label: 'Favorieten', description: 'Opgeslagen Handy\'s', action: 'favorites' },
+        { icon: Star, label: 'Favorieten', description: "Opgeslagen Handy's", action: 'favorites' },
         { icon: MapPin, label: 'Locatie', description: `${userAddress.street}, ${userAddress.postalCode} ${userAddress.city}`, action: 'location' },
       ];
 
@@ -176,10 +222,19 @@ const ProfilePage = () => {
               </button>
               {showAvatarMenu && (
                 <div className="absolute -bottom-20 -right-2 bg-card rounded-xl shadow-lg border border-border z-50 overflow-hidden">
-                  <button onClick={handleOpenCamera} className="flex items-center gap-2 px-4 py-2 hover:bg-muted text-sm text-foreground w-full">
+                  <button
+                    onClick={handleOpenCamera}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-muted text-sm text-foreground w-full"
+                  >
                     <Camera className="w-4 h-4" /> Camera
                   </button>
-                  <button onClick={() => { setShowAvatarMenu(false); avatarInputRef.current?.click(); }} className="flex items-center gap-2 px-4 py-2 hover:bg-muted text-sm text-foreground w-full">
+                  <button
+                    onClick={() => {
+                      setShowAvatarMenu(false);
+                      avatarInputRef.current?.click();
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-muted text-sm text-foreground w-full"
+                  >
                     <User className="w-4 h-4" /> Bestand
                   </button>
                 </div>
@@ -187,22 +242,24 @@ const ProfilePage = () => {
             </div>
             <div className="flex-1">
               <h2 className="font-display font-bold text-xl text-foreground">
-                {user.username || 'Gebruiker'}
+                {displayName}
               </h2>
-              <p className="text-muted-foreground text-sm">{user.email}</p>
+              <p className="text-muted-foreground text-sm">{displayEmail}</p>
               {isHandy && (
                 <div className="flex items-center gap-2 mt-2">
-                  <HammerRating rating={4.5} size="sm" />
-                  <span className="text-sm text-muted-foreground">(0 reviews)</span>
+                  <HammerRating rating={displayRating || 4.5} size="sm" />
+                  <span className="text-sm text-muted-foreground">({reviewCount} reviews)</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* User Type Badge */}
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl ${
-            isHandy ? 'bg-secondary text-foreground' : 'bg-accent/10 text-accent'
-          }`}>
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl ${
+              isHandy ? 'bg-secondary text-foreground' : 'bg-accent/10 text-accent'
+            }`}
+          >
             {isHandy ? <Briefcase className="w-4 h-4" /> : <User className="w-4 h-4" />}
             <span className="font-medium text-sm">
               {isHandy ? 'Handy Account' : 'Zoeker Account'}
@@ -218,7 +275,7 @@ const ProfilePage = () => {
                   {isOnline ? 'Je bent zichtbaar' : 'Je bent offline'}
                 </p>
               </div>
-              <Switch checked={isOnline} onCheckedChange={setIsOnline} />
+              <Switch checked={isOnline} onCheckedChange={handleOnlineToggle} />
             </div>
           )}
         </motion.div>
@@ -273,6 +330,7 @@ const ProfilePage = () => {
         >
           <CalendarSection />
         </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -323,16 +381,16 @@ const ProfilePage = () => {
       </div>
 
       {/* Sheets */}
-      <CreateProjectSheet 
-        isOpen={showCreateProject} 
-        onClose={() => setShowCreateProject(false)} 
+      <CreateProjectSheet
+        isOpen={showCreateProject}
+        onClose={() => setShowCreateProject(false)}
       />
-      <FavoritesSheet 
-        isOpen={showFavorites} 
-        onClose={() => setShowFavorites(false)} 
+      <FavoritesSheet
+        isOpen={showFavorites}
+        onClose={() => setShowFavorites(false)}
       />
-      <LocationEditSheet 
-        isOpen={showLocationEdit} 
+      <LocationEditSheet
+        isOpen={showLocationEdit}
         onClose={() => setShowLocationEdit(false)}
         onSave={(addr) => setUserAddress(addr)}
       />

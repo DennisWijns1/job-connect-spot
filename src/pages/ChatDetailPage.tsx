@@ -1,18 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mockChats } from '@/data/mockData';
-import { mockHandyChats } from '@/data/handyMockData';
 import { Send, Calendar, Phone, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { AddToCalendarSheet, AppointmentData } from '@/components/AddToCalendarSheet';
+import { useMessages, useSendMessage } from '@/hooks/useChat';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const ChatDetailPage = () => {
   const { id } = useParams();
   const location = useLocation();
-  
+  const { user } = useAuth();
+
   // State uit navigatie voor nieuwe chat
   const navState = location.state as {
     isNewChat?: boolean;
@@ -20,28 +22,21 @@ const ChatDetailPage = () => {
     handyName?: string;
     handyAvatar?: string;
   } | null;
-  
+
   const isNewChat = navState?.isNewChat && id?.startsWith('new-');
-  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
-  const isHandy = userType === 'handy';
-  const allChats = isHandy ? mockHandyChats : mockChats;
-  const existingChat = allChats.find(c => c.id === id);
-  
-  // Participant bepalen
-  const participant = isNewChat 
-    ? {
-        id: navState!.handyId!,
-        name: navState!.handyName!,
-        avatar: navState!.handyAvatar!,
-        isOnline: true,
-      }
-    : existingChat?.participant;
-  
-  const [messages, setMessages] = useState(
-    isNewChat ? [] : (existingChat?.messages || [])
-  );
+
+  const conversationId = isNewChat ? null : (id || null);
+  const { messages: supabaseMessages, isLoading: messagesLoading } = useMessages(conversationId);
+  const sendMessage = useSendMessage();
+
   const [input, setInput] = useState('');
   const [showCalendarSheet, setShowCalendarSheet] = useState(false);
+  const [participant, setParticipant] = useState<{
+    id: string;
+    name: string;
+    avatar: string;
+    isOnline: boolean;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -50,20 +45,68 @@ const ChatDetailPage = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [supabaseMessages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // Load participant info from conversation
+  useEffect(() => {
+    if (isNewChat && navState) {
+      setParticipant({
+        id: navState.handyId!,
+        name: navState.handyName!,
+        avatar: navState.handyAvatar!,
+        isOnline: true,
+      });
+      return;
+    }
 
-    const newMessage = {
-      id: Date.now().toString(),
-      senderId: 'user',
-      text: input,
-      timestamp: new Date(),
+    if (!id || !user) return;
+
+    const loadParticipant = async () => {
+      try {
+        const { data: conv } = await supabase
+          .from('conversations')
+          .select('participant_1, participant_2')
+          .eq('id', id)
+          .single();
+
+        if (!conv) return;
+
+        const otherUserId = conv.participant_1 === user.id ? conv.participant_2 : conv.participant_1;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, avatar_url, is_online')
+          .eq('user_id', otherUserId)
+          .single();
+
+        if (profile) {
+          setParticipant({
+            id: profile.user_id,
+            name: profile.full_name || 'Onbekend',
+            avatar: profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user_id}`,
+            isOnline: profile.is_online || false,
+          });
+        }
+      } catch (err) {
+        console.error('Error loading participant:', err);
+      }
     };
 
-    setMessages([...messages, newMessage]);
+    loadParticipant();
+  }, [id, user, isNewChat, navState]);
+
+  const handleSend = async () => {
+    if (!input.trim() || !conversationId) return;
+
+    const content = input;
     setInput('');
+
+    try {
+      await sendMessage(conversationId, content);
+    } catch (err) {
+      console.error('Error sending message:', err);
+      setInput(content);
+    }
   };
 
   const handleAppointment = () => {
@@ -71,12 +114,20 @@ const ChatDetailPage = () => {
   };
 
   const handleConfirmAppointment = (appointment: AppointmentData) => {
-    // Hier kun je de afspraak opslaan in de database
     console.log('Afspraak bevestigd:', appointment);
   };
 
-  if (!participant) {
-    return <div>Chat niet gevonden</div>;
+  // Map supabase messages to display format
+  const displayMessages = supabaseMessages.map((msg) => ({
+    id: msg.id,
+    senderId: msg.sender_id === user?.id ? 'user' : 'other',
+    text: msg.content,
+    timestamp: new Date(msg.created_at),
+    isAppointmentRequest: false,
+  }));
+
+  if (!participant && !messagesLoading) {
+    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Chat niet gevonden</div>;
   }
 
   return (
@@ -91,24 +142,28 @@ const ChatDetailPage = () => {
             >
               ←
             </button>
-            <div className="relative">
-              <img
-                src={participant.avatar}
-                alt={participant.name}
-                className="w-10 h-10 rounded-xl object-cover"
-              />
-              {participant.isOnline && (
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-card" />
-              )}
-            </div>
-            <div>
-              <h1 className="font-semibold text-foreground">
-                {participant.name}
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                {participant.isOnline ? 'Online' : 'Offline'}
-              </p>
-            </div>
+            {participant && (
+              <>
+                <div className="relative">
+                  <img
+                    src={participant.avatar}
+                    alt={participant.name}
+                    className="w-10 h-10 rounded-xl object-cover"
+                  />
+                  {participant.isOnline && (
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-card" />
+                  )}
+                </div>
+                <div>
+                  <h1 className="font-semibold text-foreground">
+                    {participant.name}
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    {participant.isOnline ? 'Online' : 'Offline'}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -124,10 +179,10 @@ const ChatDetailPage = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages.length === 0 ? (
+        {displayMessages.length === 0 && participant ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <img 
-              src={participant.avatar} 
+            <img
+              src={participant.avatar}
               alt={participant.name}
               className="w-20 h-20 rounded-full object-cover mb-4 border-4 border-card shadow-lg"
             />
@@ -140,7 +195,7 @@ const ChatDetailPage = () => {
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
-            {messages.map((message) => (
+            {displayMessages.map((message) => (
               <motion.div
                 key={message.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -150,7 +205,8 @@ const ChatDetailPage = () => {
                 <div
                   className={`max-w-[75%] p-4 rounded-2xl ${
                     message.senderId === 'user'
-                      ? 'rounded-br-sm text-white' : 'bg-card shadow-soft rounded-bl-sm border border-border'
+                      ? 'rounded-br-sm text-white'
+                      : 'bg-card shadow-soft rounded-bl-sm border border-border'
                   }`}
                   style={message.senderId === 'user' ? { backgroundColor: 'hsl(330, 65%, 55%)' } : {}}
                 >

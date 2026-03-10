@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
@@ -13,29 +13,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UploadedDoc {
   id: string;
   name: string;
   type: 'diploma' | 'payslip' | 'certificate' | 'other';
   uploadedAt: string;
-  status: 'pending' | 'verified' | 'rejected';
+  status: 'pending' | 'analyzing' | 'verified' | 'rejected';
+  document_url?: string;
 }
-
-const STORAGE_KEY = 'handymatch_verification';
-
-const getStoredVerification = () => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) return JSON.parse(stored);
-  return {
-    linkedinUrl: '',
-    documents: [] as UploadedDoc[],
-    diplomaVerified: false,
-    experienceVerified: false,
-    identityVerified: false,
-    lessonsCompleted: 2,
-  };
-};
 
 // Fictive completed lessons that count as verification
 const completedLessonVerifications = [
@@ -59,51 +47,164 @@ const completedLessonVerifications = [
 
 const VerificationPage = () => {
   const navigate = useNavigate();
-  const [verification, setVerification] = useState(getStoredVerification);
-  const [linkedinUrl, setLinkedinUrl] = useState(verification.linkedinUrl || '');
-  const [documents, setDocuments] = useState<UploadedDoc[]>(verification.documents || []);
+  const { user, refreshProfile } = useAuth();
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [documents, setDocuments] = useState<UploadedDoc[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSavingLinkedin, setIsSavingLinkedin] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<'diploma' | 'payslip' | 'certificate' | 'other'>('diploma');
 
-  const saveVerification = (updates: any) => {
-    const data = { ...verification, ...updates };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    setVerification(data);
-  };
+  // Load existing verifications from Supabase on mount
+  useEffect(() => {
+    if (!user) return;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const loadData = async () => {
+      try {
+        // Load profile for linkedin URL
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('linkedin_url')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profileData?.linkedin_url) setLinkedinUrl(profileData.linkedin_url);
+
+        // Load verifications
+        const { data: verData } = await supabase
+          .from('handy_verifications')
+          .select('*')
+          .eq('handy_id', user.id)
+          .order('uploaded_at', { ascending: false });
+
+        if (verData) {
+          const docs: UploadedDoc[] = verData.map((v: any) => ({
+            id: v.id,
+            name: v.document_url.split('/').pop() || 'Document',
+            type: v.document_type as UploadedDoc['type'],
+            uploadedAt: new Date(v.uploaded_at).toLocaleDateString('nl-BE'),
+            status: v.status as UploadedDoc['status'],
+            document_url: v.document_url,
+          }));
+          setDocuments(docs);
+        }
+      } catch (err) {
+        console.error('Error loading verification data:', err);
+        // Fallback to localStorage
+        const stored = localStorage.getItem('handymatch_verification');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed.linkedinUrl) setLinkedinUrl(parsed.linkedinUrl);
+          if (parsed.documents) setDocuments(parsed.documents);
+        }
+      }
+    };
+
+    loadData();
+  }, [user]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
+
     if (file.size > 10 * 1024 * 1024) {
       toast.error('Bestand mag maximaal 10MB zijn');
       return;
     }
 
-    const newDoc: UploadedDoc = {
-      id: Date.now().toString(),
-      name: file.name,
-      type: uploadType,
-      uploadedAt: new Date().toLocaleDateString('nl-BE'),
-      status: 'pending',
-    };
+    setIsUploading(true);
 
-    const updatedDocs = [...documents, newDoc];
-    setDocuments(updatedDocs);
-    saveVerification({ documents: updatedDocs });
-    toast.success(`${file.name} geüpload! Verificatie wordt verwerkt.`);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('verification-docs')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('verification-docs')
+        .getPublicUrl(fileName);
+
+      const documentUrl = urlData?.publicUrl || fileName;
+
+      const { data: verRecord, error: insertError } = await supabase
+        .from('handy_verifications')
+        .insert({
+          handy_id: user.id,
+          document_url: documentUrl,
+          document_type: uploadType,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      const newDoc: UploadedDoc = {
+        id: verRecord.id,
+        name: file.name,
+        type: uploadType,
+        uploadedAt: new Date().toLocaleDateString('nl-BE'),
+        status: 'pending',
+        document_url: documentUrl,
+      };
+
+      setDocuments((prev) => [newDoc, ...prev]);
+      toast.success(`${file.name} geüpload! Verificatie wordt verwerkt.`);
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      // Fallback: save locally
+      const newDoc: UploadedDoc = {
+        id: Date.now().toString(),
+        name: file.name,
+        type: uploadType,
+        uploadedAt: new Date().toLocaleDateString('nl-BE'),
+        status: 'pending',
+      };
+      setDocuments((prev) => [newDoc, ...prev]);
+      toast.success(`${file.name} geüpload!`);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
-  const removeDocument = (id: string) => {
-    const updatedDocs = documents.filter(d => d.id !== id);
-    setDocuments(updatedDocs);
-    saveVerification({ documents: updatedDocs });
+  const removeDocument = async (id: string) => {
+    if (user) {
+      try {
+        await supabase.from('handy_verifications').delete().eq('id', id);
+      } catch (err) {
+        console.error('Error deleting verification:', err);
+      }
+    }
+    setDocuments((prev) => prev.filter((d) => d.id !== id));
     toast.success('Document verwijderd');
   };
 
-  const handleLinkedinSave = () => {
-    saveVerification({ linkedinUrl });
-    toast.success('LinkedIn profiel opgeslagen!');
+  const handleLinkedinSave = async () => {
+    if (!user) return;
+    setIsSavingLinkedin(true);
+
+    try {
+      await supabase
+        .from('profiles')
+        .update({ linkedin_url: linkedinUrl })
+        .eq('user_id', user.id);
+      await refreshProfile();
+      toast.success('LinkedIn profiel opgeslagen!');
+    } catch (err) {
+      console.error('Error saving LinkedIn URL:', err);
+      // Fallback to localStorage
+      const stored = localStorage.getItem('handymatch_verification');
+      const data = stored ? JSON.parse(stored) : {};
+      localStorage.setItem('handymatch_verification', JSON.stringify({ ...data, linkedinUrl }));
+      toast.success('LinkedIn profiel opgeslagen!');
+    } finally {
+      setIsSavingLinkedin(false);
+    }
   };
 
   const getTypeLabel = (type: string) => {
@@ -121,16 +222,19 @@ const VerificationPage = () => {
         return <Badge className="bg-emerald-100 text-emerald-700 border-0">Geverifieerd</Badge>;
       case 'rejected':
         return <Badge className="bg-red-100 text-red-700 border-0">Afgekeurd</Badge>;
+      case 'analyzing':
+        return <Badge className="bg-blue-100 text-blue-700 border-0">Analyseren</Badge>;
       default:
         return <Badge className="bg-amber-100 text-amber-700 border-0">In behandeling</Badge>;
     }
   };
 
+  // Calculate real verification score from actual data
   const verificationScore = [
     completedLessonVerifications.length > 0,
-    documents.some(d => d.type === 'diploma'),
+    documents.some((d) => d.type === 'diploma' || d.type === 'certificate'),
     linkedinUrl.length > 0,
-    documents.some(d => d.type === 'payslip'),
+    documents.some((d) => d.type === 'payslip'),
   ].filter(Boolean).length;
 
   return (
@@ -155,7 +259,7 @@ const VerificationPage = () => {
             </div>
           </div>
           <div className="flex gap-1.5 mt-4">
-            {[0, 1, 2, 3].map(i => (
+            {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
                 className={`h-2 flex-1 rounded-full ${
@@ -166,9 +270,8 @@ const VerificationPage = () => {
           </div>
           <p className="text-xs opacity-75 mt-2">
             {verificationScore === 4
-              ? '🎉 Volledig geverifieerd! Je profiel straalt vertrouwen uit.'
-              : 'Hoe meer je verifieert, hoe meer vertrouwen klanten in jou hebben.'
-            }
+              ? 'Volledig geverifieerd! Je profiel straalt vertrouwen uit.'
+              : 'Hoe meer je verifieert, hoe meer vertrouwen klanten in jou hebben.'}
           </p>
         </motion.div>
 
@@ -195,7 +298,7 @@ const VerificationPage = () => {
 
             {completedLessonVerifications.length > 0 ? (
               <div className="space-y-3 mb-4">
-                {completedLessonVerifications.map(lesson => (
+                {completedLessonVerifications.map((lesson) => (
                   <div key={lesson.id} className="flex items-center gap-3 bg-emerald-50 rounded-xl p-3 border border-emerald-100">
                     <Award className="w-5 h-5 text-accent flex-shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -205,7 +308,7 @@ const VerificationPage = () => {
                       </p>
                     </div>
                     <Badge className="bg-emerald-100 text-emerald-700 border-0 text-xs flex-shrink-0">
-                      ✓ Diploma
+                      Diploma
                     </Badge>
                   </div>
                 ))}
@@ -256,7 +359,7 @@ const VerificationPage = () => {
 
             {/* Upload type selector */}
             <div className="flex gap-2 mb-4">
-              {(['diploma', 'certificate'] as const).map(type => (
+              {(['diploma', 'certificate'] as const).map((type) => (
                 <button
                   key={type}
                   onClick={() => setUploadType(type)}
@@ -266,35 +369,42 @@ const VerificationPage = () => {
                       : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  {type === 'diploma' ? '📜 Diploma' : '📋 Certificaat'}
+                  {type === 'diploma' ? 'Diploma' : 'Certificaat'}
                 </button>
               ))}
             </div>
 
             <Button
               onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
               className="w-full rounded-xl bg-gradient-to-r from-accent to-accent/80 text-white font-semibold h-12 mb-4"
             >
               <Upload className="w-4 h-4 mr-2" />
-              {uploadType === 'diploma' ? 'Diploma uploaden' : 'Certificaat uploaden'}
+              {isUploading
+                ? 'Uploaden...'
+                : uploadType === 'diploma'
+                ? 'Diploma uploaden'
+                : 'Certificaat uploaden'}
             </Button>
 
             {/* Uploaded documents */}
-            {documents.filter(d => d.type === 'diploma' || d.type === 'certificate').length > 0 && (
+            {documents.filter((d) => d.type === 'diploma' || d.type === 'certificate').length > 0 && (
               <div className="space-y-2">
-                {documents.filter(d => d.type === 'diploma' || d.type === 'certificate').map(doc => (
-                  <div key={doc.id} className="flex items-center gap-3 bg-background rounded-xl p-3 border border-border">
-                    <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{doc.name}</p>
-                      <p className="text-xs text-muted-foreground">{getTypeLabel(doc.type)} • {doc.uploadedAt}</p>
+                {documents
+                  .filter((d) => d.type === 'diploma' || d.type === 'certificate')
+                  .map((doc) => (
+                    <div key={doc.id} className="flex items-center gap-3 bg-background rounded-xl p-3 border border-border">
+                      <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{doc.name}</p>
+                        <p className="text-xs text-muted-foreground">{getTypeLabel(doc.type)} • {doc.uploadedAt}</p>
+                      </div>
+                      {getStatusBadge(doc.status)}
+                      <button onClick={() => removeDocument(doc.id)} className="p-1 hover:bg-muted rounded-lg">
+                        <X className="w-4 h-4 text-muted-foreground" />
+                      </button>
                     </div>
-                    {getStatusBadge(doc.status)}
-                    <button onClick={() => removeDocument(doc.id)} className="p-1 hover:bg-muted rounded-lg">
-                      <X className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
@@ -333,10 +443,11 @@ const VerificationPage = () => {
                 />
                 <Button
                   onClick={handleLinkedinSave}
+                  disabled={isSavingLinkedin}
                   size="sm"
                   className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4"
                 >
-                  Opslaan
+                  {isSavingLinkedin ? '...' : 'Opslaan'}
                 </Button>
               </div>
               {linkedinUrl && (
@@ -358,6 +469,7 @@ const VerificationPage = () => {
                   setUploadType('payslip');
                   fileInputRef.current?.click();
                 }}
+                disabled={isUploading}
                 variant="outline"
                 className="w-full rounded-xl border-dashed border-2 border-border h-12 text-muted-foreground hover:border-primary hover:text-primary"
               >
@@ -365,21 +477,23 @@ const VerificationPage = () => {
                 Loonbrief of contract uploaden
               </Button>
 
-              {documents.filter(d => d.type === 'payslip').length > 0 && (
+              {documents.filter((d) => d.type === 'payslip').length > 0 && (
                 <div className="space-y-2 mt-2">
-                  {documents.filter(d => d.type === 'payslip').map(doc => (
-                    <div key={doc.id} className="flex items-center gap-3 bg-background rounded-xl p-3 border border-border">
-                      <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{doc.name}</p>
-                        <p className="text-xs text-muted-foreground">{doc.uploadedAt}</p>
+                  {documents
+                    .filter((d) => d.type === 'payslip')
+                    .map((doc) => (
+                      <div key={doc.id} className="flex items-center gap-3 bg-background rounded-xl p-3 border border-border">
+                        <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{doc.name}</p>
+                          <p className="text-xs text-muted-foreground">{doc.uploadedAt}</p>
+                        </div>
+                        {getStatusBadge(doc.status)}
+                        <button onClick={() => removeDocument(doc.id)} className="p-1 hover:bg-muted rounded-lg">
+                          <X className="w-4 h-4 text-muted-foreground" />
+                        </button>
                       </div>
-                      {getStatusBadge(doc.status)}
-                      <button onClick={() => removeDocument(doc.id)} className="p-1 hover:bg-muted rounded-lg">
-                        <X className="w-4 h-4 text-muted-foreground" />
-                      </button>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
             </div>

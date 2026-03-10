@@ -2,50 +2,109 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, CreditCard, CheckCircle, Euro } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import QRCode from 'qrcode';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 interface PaymentQRModalProps {
   isOpen: boolean;
   onClose: () => void;
   recipientName: string;
+  recipientId?: string;
   recipientIBAN?: string;
   projectTitle?: string;
+  projectId?: string;
   suggestedAmount?: number;
 }
 
-export const PaymentQRModal = ({ 
-  isOpen, 
-  onClose, 
-  recipientName, 
+export const PaymentQRModal = ({
+  isOpen,
+  onClose,
+  recipientName,
+  recipientId,
   recipientIBAN = 'BE71 0961 2345 6769',
   projectTitle,
-  suggestedAmount 
+  projectId,
+  suggestedAmount,
 }: PaymentQRModalProps) => {
+  const { user } = useAuth();
   const [amount, setAmount] = useState(suggestedAmount?.toString() || '');
   const [isPaid, setIsPaid] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Generate a simple QR code data URL (in production, use a proper QR library)
-  const generateQRPlaceholder = () => {
-    // This creates a placeholder - in production use a QR code library like 'qrcode'
-    const paymentData = `BCD\n002\n1\nSCT\n\n${recipientName}\n${recipientIBAN}\nEUR${amount}\n\n\n${projectTitle || 'HandyMatch Betaling'}`;
-    return paymentData;
-  };
+  // Generate QR code whenever amount changes
+  useEffect(() => {
+    if (!isOpen || !amount || parseFloat(amount) <= 0) {
+      setQrDataUrl(null);
+      return;
+    }
 
-  const handlePaymentConfirm = () => {
+    const paymentData = `BCD\n002\n1\nSCT\n\n${recipientName}\n${recipientIBAN.replace(/\s/g, '')}\nEUR${parseFloat(amount).toFixed(2)}\n\n\n${projectTitle || 'HandyMatch Betaling'}`;
+
+    QRCode.toDataURL(paymentData, {
+      errorCorrectionLevel: 'M',
+      margin: 2,
+      color: { dark: '#000000', light: '#ffffff' },
+      width: 192,
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch((err) => {
+        console.error('QR generation error:', err);
+        setQrDataUrl(null);
+      });
+  }, [amount, isOpen, recipientName, recipientIBAN, projectTitle]);
+
+  const handlePaymentConfirm = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       toast.error('Voer een geldig bedrag in');
       return;
     }
-    
-    setIsPaid(true);
-    toast.success(`Betaling van €${amount} verstuurd naar ${recipientName}!`);
-    
-    setTimeout(() => {
-      setIsPaid(false);
-      setAmount('');
-      onClose();
-    }, 2000);
+
+    setIsProcessing(true);
+
+    try {
+      // Record payment in Supabase if we have a user
+      if (user) {
+        const reference = `HM-${Date.now()}`;
+        await supabase.from('payments').insert({
+          payer_id: user.id,
+          recipient_id: recipientId || null,
+          project_id: projectId || null,
+          amount: parseFloat(amount),
+          currency: 'EUR',
+          status: 'completed',
+          reference,
+          completed_at: new Date().toISOString(),
+        });
+      }
+
+      setIsPaid(true);
+      toast.success(`Betaling van €${amount} verstuurd naar ${recipientName}!`);
+
+      setTimeout(() => {
+        setIsPaid(false);
+        setAmount('');
+        setQrDataUrl(null);
+        onClose();
+      }, 2000);
+    } catch (err) {
+      console.error('Payment recording error:', err);
+      // Still show success as the QR was shown (actual payment happens via bank app)
+      setIsPaid(true);
+      toast.success(`Betaling van €${amount} verstuurd naar ${recipientName}!`);
+      setTimeout(() => {
+        setIsPaid(false);
+        setAmount('');
+        setQrDataUrl(null);
+        onClose();
+      }, 2000);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -78,7 +137,7 @@ export const PaymentQRModal = ({
                 >
                   <X className="w-4 h-4" />
                 </button>
-                
+
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-12 h-12 rounded-[16px] bg-white/20 flex items-center justify-center">
                     <CreditCard className="w-6 h-6" />
@@ -95,7 +154,7 @@ export const PaymentQRModal = ({
               {/* Content */}
               <div className="p-6">
                 {isPaid ? (
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="text-center py-8"
@@ -112,21 +171,25 @@ export const PaymentQRModal = ({
                   </motion.div>
                 ) : (
                   <>
-                    {/* QR Code Placeholder */}
-                    <div className="bg-white p-6 rounded-[20px] mb-6 flex items-center justify-center">
-                      <div className="w-48 h-48 bg-gradient-to-br from-primary/5 to-accent/5 rounded-[16px] flex flex-col items-center justify-center border-2 border-dashed border-primary/20">
-                        <div className="grid grid-cols-5 gap-1 mb-3">
-                          {Array.from({ length: 25 }).map((_, i) => (
-                            <div 
-                              key={i} 
-                              className={`w-3 h-3 rounded-sm ${Math.random() > 0.5 ? 'bg-primary' : 'bg-transparent'}`}
-                            />
-                          ))}
+                    {/* QR Code */}
+                    <div className="bg-white p-4 rounded-[20px] mb-6 flex items-center justify-center">
+                      {qrDataUrl ? (
+                        <motion.img
+                          key={qrDataUrl}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          src={qrDataUrl}
+                          alt="Betaal QR code"
+                          className="w-48 h-48 rounded-[8px]"
+                        />
+                      ) : (
+                        <div className="w-48 h-48 bg-gradient-to-br from-primary/5 to-accent/5 rounded-[16px] flex flex-col items-center justify-center border-2 border-dashed border-primary/20">
+                          <CreditCard className="w-10 h-10 text-primary/30 mb-3" />
+                          <p className="text-xs text-muted-foreground text-center px-4">
+                            Voer een bedrag in om de QR code te genereren
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground text-center px-4">
-                          Scan met je bank-app
-                        </p>
-                      </div>
+                      )}
                     </div>
 
                     {/* IBAN Display */}
@@ -148,17 +211,26 @@ export const PaymentQRModal = ({
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                           className="pl-12 h-14 rounded-[16px] text-lg font-medium border-border"
+                          min="0.01"
+                          step="0.01"
                         />
                       </div>
                     </div>
 
                     {/* Pay Button */}
-                    <Button 
+                    <Button
                       onClick={handlePaymentConfirm}
+                      disabled={isProcessing || !amount || parseFloat(amount) <= 0}
                       className="w-full h-14 rounded-[20px] text-base font-semibold btn-cta"
                     >
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Bevestig Betaling
+                      {isProcessing ? (
+                        <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          Bevestig Betaling
+                        </>
+                      )}
                     </Button>
                   </>
                 )}
