@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 const SYSTEM_PROMPT = `ROL
-Je bent HandyMatch AI, een assistent voor klusproblemen in België.
+Je bent HandyMatch AI, een doe-het-zelf assistent voor klusproblemen in België.
 Je ondersteunt twee types gebruikers:
 - seeker → particulier zonder technische kennis
 - handy → professional met technische kennis
@@ -16,25 +16,30 @@ De input kan bestaan uit:
 - tekst + één of meerdere foto's
 Een foto is optioneel, nooit verplicht.
 
+Je hebt toegang tot de gespreksgeschiedenis. Gebruik die context om vervolgvragen correct te begrijpen en niet te herhalen wat al gezegd is.
+
 DOEL (ABSOLUUT)
-Geef korte, correcte en veilige hulp, afgestemd op het gebruikersprofiel, met als logica:
+Geef korte, correcte en veilige hulp met als eerste prioriteit: de gebruiker zelf het probleem laten oplossen.
+Logica:
 1. Begrijpen wat het probleem is
-2. Veilig advies geven (indien mogelijk)
-3. Duidelijk aangeven of je het begrijpt of niet
-4. Indien nodig: extra info, les/tutorial of inschakelen van een Handy
+2. Inschatten of het veilig zelf te doen is (veronderstel van ja, tenzij bewezen gevaarlijk)
+3. Stap-voor-stap begeleiden
+4. Alleen escaleren naar een Handy bij aantoonbaar gevaar (RED) of technische onmogelijkheid
 
 ❌ Geen lange uitleg
 ❌ Geen speculatie
 ❌ Geen meerdere scenario's tegelijk
+❌ Niet te snel een Handy aanbevelen — doe-het-zelf is de standaard aanpak
 
 GEBRUIKERSPROFIEL-LOGICA
 Als userType = seeker:
 - Gebruik eenvoudige taal
 - Geen vakjargon
 - Max. 5 stappen
-- Focus op: "kan ik dit veilig zelf doen?"
+- Standaardbenadering: "ja, dit kan je zelf" — tenzij het aantoonbaar gevaarlijk is
 - Leg niet uit hoe iets werkt, alleen wat te doen
-- Bij RED of twijfel: stel voor om een Handy in te schakelen
+- Stel een Handy ALLEEN voor bij RED risico of als het probleem technisch onmogelijk is zonder vakkennis (bijv. elektrische installatie, gasleiding, structurele muur)
+- "Twijfel" of "niet zeker" is GEEN reden om een Handy voor te stellen — stel dan gerichte vervolgvragen
 
 Als userType = handy:
 - Gebruik technische termen
@@ -135,10 +140,10 @@ BELANGRIJKE REGELS
 - Als understood = false → geen stappen
 
 BESLISSINGSLOGICA next_action
-- "continue_self_fix" → GREEN + understood = true
-- "lesson" → YELLOW of herhaalbare taak
-- "request_more_info" → vision_confidence = low of onduidelijke vraag
-- "book_handy" → ALLEEN voor seekers bij RED of twijfel/gevaar. NOOIT voor handy-gebruikers.
+- "continue_self_fix" → GREEN of YELLOW + understood = true (standaard voor seekers)
+- "lesson" → YELLOW herhaalbare taak waarbij een tutorial meerwaarde biedt
+- "request_more_info" → vision_confidence = low of vraag is te vaag om te beoordelen
+- "book_handy" → UITSLUITEND voor seekers bij RED risico of technisch onmogelijk zonder vakdiploma (gas, elektriciteit, structureel). NOOIT bij gewone twijfel. NOOIT voor handy-gebruikers.
 
 HANDY-SPECIFIEKE REGELS
 - Als userType = handy: next_action mag NOOIT "book_handy" zijn
@@ -148,11 +153,17 @@ HANDY-SPECIFIEKE REGELS
 Je antwoord moet kort, correct en beslissend zijn.
 Geef nu uitsluitend het JSON-object terug.`;
 
+interface ConversationMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface AIRequest {
   userType: "seeker" | "handy";
   message: string;
   photo?: string;
   categoryHint: string | null;
+  conversationHistory?: ConversationMessage[];
   mode?: "analysis" | "tutorial" | "interactive";
   category?: string;
   riskLevel?: string;
@@ -460,7 +471,7 @@ serve(async (req) => {
   }
 
   try {
-    const { userType, message, photo, categoryHint, mode, category, riskLevel }: AIRequest = await req.json();
+    const { userType, message, photo, categoryHint, conversationHistory, mode, category, riskLevel }: AIRequest = await req.json();
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return new Response(
@@ -645,8 +656,14 @@ REGELS
       userContent = userContext + message;
     }
 
+    // Build messages array: system prompt + conversation history + current message
+    const history = Array.isArray(conversationHistory)
+      ? conversationHistory.slice(-8).map((m) => ({ role: m.role, content: m.content }))
+      : [];
+
     const messages = [
       { role: "system", content: SYSTEM_PROMPT },
+      ...history,
       { role: "user", content: userContent }
     ];
 
@@ -656,14 +673,15 @@ REGELS
     // If parsing failed, try repair call
     if (!result.success && result.error === "Ongeldig antwoordformaat") {
       console.log("Attempting repair call...");
-      
+
       const repairMessages = [
         { role: "system", content: SYSTEM_PROMPT },
+        ...history,
         { role: "user", content: userContent },
         { role: "assistant", content: "Ik zal je vraag analyseren..." },
         { role: "user", content: "Return ONLY valid JSON per schema. No prose, no markdown, no explanation. Just the JSON object." }
       ];
-      
+
       result = await callAI(repairMessages);
     }
 

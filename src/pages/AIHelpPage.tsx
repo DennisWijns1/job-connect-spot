@@ -240,16 +240,28 @@ const AIHelpPage = () => {
     setPhotoPreview(null);
   };
 
-  const sendToAI = async (messageText: string, photo: string | null, photoPreviewUrl: string | null) => {
+  const sendToAI = async (messageText: string, photo: string | null, photoPreviewUrl: string | null, currentMessages: Message[]) => {
     setIsTyping(true);
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 25000);
 
+      // Build conversation history (exclude the just-added user message, max 8 previous)
+      const history = currentMessages
+        .filter((m) => !m.isError)
+        .slice(-8)
+        .map((m) => ({
+          role: m.role,
+          content: m.aiResponse
+            ? [m.aiResponse.main_issue, ...(m.aiResponse.suggested_steps || [])].filter(Boolean).join(' ') || m.content
+            : m.content,
+        }));
+
       const body: any = {
         message: messageText,
         userType: isHandy ? 'handy' : 'seeker',
         categoryHint: null,
+        conversationHistory: history,
       };
       if (photo) {
         body.photo = photo;
@@ -339,7 +351,7 @@ const AIHelpPage = () => {
     }
   };
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!input.trim() && !photoBase64) return;
 
     const messageText = input.trim() || (photoBase64 ? 'Bekijk deze foto en analyseer het probleem.' : '');
@@ -352,14 +364,15 @@ const AIHelpPage = () => {
       photoUrl: photoPreview || undefined,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     const currentPhoto = photoBase64;
     const currentPhotoPreview = photoPreview;
     setInput('');
     clearPhoto();
 
-    await sendToAI(messageText, currentPhoto, currentPhotoPreview);
-  };
+    await sendToAI(messageText, currentPhoto, currentPhotoPreview, updatedMessages);
+  }, [input, photoBase64, photoPreview, messages]);
 
   const handleSuggestion = async (text: string) => {
     const userMessage: Message = {
@@ -369,8 +382,9 @@ const AIHelpPage = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    await sendToAI(text, null, null);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    await sendToAI(text, null, null, updatedMessages);
   };
 
   const handleCTAClick = (action: 'self_fix' | 'lesson' | 'book_handy', topic?: string) => {
