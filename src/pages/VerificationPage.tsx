@@ -68,12 +68,12 @@ const VerificationPage = () => {
           .eq('user_id', user.id)
           .single();
 
-        if (profileData?.linkedin_url) setLinkedinUrl(profileData.linkedin_url);
+        if ((profileData as any)?.linkedin_url) setLinkedinUrl((profileData as any).linkedin_url);
 
         // Load verifications
-        const { data: verData } = await supabase
-          .from('handy_verifications')
-          .select('*')
+        const { data: verData } = await (supabase
+          .from('handy_verifications' as any)
+          .select('*') as any)
           .eq('handy_id', user.id)
           .order('uploaded_at', { ascending: false });
 
