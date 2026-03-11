@@ -9,11 +9,11 @@ export const useConversations = () => {
 
   const fetch = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from('conversations')
+    const { data } = await (supabase
+      .from('conversations' as any)
       .select(
         '*, p1:profiles!participant_1(full_name, avatar_url, user_type), p2:profiles!participant_2(full_name, avatar_url, user_type)'
-      )
+      ) as any)
       .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
       .order('last_message_at', { ascending: false });
     if (data) setConversations(data);
