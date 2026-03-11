@@ -41,12 +41,12 @@ export const useMessages = (conversationId: string | null) => {
   useEffect(() => {
     if (!conversationId) return;
 
-    supabase
-      .from('messages')
-      .select('*, sender:profiles!sender_id(full_name, avatar_url)')
+    (supabase
+      .from('messages' as any)
+      .select('*, sender:profiles!sender_id(full_name, avatar_url)') as any)
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) setMessages(data);
         setIsLoading(false);
       });
