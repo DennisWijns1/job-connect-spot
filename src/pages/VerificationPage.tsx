@@ -130,8 +130,8 @@ const VerificationPage = () => {
 
       const documentUrl = urlData?.publicUrl || fileName;
 
-      const { data: verRecord, error: insertError } = await supabase
-        .from('handy_verifications')
+      const { data: verRecord, error: insertError } = await (supabase
+        .from('handy_verifications' as any) as any)
         .insert({
           handy_id: user.id,
           document_url: documentUrl,
