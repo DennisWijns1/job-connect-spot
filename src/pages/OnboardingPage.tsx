@@ -71,7 +71,7 @@ const OnboardingPage = () => {
           toast.error('Kies minstens één specialisatie');
           return;
         }
-        await supabase.from('profiles').update({ specialties: selectedSpecialties }).eq('user_id', user.id);
+        await supabase.from('profiles').update({ specialty: selectedSpecialties.join(', ') }).eq('user_id', user.id);
 
       } else if (step === 2 && !isHandy) {
         // Seekers: save preferred job types in bio or specialties
