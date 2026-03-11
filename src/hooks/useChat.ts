@@ -79,15 +79,14 @@ export const useSendMessage = () => {
   const send = async (conversationId: string, content: string) => {
     if (!user || !content.trim()) return;
 
-    const { error } = await supabase.from('messages').insert({
+    const { error } = await (supabase.from('messages' as any) as any).insert({
       conversation_id: conversationId,
       sender_id: user.id,
       content: content.trim(),
     });
 
     if (!error) {
-      await supabase
-        .from('conversations')
+      await (supabase.from('conversations' as any) as any)
         .update({
           last_message: content.trim(),
           last_message_at: new Date().toISOString(),
