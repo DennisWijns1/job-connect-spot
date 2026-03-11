@@ -175,7 +175,7 @@ const VerificationPage = () => {
   const removeDocument = async (id: string) => {
     if (user) {
       try {
-        await supabase.from('handy_verifications').delete().eq('id', id);
+        await (supabase.from('handy_verifications' as any) as any).delete().eq('id', id);
       } catch (err) {
         console.error('Error deleting verification:', err);
       }
