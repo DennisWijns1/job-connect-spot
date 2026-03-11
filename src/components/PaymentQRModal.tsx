@@ -70,7 +70,7 @@ export const PaymentQRModal = ({
       // Record payment in Supabase if we have a user
       if (user) {
         const reference = `HM-${Date.now()}`;
-        await supabase.from('payments').insert({
+        await (supabase.from('payments' as any) as any).insert({
           payer_id: user.id,
           recipient_id: recipientId || null,
           project_id: projectId || null,

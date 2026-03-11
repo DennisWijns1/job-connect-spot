@@ -13,7 +13,7 @@ interface Profile {
   location: string | null;
   bio: string | null;
   is_online: boolean;
-  onboarding_completed: boolean;
+  onboarding_completed?: boolean;
 }
 
 interface AuthContextType {

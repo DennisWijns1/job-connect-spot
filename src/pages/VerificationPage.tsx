@@ -189,9 +189,9 @@ const VerificationPage = () => {
     setIsSavingLinkedin(true);
 
     try {
-      await supabase
+      await (supabase
         .from('profiles')
-        .update({ linkedin_url: linkedinUrl })
+        .update({ linkedin_url: linkedinUrl } as any) as any)
         .eq('user_id', user.id);
       await refreshProfile();
       toast.success('LinkedIn profiel opgeslagen!');

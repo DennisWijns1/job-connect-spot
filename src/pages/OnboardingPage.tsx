@@ -93,7 +93,7 @@ const OnboardingPage = () => {
       // Last step: mark onboarding complete
       const isLastStep = step === totalSteps - 1;
       if (isLastStep) {
-        await supabase.from('profiles').update({ onboarding_completed: true }).eq('user_id', user.id);
+        await (supabase.from('profiles').update({ onboarding_completed: true } as any) as any).eq('user_id', user.id);
         await refreshProfile();
         setStep((prev) => prev + 1);
       } else if (step < totalSteps) {

@@ -106,9 +106,9 @@ export const useOrCreateConversation = () => {
   const getOrCreate = async (otherUserId: string, projectId?: string) => {
     if (!user) return null;
 
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
+    const { data: existing } = await (supabase
+      .from('conversations' as any)
+      .select('id') as any)
       .or(
         `and(participant_1.eq.${user.id},participant_2.eq.${otherUserId}),and(participant_1.eq.${otherUserId},participant_2.eq.${user.id})`
       )
@@ -116,8 +116,8 @@ export const useOrCreateConversation = () => {
 
     if (existing) return existing.id;
 
-    const { data: created } = await supabase
-      .from('conversations')
+    const { data: created } = await (supabase
+      .from('conversations' as any) as any)
       .insert({
         participant_1: user.id,
         participant_2: otherUserId,
