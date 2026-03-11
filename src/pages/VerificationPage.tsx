@@ -68,12 +68,12 @@ const VerificationPage = () => {
           .eq('user_id', user.id)
           .single();
 
-        if (profileData?.linkedin_url) setLinkedinUrl(profileData.linkedin_url);
+        if ((profileData as any)?.linkedin_url) setLinkedinUrl((profileData as any).linkedin_url);
 
         // Load verifications
-        const { data: verData } = await supabase
-          .from('handy_verifications')
-          .select('*')
+        const { data: verData } = await (supabase
+          .from('handy_verifications' as any)
+          .select('*') as any)
           .eq('handy_id', user.id)
           .order('uploaded_at', { ascending: false });
 
@@ -130,8 +130,8 @@ const VerificationPage = () => {
 
       const documentUrl = urlData?.publicUrl || fileName;
 
-      const { data: verRecord, error: insertError } = await supabase
-        .from('handy_verifications')
+      const { data: verRecord, error: insertError } = await (supabase
+        .from('handy_verifications' as any) as any)
         .insert({
           handy_id: user.id,
           document_url: documentUrl,
@@ -175,7 +175,7 @@ const VerificationPage = () => {
   const removeDocument = async (id: string) => {
     if (user) {
       try {
-        await supabase.from('handy_verifications').delete().eq('id', id);
+        await (supabase.from('handy_verifications' as any) as any).delete().eq('id', id);
       } catch (err) {
         console.error('Error deleting verification:', err);
       }
@@ -189,9 +189,9 @@ const VerificationPage = () => {
     setIsSavingLinkedin(true);
 
     try {
-      await supabase
+      await (supabase
         .from('profiles')
-        .update({ linkedin_url: linkedinUrl })
+        .update({ linkedin_url: linkedinUrl } as any) as any)
         .eq('user_id', user.id);
       await refreshProfile();
       toast.success('LinkedIn profiel opgeslagen!');

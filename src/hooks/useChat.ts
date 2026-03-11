@@ -9,11 +9,11 @@ export const useConversations = () => {
 
   const fetch = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from('conversations')
+    const { data } = await (supabase
+      .from('conversations' as any)
       .select(
         '*, p1:profiles!participant_1(full_name, avatar_url, user_type), p2:profiles!participant_2(full_name, avatar_url, user_type)'
-      )
+      ) as any)
       .or(`participant_1.eq.${user.id},participant_2.eq.${user.id}`)
       .order('last_message_at', { ascending: false });
     if (data) setConversations(data);
@@ -41,12 +41,12 @@ export const useMessages = (conversationId: string | null) => {
   useEffect(() => {
     if (!conversationId) return;
 
-    supabase
-      .from('messages')
-      .select('*, sender:profiles!sender_id(full_name, avatar_url)')
+    (supabase
+      .from('messages' as any)
+      .select('*, sender:profiles!sender_id(full_name, avatar_url)') as any)
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) setMessages(data);
         setIsLoading(false);
       });
@@ -79,15 +79,14 @@ export const useSendMessage = () => {
   const send = async (conversationId: string, content: string) => {
     if (!user || !content.trim()) return;
 
-    const { error } = await supabase.from('messages').insert({
+    const { error } = await (supabase.from('messages' as any) as any).insert({
       conversation_id: conversationId,
       sender_id: user.id,
       content: content.trim(),
     });
 
     if (!error) {
-      await supabase
-        .from('conversations')
+      await (supabase.from('conversations' as any) as any)
         .update({
           last_message: content.trim(),
           last_message_at: new Date().toISOString(),
@@ -107,9 +106,9 @@ export const useOrCreateConversation = () => {
   const getOrCreate = async (otherUserId: string, projectId?: string) => {
     if (!user) return null;
 
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
+    const { data: existing } = await (supabase
+      .from('conversations' as any)
+      .select('id') as any)
       .or(
         `and(participant_1.eq.${user.id},participant_2.eq.${otherUserId}),and(participant_1.eq.${otherUserId},participant_2.eq.${user.id})`
       )
@@ -117,8 +116,8 @@ export const useOrCreateConversation = () => {
 
     if (existing) return existing.id;
 
-    const { data: created } = await supabase
-      .from('conversations')
+    const { data: created } = await (supabase
+      .from('conversations' as any) as any)
       .insert({
         participant_1: user.id,
         participant_2: otherUserId,

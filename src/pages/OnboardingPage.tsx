@@ -71,7 +71,7 @@ const OnboardingPage = () => {
           toast.error('Kies minstens één specialisatie');
           return;
         }
-        await supabase.from('profiles').update({ specialties: selectedSpecialties }).eq('user_id', user.id);
+        await supabase.from('profiles').update({ specialty: selectedSpecialties.join(', ') }).eq('user_id', user.id);
 
       } else if (step === 2 && !isHandy) {
         // Seekers: save preferred job types in bio or specialties
@@ -86,15 +86,14 @@ const OnboardingPage = () => {
           return;
         }
         await supabase.from('profiles').update({
-          is_quote_based: isQuoteBased,
           hourly_rate: isQuoteBased ? null : rate,
-        }).eq('user_id', user.id);
+        } as any).eq('user_id', user.id);
       }
 
       // Last step: mark onboarding complete
       const isLastStep = step === totalSteps - 1;
       if (isLastStep) {
-        await supabase.from('profiles').update({ onboarding_completed: true }).eq('user_id', user.id);
+        await (supabase.from('profiles').update({ onboarding_completed: true } as any) as any).eq('user_id', user.id);
         await refreshProfile();
         setStep((prev) => prev + 1);
       } else if (step < totalSteps) {

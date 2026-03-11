@@ -63,9 +63,9 @@ const ChatDetailPage = () => {
 
     const loadParticipant = async () => {
       try {
-        const { data: conv } = await supabase
-          .from('conversations')
-          .select('participant_1, participant_2')
+        const { data: conv } = await (supabase
+          .from('conversations' as any)
+          .select('participant_1, participant_2') as any)
           .eq('id', id)
           .single();
 

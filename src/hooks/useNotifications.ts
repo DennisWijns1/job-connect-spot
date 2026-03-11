@@ -10,12 +10,12 @@ export const useNotifications = () => {
   useEffect(() => {
     if (!user) return;
 
-    supabase
-      .from('notifications')
-      .select('*')
+    (supabase
+      .from('notifications' as any)
+      .select('*') as any)
       .eq('user_id', user.id)
       .eq('read', false)
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) setUnreadCount(data.length);
       });
 
@@ -43,8 +43,8 @@ export const useNotifications = () => {
 
   const markAllRead = async () => {
     if (!user) return;
-    await supabase
-      .from('notifications')
+    await (supabase
+      .from('notifications' as any) as any)
       .update({ read: true })
       .eq('user_id', user.id)
       .eq('read', false);
