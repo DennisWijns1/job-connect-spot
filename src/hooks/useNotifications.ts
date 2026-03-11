@@ -10,12 +10,12 @@ export const useNotifications = () => {
   useEffect(() => {
     if (!user) return;
 
-    supabase
-      .from('notifications')
-      .select('*')
+    (supabase
+      .from('notifications' as any)
+      .select('*') as any)
       .eq('user_id', user.id)
       .eq('read', false)
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) setUnreadCount(data.length);
       });
 
