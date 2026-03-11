@@ -64,6 +64,77 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_message: string | null
+          last_message_at: string | null
+          participant_1: string
+          participant_2: string
+          project_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          participant_1: string
+          participant_2: string
+          project_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          participant_1?: string
+          participant_2?: string
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      handy_verifications: {
+        Row: {
+          created_at: string | null
+          document_type: string | null
+          document_url: string | null
+          handy_id: string
+          id: string
+          status: string | null
+          uploaded_at: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type?: string | null
+          document_url?: string | null
+          handy_id: string
+          id?: string
+          status?: string | null
+          uploaded_at?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string | null
+          document_url?: string | null
+          handy_id?: string
+          id?: string
+          status?: string | null
+          uploaded_at?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       instructor_diplomas: {
         Row: {
           ai_verification_result: Json | null
@@ -339,6 +410,115 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          read: boolean | null
+          title: string | null
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          title?: string | null
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          title?: string | null
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          payer_id: string
+          project_id: string | null
+          recipient_id: string | null
+          reference: string | null
+          status: string | null
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          payer_id: string
+          project_id?: string | null
+          recipient_id?: string | null
+          reference?: string | null
+          status?: string | null
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          payer_id?: string
+          project_id?: string | null
+          recipient_id?: string | null
+          reference?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -348,7 +528,9 @@ export type Database = {
           hourly_rate: number | null
           id: string
           is_online: boolean | null
+          linkedin_url: string | null
           location: string | null
+          onboarding_completed: boolean | null
           specialty: string | null
           updated_at: string
           user_id: string
@@ -362,7 +544,9 @@ export type Database = {
           hourly_rate?: number | null
           id?: string
           is_online?: boolean | null
+          linkedin_url?: string | null
           location?: string | null
+          onboarding_completed?: boolean | null
           specialty?: string | null
           updated_at?: string
           user_id: string
@@ -376,7 +560,9 @@ export type Database = {
           hourly_rate?: number | null
           id?: string
           is_online?: boolean | null
+          linkedin_url?: string | null
           location?: string | null
+          onboarding_completed?: boolean | null
           specialty?: string | null
           updated_at?: string
           user_id?: string
