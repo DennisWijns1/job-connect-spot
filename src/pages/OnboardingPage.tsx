@@ -86,9 +86,8 @@ const OnboardingPage = () => {
           return;
         }
         await supabase.from('profiles').update({
-          is_quote_based: isQuoteBased,
           hourly_rate: isQuoteBased ? null : rate,
-        }).eq('user_id', user.id);
+        } as any).eq('user_id', user.id);
       }
 
       // Last step: mark onboarding complete
