@@ -28,6 +28,7 @@ const ALERT_CONFIGS: Record<string, WeatherAlert> = {
     ],
   },
   rain: {
+    type: 'rain',
     icon: '🌧️',
     title: '🌧️ Zware regen verwacht',
     body: 'Meer dan 20mm neerslag verwacht',
