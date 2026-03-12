@@ -70,8 +70,8 @@ const SettingsPage = () => {
   };
 
   const handleDeleteAccount = () => {
-    toast.error('Account verwijderen is momenteel uitgeschakeld', {
-      description: 'Neem contact op met support voor hulp',
+    toast.error(t('settings.deleteAccountDisabled'), {
+      description: t('settings.contactSupport'),
     });
   };
 
