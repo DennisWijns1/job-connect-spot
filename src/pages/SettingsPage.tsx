@@ -59,7 +59,7 @@ const SettingsPage = () => {
 
   const updateSetting = (key: keyof typeof settings, value: boolean) => {
     setSettings(prev => ({ ...prev, [key]: value }));
-    toast.success('Instelling opgeslagen');
+    toast.success(t('settings.settingSaved'));
   };
 
   const handleLogout = () => {
