@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -11,17 +11,57 @@ const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingLink, setIsCheckingLink] = useState(true);
+  const [canResetPassword, setCanResetPassword] = useState(false);
 
-  const isRecoveryLink = useMemo(() => {
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-    return hashParams.get('type') === 'recovery';
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeRecoveryState = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const queryParams = new URLSearchParams(window.location.search);
+
+      const isRecoveryIntent =
+        hashParams.get('type') === 'recovery' ||
+        queryParams.get('type') === 'recovery' ||
+        Boolean(hashParams.get('access_token')) ||
+        Boolean(queryParams.get('code'));
+
+      const authCode = queryParams.get('code');
+      if (authCode) {
+        await supabase.auth.exchangeCodeForSession(authCode);
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (!isMounted) return;
+
+      setCanResetPassword(Boolean(data.session?.user) || isRecoveryIntent);
+      setIsCheckingLink(false);
+    };
+
+    initializeRecoveryState();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        setCanResetPassword(Boolean(session?.user));
+        setIsCheckingLink(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isRecoveryLink) {
-      toast.error('Deze resetlink is ongeldig of verlopen');
+    if (!canResetPassword) {
+      toast.error('Deze resetlink is ongeldig of verlopen. Vraag een nieuwe aan.');
       return;
     }
 
@@ -50,14 +90,18 @@ const ResetPasswordPage = () => {
     }
   };
 
+  const isDisabled = isCheckingLink || !canResetPassword || isSubmitting;
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h1 className="font-display text-2xl font-bold text-foreground mb-2">Nieuw wachtwoord</h1>
         <p className="text-sm text-muted-foreground mb-6">
-          {!isRecoveryLink
-            ? 'Open deze pagina via de resetlink in je e-mail.'
-            : 'Voer je nieuwe wachtwoord in om weer in te loggen.'}
+          {isCheckingLink
+            ? 'Resetlink wordt gecontroleerd...'
+            : !canResetPassword
+              ? 'Deze link is verlopen. Vraag een nieuwe resetmail aan.'
+              : 'Voer je nieuwe wachtwoord in om weer in te loggen.'}
         </p>
 
         <form onSubmit={handleResetPassword} className="space-y-4">
@@ -69,7 +113,7 @@ const ResetPasswordPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-11 h-12"
-              disabled={!isRecoveryLink || isSubmitting}
+              disabled={isDisabled}
             />
           </div>
 
@@ -81,15 +125,11 @@ const ResetPasswordPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="pl-11 h-12"
-              disabled={!isRecoveryLink || isSubmitting}
+              disabled={isDisabled}
             />
           </div>
 
-          <Button
-            type="submit"
-            className="w-full h-12"
-            disabled={!isRecoveryLink || isSubmitting}
-          >
+          <Button type="submit" className="w-full h-12" disabled={isDisabled}>
             {isSubmitting ? (
               <div className="w-4 h-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
             ) : (
