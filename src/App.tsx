@@ -33,6 +33,7 @@ import HandySkillsPage from "./pages/HandySkillsPage";
 import WorkAreaPage from "./pages/WorkAreaPage";
 import VerificationPage from "./pages/VerificationPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import KluspaspoortPage from "./pages/KluspaspoortPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
