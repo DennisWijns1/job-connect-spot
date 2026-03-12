@@ -12,7 +12,7 @@ export const BottomNav = () => {
 
   const navItems = isSeeker ? [
     { icon: Bot, label: t('nav.aiHelp'), path: '/ai' },
-    { icon: Map, label: t('nav.map'), path: '/map' },
+    { icon: LayoutDashboard, label: t('nav.dashboard', 'Dashboard'), path: '/dashboard' },
     { icon: MessagesSquare, label: t('nav.quickChat'), path: '/quick-chat', highlight: true },
     { icon: Home, label: t('nav.swipe'), path: '/swipe' },
     { icon: MessageCircle, label: t('nav.chats'), path: '/chats' },

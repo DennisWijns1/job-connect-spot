@@ -26,9 +26,9 @@ export const WeatherWarnings = () => {
   return (
     <div className="space-y-4">
       {/* Current weather */}
-      <div className="bg-gradient-to-br from-sky-500/10 to-blue-500/10 rounded-2xl p-4 border border-sky-500/20">
+      <div className="bg-gradient-to-br from-primary/10 to-secondary rounded-2xl p-4 border border-primary/20">
         <div className="flex items-center gap-3">
-          <CloudSun className="w-8 h-8 text-sky-500" />
+          <CloudSun className="w-8 h-8 text-primary" />
           <div>
             <p className="text-2xl font-bold text-foreground">
               {temperature !== undefined ? `${Math.round(temperature)}°C` : '--'}
