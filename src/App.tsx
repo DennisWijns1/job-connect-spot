@@ -81,6 +81,7 @@ const App = () => (
             <Route path="/profile/skills" element={<ProtectedRoute><HandySkillsPage /></ProtectedRoute>} />
             <Route path="/profile/area" element={<ProtectedRoute><WorkAreaPage /></ProtectedRoute>} />
             <Route path="/profile/verify" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
+            <Route path="/kluspaspoort" element={<ProtectedRoute><KluspaspoortPage /></ProtectedRoute>} />
             <Route path="/learning" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
             <Route path="/quick-chat" element={<ProtectedRoute><QuickChatPage /></ProtectedRoute>} />
             <Route path="/instructor" element={<ProtectedRoute><InstructorHomePage /></ProtectedRoute>} />
