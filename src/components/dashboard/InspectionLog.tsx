@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { format, differenceInDays } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Trash2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
