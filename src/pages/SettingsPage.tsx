@@ -180,32 +180,32 @@ const SettingsPage = () => {
           </SettingsSection>
 
           {/* Section 4: Interactie & Meldingen */}
-          <SettingsSection title="Interactie & Meldingen">
+          <SettingsSection title={t('settings.interactionNotifications')}>
             <SettingsToggle
               icon={Heart}
-              label="Nieuwe matches"
-              description="Notificatie bij match"
+              label={t('settings.newMatches')}
+              description={t('settings.newMatchesDesc')}
               checked={settings.notifyMatches}
               onCheckedChange={(v) => updateSetting('notifyMatches', v)}
             />
             <SettingsToggle
               icon={MessageCircle}
-              label="Ontvangen berichten"
-              description="Notificatie bij bericht"
+              label={t('settings.receivedMessages')}
+              description={t('settings.receivedMessagesDesc')}
               checked={settings.notifyMessages}
               onCheckedChange={(v) => updateSetting('notifyMessages', v)}
             />
             <SettingsToggle
               icon={Bell}
-              label="App updates"
-              description="Nieuws en functie updates"
+              label={t('settings.appUpdates')}
+              description={t('settings.appUpdatesDesc')}
               checked={settings.notifyUpdates}
               onCheckedChange={(v) => updateSetting('notifyUpdates', v)}
             />
             <SettingsToggle
               icon={Filter}
-              label="Enkel geverifieerde gebruikers"
-              description="Beperk wie contact kan opnemen"
+              label={t('settings.verifiedOnly')}
+              description={t('settings.verifiedOnlyDesc')}
               checked={settings.onlyVerifiedContacts}
               onCheckedChange={(v) => updateSetting('onlyVerifiedContacts', v)}
             />
