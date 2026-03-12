@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 interface WeatherAlert {
   type: 'wind' | 'rain' | 'frost' | 'thunder';
@@ -63,6 +65,7 @@ const ALERT_CONFIGS: Record<string, WeatherAlert> = {
 };
 
 export const useWeatherAlerts = (lat = 50.88, lon = 4.7) => {
+  const { user } = useAuth();
   const [data, setData] = useState<WeatherData>({ alerts: [], loading: true });
 
   useEffect(() => {
@@ -75,40 +78,59 @@ export const useWeatherAlerts = (lat = 50.88, lon = 4.7) => {
         const alerts: WeatherAlert[] = [];
         const hourly = json.hourly;
 
-        // Check wind gusts > 60 km/h
         if (hourly.wind_gusts_10m?.some((v: number) => v > 60)) {
           alerts.push(ALERT_CONFIGS.wind);
         }
 
-        // Check precipitation > 20mm in any 24h period
         const precip = hourly.precipitation || [];
         for (let i = 0; i < precip.length - 24; i++) {
           const sum24h = precip.slice(i, i + 24).reduce((a: number, b: number) => a + b, 0);
           if (sum24h > 20) { alerts.push(ALERT_CONFIGS.rain); break; }
         }
 
-        // Check temperature < -2°C
         if (hourly.temperature_2m?.some((v: number) => v < -2)) {
           alerts.push(ALERT_CONFIGS.frost);
         }
 
-        // Check thunderstorm weather codes (95, 96, 99)
         if (hourly.weather_code?.some((v: number) => [95, 96, 99].includes(v))) {
           alerts.push(ALERT_CONFIGS.thunder);
         }
 
         const currentTemp = hourly.temperature_2m?.[0];
-
         setData({ alerts, loading: false, temperature: currentTemp });
+
+        // Send push notifications for weather alerts if user is logged in
+        if (alerts.length > 0 && user) {
+          const lastPushKey = `handymatch_weather_push_${new Date().toDateString()}`;
+          const alreadySent = localStorage.getItem(lastPushKey);
+          
+          if (!alreadySent) {
+            // Send push for the most severe alert
+            const topAlert = alerts[0];
+            try {
+              await supabase.functions.invoke('send-push-notification', {
+                body: {
+                  user_id: user.id,
+                  title: topAlert.title,
+                  body: `${topAlert.body}. ${topAlert.actions[0]}`,
+                  url: '/dashboard',
+                },
+              });
+              localStorage.setItem(lastPushKey, 'true');
+            } catch (e) {
+              console.error('Failed to send weather push:', e);
+            }
+          }
+        }
       } catch {
         setData({ alerts: [], loading: false });
       }
     };
 
     fetchWeather();
-    const interval = setInterval(fetchWeather, 30 * 60 * 1000); // refresh every 30 min
+    const interval = setInterval(fetchWeather, 30 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [lat, lon]);
+  }, [lat, lon, user]);
 
   return data;
 };
