@@ -162,18 +162,18 @@ const SettingsPage = () => {
           </SettingsSection>
 
           {/* Section 3: Reputatie & Historiek */}
-          <SettingsSection title="Reputatie & Historiek">
+          <SettingsSection title={t('settings.reputationHistory')}>
             <SettingsToggle
               icon={Star}
-              label="Ratings zichtbaar"
-              description="Toon beoordelingen op profiel"
+              label={t('settings.ratingsVisible')}
+              description={t('settings.ratingsVisibleDesc')}
               checked={settings.showRatings}
               onCheckedChange={(v) => updateSetting('showRatings', v)}
             />
             <SettingsToggle
               icon={CheckCircle2}
-              label="Voltooide klussen tonen"
-              description="Aantal afgeronde projecten"
+              label={t('settings.showCompletedJobs')}
+              description={t('settings.showCompletedJobsDesc')}
               checked={settings.showCompletedJobs}
               onCheckedChange={(v) => updateSetting('showCompletedJobs', v)}
             />
