@@ -90,8 +90,18 @@ const SettingsPage = () => {
 
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="px-4 py-6">
+          {/* Language Switcher */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+              {t('settings.language')}
+            </h3>
+            <div className="bg-card rounded-3xl p-4 shadow-card">
+              <LanguageSwitcher />
+            </div>
+          </div>
+
           {/* Section 1: Account Beheer */}
-          <SettingsSection title="Account Beheer">
+          <SettingsSection title={t('settings.accountManagement')}>
             <SettingsItem
               icon={User}
               label="Persoonlijke Informatie"
