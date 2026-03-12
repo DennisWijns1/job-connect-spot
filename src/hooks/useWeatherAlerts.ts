@@ -50,6 +50,7 @@ const ALERT_CONFIGS: Record<string, WeatherAlert> = {
     ],
   },
   thunder: {
+    type: 'thunder',
     icon: '⛈️',
     title: '⛈️ Onweer op komst',
     body: 'Onweer voorspeld in de komende uren',
