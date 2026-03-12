@@ -22,6 +22,7 @@ import {
   Star,
   HelpCircle,
   CheckCircle,
+  Hammer,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
@@ -30,11 +31,12 @@ import { supabase } from '@/integrations/supabase/client';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { profile, signOut, refreshProfile } = useAuth();
+  const { profile, signOut, refreshProfile, activeRole, switchRole } = useAuth();
 
-  // Fallback to localStorage for backwards compatibility
   const userType = profile?.user_type || localStorage.getItem('handymatch_userType') || 'seeker';
-  const isHandy = userType === 'handy';
+  const isHandy = activeRole === 'handy';
+  const isInstructor = activeRole === 'instructor';
+  const isMultiRole = profile?.is_handy || profile?.is_instructor || userType === 'both';
 
   const [isOnline, setIsOnline] = useState(profile?.is_online ?? true);
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -254,17 +256,70 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* User Type Badge */}
-          <div
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl ${
-              isHandy ? 'bg-secondary text-foreground' : 'bg-accent/10 text-accent'
-            }`}
-          >
-            {isHandy ? <Briefcase className="w-4 h-4" /> : <User className="w-4 h-4" />}
-            <span className="font-medium text-sm">
-              {isHandy ? 'Handy Account' : 'Zoeker Account'}
-            </span>
-          </div>
+          {/* User Type Badge + Role Switcher */}
+          {isMultiRole ? (
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => switchRole('seeker')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  activeRole === 'seeker' ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                <User className="w-4 h-4" /> Zoeker
+              </button>
+              {(profile?.is_handy || userType === 'handy' || userType === 'both') && (
+                <button
+                  onClick={() => switchRole('handy')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                    activeRole === 'handy' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <Hammer className="w-4 h-4" /> Handy
+                </button>
+              )}
+              {profile?.is_instructor && (
+                <button
+                  onClick={() => switchRole('instructor')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                    activeRole === 'instructor' ? 'bg-secondary text-foreground' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4" /> Lesgever
+                </button>
+              )}
+            </div>
+          ) : (
+            <div
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl ${
+                isHandy ? 'bg-secondary text-foreground' : isInstructor ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+              }`}
+            >
+              {isHandy ? <Briefcase className="w-4 h-4" /> : isInstructor ? <BookOpen className="w-4 h-4" /> : <User className="w-4 h-4" />}
+              <span className="font-medium text-sm">
+                {isHandy ? 'Handy Account' : isInstructor ? 'Lesgever Account' : 'Zoeker Account'}
+              </span>
+            </div>
+          )}
+
+          {/* Upgrade buttons (only for pure seeker) */}
+          {userType === 'seeker' && (
+            <div className="mt-3 flex flex-col gap-2">
+              <button
+                onClick={() => navigate('/handy/register')}
+                className="w-full flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-primary/40 text-primary text-sm font-medium hover:bg-primary/5 transition-colors"
+              >
+                <Hammer className="w-4 h-4" />
+                Word ook actief als Handy
+              </button>
+              <button
+                onClick={() => navigate('/instructor/register')}
+                className="w-full flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-secondary/60 text-foreground text-sm font-medium hover:bg-secondary/10 transition-colors"
+              >
+                <BookOpen className="w-4 h-4" />
+                Word ook actief als Lesgever
+              </button>
+            </div>
+          )}
 
           {/* Online Toggle for Handy */}
           {isHandy && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Hammer, Mail, Lock, User, ArrowRight, Eye, EyeOff, Upload, Check, HelpCircle, Wrench, Zap, Droplets, Paintbrush, Ruler, Trees, Shield, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,8 @@ const specializations = [
 
 const HandyRegisterPage = () => {
   const navigate = useNavigate();
+  const { user: loggedInUser, switchRole, refreshProfile } = useAuth();
+  const isUpgrade = !!loggedInUser;
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   
@@ -71,14 +74,31 @@ const HandyRegisterPage = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      toast.error('Vul alle verplichte velden in');
+  const handleSubmit = async () => {
+    if (!formData.userRole) {
+      toast.error('Kies je rol: Helper, Handy of beide');
       return;
     }
 
-    if (!formData.userRole) {
-      toast.error('Kies je rol: Helper, Handy of beide');
+    if (isUpgrade && loggedInUser) {
+      // Upgrade existing account to also be Handy
+      const { supabase } = await import('@/integrations/supabase/client');
+      await supabase.from('profiles').update({
+        is_handy: true,
+        user_type: 'both',
+        specialty: formData.mainSpecialization || null,
+      }).eq('user_id', loggedInUser.id);
+
+      await refreshProfile();
+      switchRole('handy');
+      toast.success('Je bent nu ook actief als Handy!');
+      navigate('/profile');
+      return;
+    }
+
+    // New registration
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      toast.error('Vul alle verplichte velden in');
       return;
     }
 

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BottomNav } from '@/components/BottomNav';
 import { SwipeCard } from '@/components/SwipeCard';
@@ -19,8 +20,8 @@ import { useNavigate } from 'react-router-dom';
 
 const SwipePage = () => {
   const navigate = useNavigate();
-  const userType = localStorage.getItem('handymatch_userType') || 'seeker';
-  const isHandy = userType === 'handy';
+  const { activeRole } = useAuth();
+  const isHandy = activeRole === 'handy';
 
   // Check if problem dialog was already shown (only show first time for seekers)
   const [hasShownProblemDialog, setHasShownProblemDialog] = useState(() => {

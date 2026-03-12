@@ -14,6 +14,8 @@ interface Profile {
   bio: string | null;
   is_online: boolean;
   onboarding_completed?: boolean;
+  is_handy: boolean;
+  is_instructor: boolean;
 }
 
 interface AuthContextType {
@@ -21,6 +23,8 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   isLoading: boolean;
+  activeRole: 'seeker' | 'handy' | 'instructor';
+  switchRole: (role: 'seeker' | 'handy' | 'instructor') => void;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string, userType: string, fullName: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -34,6 +38,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeRole, setActiveRole] = useState<'seeker' | 'handy' | 'instructor'>(() => {
+    return (localStorage.getItem('handymatch_activeRole') as 'seeker' | 'handy' | 'instructor') || 'seeker';
+  });
+
+  const switchRole = (role: 'seeker' | 'handy' | 'instructor') => {
+    setActiveRole(role);
+    localStorage.setItem('handymatch_activeRole', role);
+    localStorage.setItem('handymatch_userType', role);
+  };
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
@@ -43,7 +56,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .single();
     if (data) {
       setProfile(data as Profile);
-      if (data.user_type) localStorage.setItem('handymatch_userType', data.user_type);
+      if (data.user_type) {
+        localStorage.setItem('handymatch_userType', data.user_type);
+        // If user only has one role, set it automatically
+        const singleRoles = ['seeker', 'handy', 'instructor'];
+        if (singleRoles.includes(data.user_type)) {
+          setActiveRole(data.user_type as 'seeker' | 'handy' | 'instructor');
+          localStorage.setItem('handymatch_activeRole', data.user_type);
+        } else {
+          // Multi-role: keep stored preference or default to seeker
+          const stored = localStorage.getItem('handymatch_activeRole') as 'seeker' | 'handy' | 'instructor' | null;
+          const validRoles = ['seeker', 'handy', 'instructor'];
+          if (!stored || !validRoles.includes(stored)) {
+            setActiveRole('seeker');
+            localStorage.setItem('handymatch_activeRole', 'seeker');
+          }
+        }
+      }
     }
   };
 
@@ -85,6 +114,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user_type: userType,
         is_online: false,
         onboarding_completed: false,
+        is_handy: userType === 'handy' || userType === 'both',
+        is_instructor: userType === 'instructor',
       });
     }
     return { error: null };
@@ -95,10 +126,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setProfile(null);
     localStorage.removeItem('handymatch_userType');
     localStorage.removeItem('handymatch_user');
+    localStorage.removeItem('handymatch_activeRole');
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, isLoading, signIn, signUp, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, isLoading, activeRole, switchRole, signIn, signUp, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

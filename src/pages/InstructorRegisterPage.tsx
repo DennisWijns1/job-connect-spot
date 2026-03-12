@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import {
   User,
@@ -45,6 +46,8 @@ interface VerificationResult {
 
 const InstructorRegisterPage = () => {
   const navigate = useNavigate();
+  const { user: loggedInUser, profile, refreshProfile } = useAuth();
+  const isUpgrade = !!loggedInUser; // already logged in → upgrading existing account
   const [step, setStep] = useState<Step>('info');
   const [loading, setLoading] = useState(false);
   
@@ -90,7 +93,7 @@ const InstructorRegisterPage = () => {
   };
 
   const handleInfoSubmit = async () => {
-    if (!fullName || !email || !password || !phone) {
+    if (!fullName || !phone) {
       toast.error('Vul alle verplichte velden in');
       return;
     }
@@ -98,50 +101,72 @@ const InstructorRegisterPage = () => {
     setLoading(true);
 
     try {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            user_type: 'instructor'
-          }
+      // Check if user is already logged in
+      const { data: { user: existingUser } } = await supabase.auth.getUser();
+
+      let userId: string;
+
+      if (existingUser) {
+        // Upgrade existing account to also be instructor
+        userId = existingUser.id;
+
+        await supabase.from('profiles').update({
+          is_instructor: true,
+          full_name: fullName,
+          bio: bio || null,
+        }).eq('user_id', userId);
+
+        localStorage.setItem('handymatch_activeRole', 'instructor');
+      } else {
+        // New registration: email + password required
+        if (!email || !password) {
+          toast.error('Vul e-mail en wachtwoord in');
+          setLoading(false);
+          return;
         }
-      });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Geen gebruiker aangemaakt');
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullName, user_type: 'instructor' } }
+        });
 
-      // Create instructor profile
+        if (authError) throw authError;
+        if (!authData.user) throw new Error('Geen gebruiker aangemaakt');
+        userId = authData.user.id;
+
+        await supabase.from('profiles').insert({
+          user_id: userId,
+          full_name: fullName,
+          user_type: 'instructor',
+          is_instructor: true,
+          is_online: false,
+          onboarding_completed: true,
+        });
+
+        localStorage.setItem('handymatch_userType', 'instructor');
+        localStorage.setItem('handymatch_activeRole', 'instructor');
+      }
+
+      // Create or update instructor record
       const { data: instructorData, error: instructorError } = await supabase
         .from('instructors')
-        .insert({
-          user_id: authData.user.id,
+        .upsert({
+          user_id: userId,
           full_name: fullName,
-          email,
+          email: email || existingUser?.email || '',
           phone,
           vat_number: vatNumber || null,
           bio: bio || null,
           expertise: expertise.length > 0 ? expertise : null,
           years_experience: yearsExperience ? parseInt(yearsExperience) : 0,
-        })
+        }, { onConflict: 'user_id' })
         .select()
         .single();
 
       if (instructorError) throw instructorError;
-
       setInstructorId(instructorData.id);
-      
-      // Also create a profile in the profiles table
-      await supabase.from('profiles').insert({
-        user_id: authData.user.id,
-        full_name: fullName,
-        user_type: 'instructor',
-      });
 
-      localStorage.setItem('handymatch_userType', 'instructor');
-      
       setStep('diploma');
     } catch (error) {
       console.error('Registration error:', error);
@@ -285,6 +310,7 @@ const InstructorRegisterPage = () => {
                   </div>
                 </div>
 
+                {!isUpgrade && (
                 <div>
                   <Label htmlFor="email">E-mailadres *</Label>
                   <div className="relative mt-1">
@@ -299,7 +325,9 @@ const InstructorRegisterPage = () => {
                     />
                   </div>
                 </div>
+                )}
 
+                {!isUpgrade && (
                 <div>
                   <Label htmlFor="password">Wachtwoord *</Label>
                   <Input
@@ -311,6 +339,7 @@ const InstructorRegisterPage = () => {
                     className="rounded-xl mt-1"
                   />
                 </div>
+                )}
 
                 <div>
                   <Label htmlFor="phone">Telefoonnummer *</Label>

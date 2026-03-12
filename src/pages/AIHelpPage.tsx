@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight, X, Mic, MicOff, Volume2, VolumeX, History, Plus, Trash2 } from 'lucide-react';
+import { Send, Camera, Bot, Wrench, Lightbulb, Droplets, Hammer, Users, TrendingUp, Clock, AlertTriangle, CheckCircle, AlertCircle, BookOpen, ArrowRight, X, Mic, MicOff, Volume2, VolumeX, History, Plus, Trash2, PiggyBank, Share2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -468,6 +468,31 @@ const AIHelpPage = () => {
     );
   };
 
+  const getPriceEstimate = (category: string): { proMin: number; proMax: number; diyMin: number; diyMax: number } | null => {
+    const cat = category.toLowerCase();
+    if (cat.includes('elektr')) return { proMin: 120, proMax: 220, diyMin: 8, diyMax: 25 };
+    if (cat.includes('sanitair') || cat.includes('loodg') || cat.includes('kraan') || cat.includes('afvoer')) return { proMin: 90, proMax: 180, diyMin: 10, diyMax: 40 };
+    if (cat.includes('schilder') || cat.includes('verf') || cat.includes('muur')) return { proMin: 80, proMax: 160, diyMin: 20, diyMax: 55 };
+    if (cat.includes('tegel')) return { proMin: 150, proMax: 300, diyMin: 30, diyMax: 80 };
+    if (cat.includes('timmer') || cat.includes('hout')) return { proMin: 100, proMax: 200, diyMin: 15, diyMax: 50 };
+    if (cat.includes('tuin') || cat.includes('gras')) return { proMin: 60, proMax: 120, diyMin: 5, diyMax: 20 };
+    if (cat.includes('dak')) return { proMin: 200, proMax: 500, diyMin: 40, diyMax: 120 };
+    if (cat.includes('vloer')) return { proMin: 120, proMax: 250, diyMin: 25, diyMax: 70 };
+    if (cat.includes('isolat')) return { proMin: 300, proMax: 800, diyMin: 60, diyMax: 150 };
+    // Generic fallback
+    return { proMin: 80, proMax: 180, diyMin: 10, diyMax: 40 };
+  };
+
+  const handleShare = (saving: number, category: string) => {
+    const text = `Ik bespaar €${saving} door mijn ${category.toLowerCase()} klus zelf te doen via HandyMatch! 🔨💶`;
+    if (navigator.share) {
+      navigator.share({ text, title: 'HandyMatch DIY besparing' }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text);
+      toast({ title: 'Gekopieerd!', description: 'Tekst gekopieerd naar klembord.' });
+    }
+  };
+
   const renderAIResponse = (aiResponse: AIResponse, messagePhotoUrl?: string) => {
     const riskStyles = getRiskStyles(aiResponse.risk_level);
     const RiskIcon = riskStyles.icon;
@@ -551,6 +576,50 @@ const AIHelpPage = () => {
             </ul>
           </div>
         )}
+
+        {/* Price transparency card — only for seekers on GREEN/YELLOW */}
+        {!isHandy && aiResponse.understood && aiResponse.risk_level !== 'RED' && aiResponse.category && (() => {
+          const price = getPriceEstimate(aiResponse.category);
+          if (!price) return null;
+          const savingMin = price.proMin - price.diyMax;
+          const savingMax = price.proMax - price.diyMin;
+          const avgSaving = Math.round((savingMin + savingMax) / 2);
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl overflow-hidden border border-success/30"
+            >
+              <div className="bg-success/10 px-4 py-3 flex items-center gap-2">
+                <PiggyBank className="w-5 h-5 text-success flex-shrink-0" />
+                <p className="text-sm font-semibold text-success">Jouw besparing als je het zelf doet</p>
+              </div>
+              <div className="bg-card px-4 py-3 grid grid-cols-2 gap-3">
+                <div className="text-center p-3 rounded-xl bg-destructive/5 border border-destructive/10">
+                  <p className="text-xs text-muted-foreground mb-1">Via professional</p>
+                  <p className="text-lg font-bold text-foreground">€{price.proMin}–{price.proMax}</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-success/5 border border-success/10">
+                  <p className="text-xs text-muted-foreground mb-1">Jij zelf (materiaal)</p>
+                  <p className="text-lg font-bold text-success">€{price.diyMin}–{price.diyMax}</p>
+                </div>
+              </div>
+              <div className="bg-success px-4 py-3 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-success-foreground/80">Gemiddelde besparing</p>
+                  <p className="text-xl font-bold text-white">~€{avgSaving}</p>
+                </div>
+                <button
+                  onClick={() => handleShare(avgSaving, aiResponse.category)}
+                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-xl text-sm font-medium transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Deel
+                </button>
+              </div>
+            </motion.div>
+          );
+        })()}
 
         <div className="pt-2 space-y-2">
           {aiResponse.understood && aiResponse.suggested_steps && aiResponse.suggested_steps.length > 0 && aiResponse.risk_level !== 'RED' && (
