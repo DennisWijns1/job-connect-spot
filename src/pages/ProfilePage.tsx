@@ -36,7 +36,7 @@ const ProfilePage = () => {
   const userType = profile?.user_type || localStorage.getItem('handymatch_userType') || 'seeker';
   const isHandy = activeRole === 'handy';
   const isInstructor = activeRole === 'instructor';
-  const isMultiRole = profile?.is_handy || profile?.is_instructor || userType === 'both';
+  const isMultiRole = userType === 'both' || userType === 'handy' || userType === 'instructor';
 
   const [isOnline, setIsOnline] = useState(profile?.is_online ?? true);
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -267,7 +267,7 @@ const ProfilePage = () => {
               >
                 <User className="w-4 h-4" /> Zoeker
               </button>
-              {(profile?.is_handy || userType === 'handy' || userType === 'both') && (
+              {(userType === 'handy' || userType === 'both') && (
                 <button
                   onClick={() => switchRole('handy')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -277,7 +277,7 @@ const ProfilePage = () => {
                   <Hammer className="w-4 h-4" /> Handy
                 </button>
               )}
-              {profile?.is_instructor && (
+              {(userType === 'instructor' || userType === 'both') && (
                 <button
                   onClick={() => switchRole('instructor')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${

@@ -12,10 +12,9 @@ interface Profile {
   hourly_rate: number | null;
   location: string | null;
   bio: string | null;
-  is_online: boolean;
-  onboarding_completed?: boolean;
-  is_handy: boolean;
-  is_instructor: boolean;
+  is_online: boolean | null;
+  onboarding_completed?: boolean | null;
+  linkedin_url?: string | null;
 }
 
 interface AuthContextType {
@@ -114,8 +113,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user_type: userType,
         is_online: false,
         onboarding_completed: false,
-        is_handy: userType === 'handy' || userType === 'both',
-        is_instructor: userType === 'instructor',
       });
     }
     return { error: null };
