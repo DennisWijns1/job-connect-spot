@@ -76,8 +76,8 @@ const SettingsPage = () => {
   };
 
   const handleDownloadData = () => {
-    toast.success('Data export gestart', {
-      description: 'Je ontvangt een e-mail wanneer de download klaar is',
+    toast.success(t('settings.dataExportStarted'), {
+      description: t('settings.dataExportDesc'),
     });
   };
 
