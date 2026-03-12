@@ -86,7 +86,7 @@ const SettingsPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Instellingen" showBack />
+      <Header title={t('settings.title')} showBack />
 
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="px-4 py-6">
