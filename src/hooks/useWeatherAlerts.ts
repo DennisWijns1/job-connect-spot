@@ -39,6 +39,7 @@ const ALERT_CONFIGS: Record<string, WeatherAlert> = {
     ],
   },
   frost: {
+    type: 'frost',
     icon: '❄️',
     title: '❄️ Vorst verwacht',
     body: 'Temperatuur daalt onder -2°C',
