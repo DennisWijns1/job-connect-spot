@@ -141,22 +141,22 @@ const SettingsPage = () => {
             />
             <SettingsToggle
               icon={MapPin}
-              label="Exacte locatie delen"
-              description="Anders alleen woonplaats/regio"
+              label={t('settings.exactLocation')}
+              description={t('settings.exactLocationDesc')}
               checked={settings.showExactLocation}
               onCheckedChange={(v) => updateSetting('showExactLocation', v)}
             />
             <SettingsToggle
               icon={Activity}
-              label="Online status tonen"
-              description="'Laatst actief' zichtbaar"
+              label={t('settings.showOnlineStatus')}
+              description={t('settings.showOnlineStatusDesc')}
               checked={settings.showOnlineStatus}
               onCheckedChange={(v) => updateSetting('showOnlineStatus', v)}
             />
             <SettingsItem
               icon={Ban}
-              label="Geblokkeerde gebruikers"
-              description="Beheer geblokkeerde accounts"
+              label={t('settings.blockedUsers')}
+              description={t('settings.blockedUsersDesc')}
               onClick={() => setShowBlockedUsers(true)}
             />
           </SettingsSection>
