@@ -212,24 +212,24 @@ const SettingsPage = () => {
           </SettingsSection>
 
           {/* Section 5: Juridisch & Data */}
-          <SettingsSection title="Juridisch & Data">
+          <SettingsSection title={t('settings.legalData')}>
             <SettingsItem
               icon={Download}
-              label="Download mijn data"
-              description="GDPR data export"
+              label={t('settings.downloadData')}
+              description={t('settings.downloadDataDesc')}
               onClick={handleDownloadData}
             />
             <SettingsItem
               icon={FileText}
-              label="Algemene Voorwaarden"
-              description="Lees onze voorwaarden"
-              onClick={() => toast.info('Algemene Voorwaarden openen...')}
+              label={t('settings.terms')}
+              description={t('settings.termsDesc')}
+              onClick={() => toast.info(t('settings.terms'))}
             />
             <SettingsItem
               icon={FileText}
-              label="Privacybeleid"
-              description="Lees ons privacybeleid"
-              onClick={() => toast.info('Privacybeleid openen...')}
+              label={t('settings.privacyPolicy')}
+              description={t('settings.privacyPolicyDesc')}
+              onClick={() => toast.info(t('settings.privacyPolicy'))}
             />
           </SettingsSection>
 
@@ -241,7 +241,7 @@ const SettingsPage = () => {
               className="w-full h-12 rounded-2xl border-border"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Uitloggen
+              {t('common.logout')}
             </Button>
             
             <Button
@@ -250,7 +250,7 @@ const SettingsPage = () => {
               className="w-full h-12 rounded-2xl"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Account verwijderen
+              {t('settings.deleteAccount')}
             </Button>
           </div>
         </div>
