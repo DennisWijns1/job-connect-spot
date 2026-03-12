@@ -5,6 +5,7 @@ import { Hammer, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -59,6 +60,25 @@ const LoginPage = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleForgotPassword = async () => {
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      toast.error('Vul eerst je e-mailadres in');
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success('Resetlink verstuurd. Check je e-mail.');
   };
 
   return (
@@ -147,7 +167,11 @@ const LoginPage = () => {
           </div>
 
           {isLogin && (
-            <button type="button" className="text-sm text-primary font-medium hover:underline">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-primary font-medium hover:underline"
+            >
               Wachtwoord vergeten?
             </button>
           )}

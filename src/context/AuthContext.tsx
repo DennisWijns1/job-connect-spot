@@ -98,13 +98,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const normalizedEmail = email.trim().toLowerCase();
+    const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
     if (error) return { error: error.message };
     return { error: null };
   };
 
   const signUp = async (email: string, password: string, userType: string, fullName: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const normalizedEmail = email.trim().toLowerCase();
+    const { data, error } = await supabase.auth.signUp({ email: normalizedEmail, password });
     if (error) return { error: error.message };
     if (data.user) {
       await supabase.from('profiles').insert({

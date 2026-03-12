@@ -3,10 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { OfflineBanner } from './components/OfflineBanner';
 import WelcomePage from "./pages/WelcomePage";
 import LoginPage from "./pages/LoginPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import HandyRegisterPage from "./pages/HandyRegisterPage";
 import SwipePage from "./pages/SwipePage";
 import MapPage from "./pages/MapPage";
@@ -66,6 +67,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<WelcomePage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/handy/register" element={<HandyRegisterPage />} />
               <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
               <Route path="/swipe" element={<ProtectedRoute><SwipePage /></ProtectedRoute>} />
