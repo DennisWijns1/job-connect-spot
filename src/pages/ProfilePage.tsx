@@ -13,6 +13,7 @@ import {
   Camera,
   MapPin,
   Settings,
+  ClipboardList,
   LogOut,
   ChevronRight,
   Shield,
