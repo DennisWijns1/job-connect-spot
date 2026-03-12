@@ -113,8 +113,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user_type: userType,
         is_online: false,
         onboarding_completed: false,
-        is_handy: userType === 'handy' || userType === 'both',
-        is_instructor: userType === 'instructor',
       });
     }
     return { error: null };
