@@ -37,6 +37,7 @@ import {
 
 const SettingsPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   // Sheet states
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
