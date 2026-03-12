@@ -13,6 +13,7 @@ import {
   Camera,
   MapPin,
   Settings,
+  ClipboardList,
   LogOut,
   ChevronRight,
   Shield,
@@ -185,6 +186,7 @@ const ProfilePage = () => {
       ]
     : [
         { icon: Plus, label: 'Project plaatsen', description: 'Beschrijf je klus', action: 'createProject' },
+        { icon: ClipboardList, label: 'Kluspaspoort', description: 'Digitaal woninglogboek', path: '/kluspaspoort', navigate: true },
         { icon: Star, label: 'Favorieten', description: "Opgeslagen Handy's", action: 'favorites' },
         { icon: MapPin, label: 'Locatie', description: `${userAddress.street}, ${userAddress.postalCode} ${userAddress.city}`, action: 'location' },
       ];
