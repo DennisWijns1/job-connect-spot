@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { OfflineBanner } from './components/OfflineBanner';
 import WelcomePage from "./pages/WelcomePage";
 import LoginPage from "./pages/LoginPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import HandyRegisterPage from "./pages/HandyRegisterPage";
 import SwipePage from "./pages/SwipePage";
 import MapPage from "./pages/MapPage";
