@@ -267,7 +267,7 @@ const ProfilePage = () => {
               >
                 <User className="w-4 h-4" /> Zoeker
               </button>
-              {(profile?.is_handy || userType === 'handy' || userType === 'both') && (
+              {(userType === 'handy' || userType === 'both') && (
                 <button
                   onClick={() => switchRole('handy')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
