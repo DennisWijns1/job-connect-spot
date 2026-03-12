@@ -277,7 +277,7 @@ const ProfilePage = () => {
                   <Hammer className="w-4 h-4" /> Handy
                 </button>
               )}
-              {profile?.is_instructor && (
+              {(userType === 'instructor' || userType === 'both') && (
                 <button
                   onClick={() => switchRole('instructor')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
