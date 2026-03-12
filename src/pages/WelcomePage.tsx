@@ -1,28 +1,30 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Hammer, Wrench, Search, GraduationCap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const WelcomePage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSelect = (type: 'handy' | 'seeker' | 'instructor') => {
     localStorage.setItem('handymatch_userType', type);
-    
-    // Instructors have a separate portal
     if (type === 'instructor') {
       navigate('/instructor');
       return;
     }
-    
-    // Always go to swipe for testing purposes
     navigate('/swipe');
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
+      {/* Language switcher */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSwitcher compact />
+      </div>
+
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        {/* Logo */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -34,7 +36,6 @@ const WelcomePage = () => {
           </div>
         </motion.div>
 
-        {/* Title */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -45,18 +46,16 @@ const WelcomePage = () => {
             Handy<span className="text-gradient">Match</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-xs mx-auto">
-            Vind de juiste hulp in je buurt, of bied je vaardigheden aan
+            {t('welcome.tagline')}
           </p>
         </motion.div>
 
-        {/* Selection Cards */}
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="w-full max-w-sm space-y-4"
         >
-          {/* Seeker Card - FIRST */}
           <button
             onClick={() => handleSelect('seeker')}
             className="w-full p-5 rounded-[20px] border border-border bg-card hover:bg-primary/5 hover:shadow-card-hover hover:border-primary/30 transition-all duration-400 text-left group card-elevated"
@@ -67,16 +66,15 @@ const WelcomePage = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                  Ik zoek een Handy
+                  {t('welcome.seekerTitle')}
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  Ik heb hulp nodig bij een klus of project
+                  {t('welcome.seekerDesc')}
                 </p>
               </div>
             </div>
           </button>
 
-          {/* Handy Card - SECOND */}
           <button
             onClick={() => handleSelect('handy')}
             className="w-full p-5 rounded-[20px] border border-border bg-card hover:bg-accent/5 hover:shadow-card-hover hover:border-accent/30 transition-all duration-400 text-left group card-elevated"
@@ -87,16 +85,15 @@ const WelcomePage = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                  Ik ben een Handy
+                  {t('welcome.handyTitle')}
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  Ik wil mijn vaardigheden aanbieden en klussen uitvoeren
+                  {t('welcome.handyDesc')}
                 </p>
               </div>
             </div>
           </button>
 
-          {/* Instructor Card - THIRD */}
           <button
             onClick={() => handleSelect('instructor')}
             className="w-full p-5 rounded-[20px] border border-border bg-card hover:bg-secondary hover:shadow-card-hover hover:border-success/40 transition-all duration-400 text-left group card-elevated"
@@ -107,10 +104,10 @@ const WelcomePage = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                  Ik ben een Lesgever
+                  {t('welcome.instructorTitle')}
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  Ik wil mijn kennis delen en anderen opleiden
+                  {t('welcome.instructorDesc')}
                 </p>
               </div>
             </div>

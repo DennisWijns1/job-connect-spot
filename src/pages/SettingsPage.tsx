@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SettingsSection } from '@/components/settings/SettingsSection';
 import { SettingsItem } from '@/components/settings/SettingsItem';
 import { SettingsToggle } from '@/components/settings/SettingsToggle';
@@ -34,6 +36,7 @@ import {
 
 const SettingsPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   // Sheet states
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
@@ -55,25 +58,25 @@ const SettingsPage = () => {
 
   const updateSetting = (key: keyof typeof settings, value: boolean) => {
     setSettings(prev => ({ ...prev, [key]: value }));
-    toast.success('Instelling opgeslagen');
+    toast.success(t('settings.settingSaved'));
   };
 
   const handleLogout = () => {
     localStorage.removeItem('handymatch_userType');
     localStorage.removeItem('handymatch_user');
-    toast.success('Tot ziens!');
+    toast.success(t('common.goodbye'));
     navigate('/');
   };
 
   const handleDeleteAccount = () => {
-    toast.error('Account verwijderen is momenteel uitgeschakeld', {
-      description: 'Neem contact op met support voor hulp',
+    toast.error(t('settings.deleteAccountDisabled'), {
+      description: t('settings.contactSupport'),
     });
   };
 
   const handleDownloadData = () => {
-    toast.success('Data export gestart', {
-      description: 'Je ontvangt een e-mail wanneer de download klaar is',
+    toast.success(t('settings.dataExportStarted'), {
+      description: t('settings.dataExportDesc'),
     });
   };
 
@@ -82,140 +85,150 @@ const SettingsPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Instellingen" showBack />
+      <Header title={t('settings.title')} showBack />
 
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="px-4 py-6">
+          {/* Language Switcher */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+              {t('settings.language')}
+            </h3>
+            <div className="bg-card rounded-3xl p-4 shadow-card">
+              <LanguageSwitcher />
+            </div>
+          </div>
+
           {/* Section 1: Account Beheer */}
-          <SettingsSection title="Account Beheer">
+          <SettingsSection title={t('settings.accountManagement')}>
             <SettingsItem
               icon={User}
-              label="Persoonlijke Informatie"
-              description="Naam, e-mail, telefoonnummer"
+              label={t('settings.personalInfo')}
+              description={t('settings.personalInfoDesc')}
               onClick={() => setShowPersonalInfo(true)}
             />
             <SettingsItem
               icon={Lock}
-              label="Wachtwoord & Beveiliging"
-              description="Wachtwoord wijzigen, 2FA"
+              label={t('settings.passwordSecurity')}
+              description={t('settings.passwordSecurityDesc')}
               onClick={() => setShowSecurity(true)}
             />
             <SettingsItem
               icon={ShieldCheck}
-              label="Verificatiestatus"
-              description={isVerified ? 'Je profiel is geverifieerd' : 'Nog niet geverifieerd'}
-              onClick={() => toast.info('Verificatie is momenteel in ontwikkeling')}
+              label={t('settings.verificationStatus')}
+              description={isVerified ? t('settings.verifiedProfile') : t('settings.notVerified')}
+              onClick={() => toast.info(t('settings.verificationInDev'))}
               rightElement={
                 <Badge 
                   variant={isVerified ? 'default' : 'secondary'}
                   className={isVerified ? 'bg-success' : ''}
                 >
-                  {isVerified ? 'Geverifieerd' : 'Pending'}
+                  {isVerified ? t('settings.verified') : t('settings.pending')}
                 </Badge>
               }
             />
           </SettingsSection>
 
           {/* Section 2: Privacy & Zichtbaarheid */}
-          <SettingsSection title="Privacy & Zichtbaarheid">
+          <SettingsSection title={t('settings.privacyVisibility')}>
             <SettingsToggle
               icon={Eye}
-              label="Profiel openbaar"
-              description="Zichtbaar voor alle gebruikers"
+              label={t('settings.publicProfile')}
+              description={t('settings.publicProfileDesc')}
               checked={settings.profilePublic}
               onCheckedChange={(v) => updateSetting('profilePublic', v)}
             />
             <SettingsToggle
               icon={MapPin}
-              label="Exacte locatie delen"
-              description="Anders alleen woonplaats/regio"
+              label={t('settings.exactLocation')}
+              description={t('settings.exactLocationDesc')}
               checked={settings.showExactLocation}
               onCheckedChange={(v) => updateSetting('showExactLocation', v)}
             />
             <SettingsToggle
               icon={Activity}
-              label="Online status tonen"
-              description="'Laatst actief' zichtbaar"
+              label={t('settings.showOnlineStatus')}
+              description={t('settings.showOnlineStatusDesc')}
               checked={settings.showOnlineStatus}
               onCheckedChange={(v) => updateSetting('showOnlineStatus', v)}
             />
             <SettingsItem
               icon={Ban}
-              label="Geblokkeerde gebruikers"
-              description="Beheer geblokkeerde accounts"
+              label={t('settings.blockedUsers')}
+              description={t('settings.blockedUsersDesc')}
               onClick={() => setShowBlockedUsers(true)}
             />
           </SettingsSection>
 
           {/* Section 3: Reputatie & Historiek */}
-          <SettingsSection title="Reputatie & Historiek">
+          <SettingsSection title={t('settings.reputationHistory')}>
             <SettingsToggle
               icon={Star}
-              label="Ratings zichtbaar"
-              description="Toon beoordelingen op profiel"
+              label={t('settings.ratingsVisible')}
+              description={t('settings.ratingsVisibleDesc')}
               checked={settings.showRatings}
               onCheckedChange={(v) => updateSetting('showRatings', v)}
             />
             <SettingsToggle
               icon={CheckCircle2}
-              label="Voltooide klussen tonen"
-              description="Aantal afgeronde projecten"
+              label={t('settings.showCompletedJobs')}
+              description={t('settings.showCompletedJobsDesc')}
               checked={settings.showCompletedJobs}
               onCheckedChange={(v) => updateSetting('showCompletedJobs', v)}
             />
           </SettingsSection>
 
           {/* Section 4: Interactie & Meldingen */}
-          <SettingsSection title="Interactie & Meldingen">
+          <SettingsSection title={t('settings.interactionNotifications')}>
             <SettingsToggle
               icon={Heart}
-              label="Nieuwe matches"
-              description="Notificatie bij match"
+              label={t('settings.newMatches')}
+              description={t('settings.newMatchesDesc')}
               checked={settings.notifyMatches}
               onCheckedChange={(v) => updateSetting('notifyMatches', v)}
             />
             <SettingsToggle
               icon={MessageCircle}
-              label="Ontvangen berichten"
-              description="Notificatie bij bericht"
+              label={t('settings.receivedMessages')}
+              description={t('settings.receivedMessagesDesc')}
               checked={settings.notifyMessages}
               onCheckedChange={(v) => updateSetting('notifyMessages', v)}
             />
             <SettingsToggle
               icon={Bell}
-              label="App updates"
-              description="Nieuws en functie updates"
+              label={t('settings.appUpdates')}
+              description={t('settings.appUpdatesDesc')}
               checked={settings.notifyUpdates}
               onCheckedChange={(v) => updateSetting('notifyUpdates', v)}
             />
             <SettingsToggle
               icon={Filter}
-              label="Enkel geverifieerde gebruikers"
-              description="Beperk wie contact kan opnemen"
+              label={t('settings.verifiedOnly')}
+              description={t('settings.verifiedOnlyDesc')}
               checked={settings.onlyVerifiedContacts}
               onCheckedChange={(v) => updateSetting('onlyVerifiedContacts', v)}
             />
           </SettingsSection>
 
           {/* Section 5: Juridisch & Data */}
-          <SettingsSection title="Juridisch & Data">
+          <SettingsSection title={t('settings.legalData')}>
             <SettingsItem
               icon={Download}
-              label="Download mijn data"
-              description="GDPR data export"
+              label={t('settings.downloadData')}
+              description={t('settings.downloadDataDesc')}
               onClick={handleDownloadData}
             />
             <SettingsItem
               icon={FileText}
-              label="Algemene Voorwaarden"
-              description="Lees onze voorwaarden"
-              onClick={() => toast.info('Algemene Voorwaarden openen...')}
+              label={t('settings.terms')}
+              description={t('settings.termsDesc')}
+              onClick={() => toast.info(t('settings.terms'))}
             />
             <SettingsItem
               icon={FileText}
-              label="Privacybeleid"
-              description="Lees ons privacybeleid"
-              onClick={() => toast.info('Privacybeleid openen...')}
+              label={t('settings.privacyPolicy')}
+              description={t('settings.privacyPolicyDesc')}
+              onClick={() => toast.info(t('settings.privacyPolicy'))}
             />
           </SettingsSection>
 
@@ -227,7 +240,7 @@ const SettingsPage = () => {
               className="w-full h-12 rounded-2xl border-border"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Uitloggen
+              {t('common.logout')}
             </Button>
             
             <Button
@@ -236,7 +249,7 @@ const SettingsPage = () => {
               className="w-full h-12 rounded-2xl"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Account verwijderen
+              {t('settings.deleteAccount')}
             </Button>
           </div>
         </div>
