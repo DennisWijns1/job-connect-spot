@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
+import { BottomNav } from '@/components/BottomNav';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { BottomNav } from '@/components/BottomNav';
 import { SettingsSection } from '@/components/settings/SettingsSection';
 import { SettingsItem } from '@/components/settings/SettingsItem';
