@@ -266,6 +266,57 @@ export type Database = {
         }
         Relationships: []
       }
+      kluspaspoort_entries: {
+        Row: {
+          address: string | null
+          category: string
+          cost: number | null
+          created_at: string
+          date_performed: string
+          description: string | null
+          handyman_name: string | null
+          id: string
+          notes: string | null
+          performed_by: string
+          photos: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          category?: string
+          cost?: number | null
+          created_at?: string
+          date_performed?: string
+          description?: string | null
+          handyman_name?: string | null
+          id?: string
+          notes?: string | null
+          performed_by?: string
+          photos?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          category?: string
+          cost?: number | null
+          created_at?: string
+          date_performed?: string
+          description?: string | null
+          handyman_name?: string | null
+          id?: string
+          notes?: string | null
+          performed_by?: string
+          photos?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_enrollments: {
         Row: {
           completed_at: string | null
