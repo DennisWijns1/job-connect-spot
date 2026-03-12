@@ -1,27 +1,29 @@
 import { Home, Map, MessageCircle, Bot, User, MessagesSquare, GraduationCap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const userType = localStorage.getItem('handymatch_userType') || 'seeker';
   const isSeeker = userType === 'seeker';
 
   const navItems = isSeeker ? [
-    { icon: Bot, label: 'AI Hulp', path: '/ai' },
-    { icon: Map, label: 'Kaart', path: '/map' },
-    { icon: MessagesSquare, label: 'Quick Chat', path: '/quick-chat', highlight: true },
-    { icon: Home, label: 'Swipe', path: '/swipe' },
-    { icon: MessageCircle, label: 'Chats', path: '/chats' },
-    { icon: User, label: 'Profiel', path: '/profile' },
+    { icon: Bot, label: t('nav.aiHelp'), path: '/ai' },
+    { icon: Map, label: t('nav.map'), path: '/map' },
+    { icon: MessagesSquare, label: t('nav.quickChat'), path: '/quick-chat', highlight: true },
+    { icon: Home, label: t('nav.swipe'), path: '/swipe' },
+    { icon: MessageCircle, label: t('nav.chats'), path: '/chats' },
+    { icon: User, label: t('nav.profile'), path: '/profile' },
   ] : [
-    { icon: Home, label: 'Swipe', path: '/swipe' },
-    { icon: Map, label: 'Kaart', path: '/map' },
-    { icon: GraduationCap, label: 'Lessen', path: '/learning', highlight: true },
-    { icon: Bot, label: 'AI Hulp', path: '/ai' },
-    { icon: MessageCircle, label: 'Chats', path: '/chats' },
-    { icon: User, label: 'Profiel', path: '/profile' },
+    { icon: Home, label: t('nav.swipe'), path: '/swipe' },
+    { icon: Map, label: t('nav.map'), path: '/map' },
+    { icon: GraduationCap, label: t('nav.lessons'), path: '/learning', highlight: true },
+    { icon: Bot, label: t('nav.aiHelp'), path: '/ai' },
+    { icon: MessageCircle, label: t('nav.chats'), path: '/chats' },
+    { icon: User, label: t('nav.profile'), path: '/profile' },
   ];
 
   return (
