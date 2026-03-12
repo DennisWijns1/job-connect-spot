@@ -34,6 +34,7 @@ import WorkAreaPage from "./pages/WorkAreaPage";
 import VerificationPage from "./pages/VerificationPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import KluspaspoortPage from "./pages/KluspaspoortPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
