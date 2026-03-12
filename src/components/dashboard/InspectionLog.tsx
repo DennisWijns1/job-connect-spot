@@ -131,6 +131,3 @@ export const InspectionLog = () => {
     </div>
   );
 };
-
-// Need to import ClipboardCheck for empty state
-import { ClipboardCheck } from 'lucide-react';
