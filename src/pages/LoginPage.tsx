@@ -62,6 +62,25 @@ const LoginPage = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      toast.error('Vul eerst je e-mailadres in');
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success('Resetlink verstuurd. Check je e-mail.');
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
