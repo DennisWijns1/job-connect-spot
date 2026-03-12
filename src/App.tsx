@@ -34,6 +34,7 @@ import WorkAreaPage from "./pages/WorkAreaPage";
 import VerificationPage from "./pages/VerificationPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import KluspaspoortPage from "./pages/KluspaspoortPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/profile/area" element={<ProtectedRoute><WorkAreaPage /></ProtectedRoute>} />
             <Route path="/profile/verify" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
             <Route path="/kluspaspoort" element={<ProtectedRoute><KluspaspoortPage /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/learning" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
             <Route path="/quick-chat" element={<ProtectedRoute><QuickChatPage /></ProtectedRoute>} />
             <Route path="/instructor" element={<ProtectedRoute><InstructorHomePage /></ProtectedRoute>} />

@@ -135,6 +135,48 @@ export type Database = {
         }
         Relationships: []
       }
+      home_inspections: {
+        Row: {
+          created_at: string
+          custom_label: string | null
+          date_performed: string
+          id: string
+          interval_years: number
+          next_due: string
+          notes: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_label?: string | null
+          date_performed?: string
+          id?: string
+          interval_years?: number
+          next_due: string
+          notes?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_label?: string | null
+          date_performed?: string
+          id?: string
+          interval_years?: number
+          next_due?: string
+          notes?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       instructor_diplomas: {
         Row: {
           ai_verification_result: Json | null
