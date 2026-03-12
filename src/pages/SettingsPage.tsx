@@ -65,7 +65,7 @@ const SettingsPage = () => {
   const handleLogout = () => {
     localStorage.removeItem('handymatch_userType');
     localStorage.removeItem('handymatch_user');
-    toast.success('Tot ziens!');
+    toast.success(t('common.goodbye'));
     navigate('/');
   };
 
