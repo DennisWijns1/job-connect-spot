@@ -15,8 +15,9 @@ interface WeatherData {
   description?: string;
 }
 
-const ALERT_CONFIGS = {
+const ALERT_CONFIGS: Record<string, WeatherAlert> = {
   wind: {
+    type: 'wind',
     icon: '💨',
     title: '⚠️ Storm op komst',
     body: 'Windstoten boven 60 km/u verwacht',
