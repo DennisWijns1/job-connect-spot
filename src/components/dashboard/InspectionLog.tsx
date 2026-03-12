@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { format, differenceInDays } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';

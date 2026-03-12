@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { ScrollArea } from '@/components/ui/scroll-area';
