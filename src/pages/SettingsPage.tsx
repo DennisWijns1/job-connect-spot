@@ -124,18 +124,18 @@ const SettingsPage = () => {
                   variant={isVerified ? 'default' : 'secondary'}
                   className={isVerified ? 'bg-success' : ''}
                 >
-                  {isVerified ? 'Geverifieerd' : 'Pending'}
+                  {isVerified ? t('settings.verified') : t('settings.pending')}
                 </Badge>
               }
             />
           </SettingsSection>
 
           {/* Section 2: Privacy & Zichtbaarheid */}
-          <SettingsSection title="Privacy & Zichtbaarheid">
+          <SettingsSection title={t('settings.privacyVisibility')}>
             <SettingsToggle
               icon={Eye}
-              label="Profiel openbaar"
-              description="Zichtbaar voor alle gebruikers"
+              label={t('settings.publicProfile')}
+              description={t('settings.publicProfileDesc')}
               checked={settings.profilePublic}
               onCheckedChange={(v) => updateSetting('profilePublic', v)}
             />
