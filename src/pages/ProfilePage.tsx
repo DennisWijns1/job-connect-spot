@@ -24,6 +24,7 @@ import {
   HelpCircle,
   CheckCircle,
   Hammer,
+  LayoutDashboard,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
