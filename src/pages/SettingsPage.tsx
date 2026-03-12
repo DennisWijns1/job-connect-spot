@@ -104,21 +104,21 @@ const SettingsPage = () => {
           <SettingsSection title={t('settings.accountManagement')}>
             <SettingsItem
               icon={User}
-              label="Persoonlijke Informatie"
-              description="Naam, e-mail, telefoonnummer"
+              label={t('settings.personalInfo')}
+              description={t('settings.personalInfoDesc')}
               onClick={() => setShowPersonalInfo(true)}
             />
             <SettingsItem
               icon={Lock}
-              label="Wachtwoord & Beveiliging"
-              description="Wachtwoord wijzigen, 2FA"
+              label={t('settings.passwordSecurity')}
+              description={t('settings.passwordSecurityDesc')}
               onClick={() => setShowSecurity(true)}
             />
             <SettingsItem
               icon={ShieldCheck}
-              label="Verificatiestatus"
-              description={isVerified ? 'Je profiel is geverifieerd' : 'Nog niet geverifieerd'}
-              onClick={() => toast.info('Verificatie is momenteel in ontwikkeling')}
+              label={t('settings.verificationStatus')}
+              description={isVerified ? t('settings.verifiedProfile') : t('settings.notVerified')}
+              onClick={() => toast.info(t('settings.verificationInDev'))}
               rightElement={
                 <Badge 
                   variant={isVerified ? 'default' : 'secondary'}
