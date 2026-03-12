@@ -1,4 +1,4 @@
-import { Home, Map, MessageCircle, Bot, User, MessagesSquare, GraduationCap } from 'lucide-react';
+import { Home, Map, MessageCircle, Bot, User, MessagesSquare, GraduationCap, LayoutDashboard } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
