@@ -67,6 +67,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<WelcomePage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/handy/register" element={<HandyRegisterPage />} />
               <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
               <Route path="/swipe" element={<ProtectedRoute><SwipePage /></ProtectedRoute>} />

@@ -167,7 +167,11 @@ const LoginPage = () => {
           </div>
 
           {isLogin && (
-            <button type="button" className="text-sm text-primary font-medium hover:underline">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-primary font-medium hover:underline"
+            >
               Wachtwoord vergeten?
             </button>
           )}
