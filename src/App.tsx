@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { OfflineBanner } from './components/OfflineBanner';
 import WelcomePage from "./pages/WelcomePage";
 import LoginPage from "./pages/LoginPage";
@@ -61,41 +61,39 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <OfflineBanner />
-          <div className="max-w-md mx-auto relative min-h-screen">
-            <Routes>
-              <Route path="/" element={<WelcomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/handy/register" element={<HandyRegisterPage />} />
-              <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
-              <Route path="/swipe" element={<ProtectedRoute><SwipePage /></ProtectedRoute>} />
-              <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
-              <Route path="/ai" element={<ProtectedRoute><AIHelpPage /></ProtectedRoute>} />
-              <Route path="/chats" element={<ProtectedRoute><ChatsPage /></ProtectedRoute>} />
-              <Route path="/chat/:id" element={<ProtectedRoute><ChatDetailPage /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="/profile/photos" element={<ProtectedRoute><HandyPhotosPage /></ProtectedRoute>} />
-              <Route path="/profile/completed" element={<ProtectedRoute><CompletedProjectsPage /></ProtectedRoute>} />
-              <Route path="/profile/skills" element={<ProtectedRoute><HandySkillsPage /></ProtectedRoute>} />
-              <Route path="/profile/area" element={<ProtectedRoute><WorkAreaPage /></ProtectedRoute>} />
-              <Route path="/profile/verify" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
-              <Route path="/learning" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
-              <Route path="/quick-chat" element={<ProtectedRoute><QuickChatPage /></ProtectedRoute>} />
-              <Route path="/instructor" element={<ProtectedRoute><InstructorHomePage /></ProtectedRoute>} />
-              <Route path="/instructor/register" element={<InstructorRegisterPage />} />
-              <Route path="/instructor/dashboard" element={<ProtectedRoute><InstructorDashboardPage /></ProtectedRoute>} />
-              <Route path="/instructor/lesson/new" element={<ProtectedRoute><CreateLessonPage /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/help" element={<ProtectedRoute><HelpSupportPage /></ProtectedRoute>} />
-              <Route path="/tutorial" element={<TutorialPage />} />
-              <Route path="/ar-tutorial" element={<ARTutorialPage />} />
-              <Route path="/interactive-tutorial" element={<InteractiveTutorialPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </AuthProvider>
+        <OfflineBanner />
+        <div className="max-w-md mx-auto relative min-h-screen">
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/handy/register" element={<HandyRegisterPage />} />
+            <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
+            <Route path="/swipe" element={<ProtectedRoute><SwipePage /></ProtectedRoute>} />
+            <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
+            <Route path="/ai" element={<ProtectedRoute><AIHelpPage /></ProtectedRoute>} />
+            <Route path="/chats" element={<ProtectedRoute><ChatsPage /></ProtectedRoute>} />
+            <Route path="/chat/:id" element={<ProtectedRoute><ChatDetailPage /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/profile/photos" element={<ProtectedRoute><HandyPhotosPage /></ProtectedRoute>} />
+            <Route path="/profile/completed" element={<ProtectedRoute><CompletedProjectsPage /></ProtectedRoute>} />
+            <Route path="/profile/skills" element={<ProtectedRoute><HandySkillsPage /></ProtectedRoute>} />
+            <Route path="/profile/area" element={<ProtectedRoute><WorkAreaPage /></ProtectedRoute>} />
+            <Route path="/profile/verify" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
+            <Route path="/learning" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
+            <Route path="/quick-chat" element={<ProtectedRoute><QuickChatPage /></ProtectedRoute>} />
+            <Route path="/instructor" element={<ProtectedRoute><InstructorHomePage /></ProtectedRoute>} />
+            <Route path="/instructor/register" element={<InstructorRegisterPage />} />
+            <Route path="/instructor/dashboard" element={<ProtectedRoute><InstructorDashboardPage /></ProtectedRoute>} />
+            <Route path="/instructor/lesson/new" element={<ProtectedRoute><CreateLessonPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/help" element={<ProtectedRoute><HelpSupportPage /></ProtectedRoute>} />
+            <Route path="/tutorial" element={<TutorialPage />} />
+            <Route path="/ar-tutorial" element={<ARTutorialPage />} />
+            <Route path="/interactive-tutorial" element={<InteractiveTutorialPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
