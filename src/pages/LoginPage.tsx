@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { REQUIRE_AUTH } from '@/config/auth';
 import { motion } from 'framer-motion';
 import { Hammer, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
