@@ -46,10 +46,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// TEMPORARY: login requirement disabled for testing.
-// Set REQUIRE_AUTH back to true to re-enable protected routes.
-const REQUIRE_AUTH = false;
-
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, isLoading } = useAuth();
   if (!REQUIRE_AUTH) return <>{children}</>;
