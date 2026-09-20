@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from '@/context/AuthContext';
+import { REQUIRE_AUTH } from '@/config/auth';
 import { OfflineBanner } from './components/OfflineBanner';
 import WelcomePage from "./pages/WelcomePage";
 import LoginPage from "./pages/LoginPage";
@@ -45,10 +46,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// TEMPORARY: login requirement disabled for testing.
-// Set REQUIRE_AUTH back to true to re-enable protected routes.
-const REQUIRE_AUTH = false;
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, isLoading } = useAuth();

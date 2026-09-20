@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { REQUIRE_AUTH } from '@/config/auth';
 import { motion } from 'framer-motion';
 import { Hammer, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,9 @@ const LoginPage = () => {
   const location = useLocation();
   const userType = location.state?.userType || 'seeker';
   const { signIn, signUp } = useAuth();
+
+  // TEMPORARY: login disabled for testing — send visitors straight into the app.
+  if (!REQUIRE_AUTH) return <Navigate to="/swipe" replace />;
 
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
