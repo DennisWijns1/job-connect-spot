@@ -14,6 +14,9 @@ const LoginPage = () => {
   const userType = location.state?.userType || 'seeker';
   const { signIn, signUp } = useAuth();
 
+  // TEMPORARY: login disabled for testing — send visitors straight into the app.
+  if (!REQUIRE_AUTH) return <Navigate to="/swipe" replace />;
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
